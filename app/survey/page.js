@@ -90,7 +90,7 @@ export default function Survey() {
             try {
                 let photoUrl = null;
                 if (earPhoto) {
-                    const storageRef = ref(storage, `ear_photos/${user.uid}_${Date.now()}`);
+                    const storageRef = ref(storage, `ear_photos/${user.uid}/${Date.now()}`);
                     await uploadBytes(storageRef, earPhoto);
                     photoUrl = await getDownloadURL(storageRef);
                 }
