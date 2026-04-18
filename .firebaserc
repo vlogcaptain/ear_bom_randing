@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "ear-bom-healthy"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

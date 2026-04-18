@@ -363,7 +363,7 @@ export default function AppointmentPage() {
 
                     {/* Summary Sidebar */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-[40px] p-8 md:p-10 shadow-2xl border border-green-50 sticky top-32 space-y-10">
+                        <div className="bg-white rounded-[40px] px-6 py-8 md:px-8 md:py-10 shadow-2xl border border-green-50 sticky top-32 space-y-10">
                             <div>
                                 <h3 className="text-2xl font-black text-slate-900 border-b border-slate-50 pb-6 mb-8 uppercase tracking-tighter">예약 확인</h3>
                                 <div className="space-y-6">
@@ -395,26 +395,29 @@ export default function AppointmentPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-[#f8fcf8] p-8 rounded-[32px] border border-[#E8F5E9] space-y-4">
-                                <div className="flex justify-between items-center gap-4">
-                                    <span className="text-slate-500 font-bold text-sm shrink-0">상담 비용</span>
-                                    <span className="font-black text-slate-800 text-right whitespace-nowrap">
-                                        {consultationType === 'offline' ? '상담+침 시술 30,000원' : '결제 금액이 없습니다'}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-end py-4 border-t border-[#E8F5E9] mt-4 gap-4">
-                                    <span className="font-black text-slate-900 shrink-0 pb-1">최종 결제 금액</span>
-                                    <div className="text-right whitespace-nowrap">
-                                        <span className="text-4xl font-black text-[#2E7D32] tracking-tighter leading-none">
-                                            {consultationType === 'offline' ? '10,000' : '0'}
+                                <div className="bg-[#f8fcf8] px-5 py-6 rounded-[32px] border border-[#E8F5E9] space-y-4">
+                                    <div className="flex justify-between items-center gap-2">
+                                        <span className="text-slate-500 font-bold text-[13px] shrink-0">상담 비용</span>
+                                        <span className="font-black text-slate-800 text-right text-[13px] whitespace-nowrap">
+                                            {consultationType === 'offline' ? '상담+침 시술 30,000원' : '결제 금액이 없습니다'}
                                         </span>
-                                        <span className="text-lg font-black text-[#2E7D32] ml-0.5">원</span>
-                                        {consultationType === 'offline' && (
-                                            <p className="text-[11px] font-bold text-orange-600 mt-1">(20,000원 현장 결제)</p>
-                                        )}
+                                    </div>
+                                    <div className="flex justify-between items-end py-4 border-t border-[#E8F5E9] mt-4 gap-2">
+                                        <span className="font-black text-slate-900 shrink-0 pb-1 text-sm">최종 결제 금액</span>
+                                        <div className="text-right whitespace-nowrap">
+                                            <div className="flex items-baseline justify-end">
+                                                <span className="text-3xl font-black text-[#2E7D32] tracking-tighter leading-none">
+                                                    {consultationType === 'offline' ? '10,000' : '0'}
+                                                </span>
+                                                <span className="text-lg font-black text-[#2E7D32] ml-0.5">원</span>
+                                            </div>
+                                            {consultationType === 'offline' && (
+                                                <p className="text-[11px] font-bold text-orange-600 mt-1">(20,000원 현장 결제)</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+
 
                             <div className="space-y-4">
                                 <label className="flex items-start gap-3 text-xs text-slate-500 font-medium px-1 cursor-pointer group">

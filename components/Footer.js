@@ -53,10 +53,12 @@ export default function Footer() {
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-green-200 text-xs text-gray-400 gap-4">
                     <p>© 2026 ear bom healthy (이노홈 홀딩스). All rights reserved.</p>
-                    <div className="flex gap-6">
+                    <div className="flex gap-6 items-center">
                         <a className="hover:text-[#2E7D32]" href="#">Instagram</a>
                         <a className="hover:text-[#2E7D32]" href="#">Facebook</a>
                         <a className="hover:text-[#2E7D32]" href="#">YouTube</a>
+                        <span className="w-px h-3 bg-gray-200 ml-2"></span>
+                        <Link className="hover:text-[#2E7D32] text-gray-300 font-medium ml-2" href="/admin/login">전문가 전용</Link>
                     </div>
                 </div>
             </div>

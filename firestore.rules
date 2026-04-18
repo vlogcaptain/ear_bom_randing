@@ -1,0 +1,98 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 전문가 권한 확인 함수
+    function isExpert() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // 설문 데이터 (Surveys)
+    match /surveys/{docId} {
+      allow create: if true;
+      allow get, list: if isExpert() || 
+                       (resource.data.userId == 'demo-user-123') || 
+                       (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isExpert();
+    }
+
+    // 회원 정보 (Users)
+    match /users/{userId} {
+      allow read, write: if isExpert() || 
+                           (userId == 'demo-user-123') || 
+                           (request.auth != null && request.auth.uid == userId);
+    }
+
+    // 예약 데이터 (Appointments)
+    match /appointments/{docId} {
+      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
+                       (request.resource.data.userId == 'demo-user-123');
+      allow get, list: if isExpert() || 
+                       (resource.data.userId == 'demo-user-123') || 
+                       (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isExpert();
+    }
+
+    // 채팅 메시지 (Chats)
+    match /chats/{docId} {
+      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
+                       isExpert() || 
+                       (request.resource.data.userId == 'demo-user-123');
+      allow read, list: if isExpert() || 
+                        (resource.data.userId == 'demo-user-123') || 
+                        (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isExpert();
+    }
+
+    // 상담 노트 (Notes)
+    match /notes/{docId} {
+      allow create, update: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
+                               (request.resource.data.userId == 'demo-user-123');
+      allow read: if isExpert() || 
+                        (resource.data.userId == 'demo-user-123') || 
+                        (request.auth != null && resource.data.userId == request.auth.uid);
+      allow delete: if isExpert();
+    }
+
+    // 결제 내역 (Payments)
+    match /payments/{docId} {
+      allow read: if isExpert() || 
+                    (request.auth != null && resource.data.customer.id == request.auth.uid) || 
+                    (resource.data.userId == 'demo-user-123');
+      allow create: if true; 
+    }
+
+    // 화상 상담 신호 (Calls for WebRTC)
+    match /calls/{userId} {
+      allow create, update, delete: if isExpert() || 
+                                     (userId == 'demo-user-123') ||
+                                     (request.auth != null && request.auth.uid == userId);
+      allow get, list: if isExpert() || 
+                        (userId == 'demo-user-123') ||
+                        (request.auth != null && request.auth.uid == userId);
+      
+      match /offerCandidates/{docId} {
+        allow create, read, write: if isExpert() || 
+                                     (userId == 'demo-user-123') ||
+                                     (request.auth != null && request.auth.uid == userId);
+      }
+      match /answerCandidates/{docId} {
+        allow create, read, write: if isExpert() || 
+                                     (userId == 'demo-user-123') ||
+                                     (request.auth != null && request.auth.uid == userId);
+      }
+    }
+
+    // 관리자 명부 (Admins)
+    match /admins/{email} {
+      allow read: if isExpert();
+      allow write: if false;
+    }
+    
+    // 기본 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -8,16 +8,46 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import {
     collection,
+    doc,
     query,
     where,
     orderBy,
     limit,
     onSnapshot,
     addDoc,
+    updateDoc,
     serverTimestamp,
     getDocs
 } from 'firebase/firestore';
-import { LogOut, User, Video, Mic, MessageSquare, Send, Camera, ClipboardList, Activity, Info } from 'lucide-react';
+import { 
+    LogOut, 
+    User, 
+    Video, 
+    VideoOff, 
+    Mic, 
+    MicOff, 
+    MessageSquare, 
+    Send, 
+    Camera, 
+    ClipboardList, 
+    Activity, 
+    Info,
+    Monitor,
+    X,
+    PhoneCall
+} from 'lucide-react';
+
+const servers = {
+    iceServers: [
+        {
+            urls: [
+                'stun:stun1.l.google.com:19302',
+                'stun:stun2.l.google.com:19302',
+            ],
+        },
+    ],
+    iceCandidatePoolSize: 10,
+};
 
 export default function ChatPage() {
     const router = useRouter();
@@ -34,8 +64,16 @@ export default function ChatPage() {
     const [reportLoading, setReportLoading] = useState(true);
     const [reportError, setReportError] = useState(false);
 
-    // Video Stream Refs
+    // Video & WebRTC States
+    const [localStream, setLocalStream] = useState(null);
+    const [remoteStream, setRemoteStream] = useState(null);
+    const [pc, setPc] = useState(null);
+    const [isMicOn, setIsMicOn] = useState(true);
+    const [isVideoOn, setIsVideoOn] = useState(true);
+    const [connectionStatus, setConnectionStatus] = useState('offline'); // offline, ready, calling, connected
+
     const videoRef = useRef(null);
+    const remoteVideoRef = useRef(null);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -75,15 +113,97 @@ export default function ChatPage() {
 
             let unsubscribe = startChatListener(true);
 
-            // 3. 카메라 스트림 시작
-            startCamera();
+            // 3. 카메라 및 WebRTC 초기화
+            initUserWebRTC();
 
             return () => {
                 unsubscribe();
-                stopCamera();
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
             };
         }
     }, [user, loading, router]);
+
+    const initUserWebRTC = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const remote = new MediaStream();
+            
+            setLocalStream(stream);
+            setRemoteStream(remote);
+
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+
+            // Signaling listener
+            const callDoc = doc(db, 'calls', user.uid);
+            const offerCandidates = collection(callDoc, 'offerCandidates');
+            const answerCandidates = collection(callDoc, 'answerCandidates');
+
+            onSnapshot(callDoc, async (snapshot) => {
+                const data = snapshot.data();
+                if (!pc && data?.offer) {
+                    const peerConnection = new RTCPeerConnection(servers);
+                    setPc(peerConnection);
+                    setConnectionStatus('calling');
+
+                    stream.getTracks().forEach((track) => {
+                        peerConnection.addTrack(track, stream);
+                    });
+
+                    peerConnection.ontrack = (event) => {
+                        event.streams[0].getTracks().forEach((track) => {
+                            remote.addTrack(track);
+                        });
+                        setConnectionStatus('connected');
+                    };
+
+                    if (remoteVideoRef.current) {
+                        remoteVideoRef.current.srcObject = remote;
+                    }
+
+                    peerConnection.onicecandidate = (event) => {
+                        if (event.candidate) {
+                            addDoc(answerCandidates, event.candidate.toJSON());
+                        }
+                    };
+
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                    const answerDescription = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answerDescription);
+
+                    const answer = {
+                        type: answerDescription.type,
+                        sdp: answerDescription.sdp,
+                    };
+
+                    await updateDoc(callDoc, { answer });
+
+                    // Listen for remote ICE candidates
+                    onSnapshot(offerCandidates, (snapshot) => {
+                        snapshot.docChanges().forEach((change) => {
+                            if (change.type === 'added') {
+                                let data = change.doc.data();
+                                peerConnection.addIceCandidate(new RTCIceCandidate(data));
+                            }
+                        });
+                    });
+                }
+                
+                if (pc && !data?.offer) {
+                    // Call ended by expert
+                    setConnectionStatus('offline');
+                    pc.close();
+                    setPc(null);
+                }
+            });
+
+        } catch (err) {
+            console.error("WebRTC Init error:", err);
+        }
+    };
 
     const fetchLatestSurvey = async () => {
         setReportLoading(true);
@@ -268,14 +388,34 @@ export default function ChatPage() {
                     {/* Left Side: Video Feed */}
                     <div className="flex-1 flex flex-col gap-4 min-w-0">
                         <div className="relative flex-1 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl group border border-slate-800">
-                            {/* Expert Video (Placeholder) */}
-                            <img
-                                className="w-full h-full object-cover opacity-90"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxQ6jAcFtwtMipMHhDpIjRzob_LvK3dnDDyYJb7WDrZJeP1JenR17VQY5SUF1iVCQeqxa-700bbXtFD1nvPb0ABm1NY_bgjBK_xhvLXDFok_NpP0JUsnPFzLAiXiWAnvgeEDpAwc9-R8gXS9hwJMVhz9veyG1OSSvOC4o0Jsc63r5Tf3Fli5P_NV9Zl5BmkCqGx334AgFlHahGkEsPCS2q9F5d5_F6AFxEXSyzj7378_F0_A5MXImnD7LOg0ybyxGcDfeIaGsrcLwa"
-                                alt="Expert Video Feed"
+                            {/* Expert Video Stream */}
+                            <video 
+                                ref={remoteVideoRef}
+                                autoPlay
+                                playsInline
+                                className="w-full h-full object-cover"
                             />
 
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            {/* Expert Video Placeholder (Overlayed when disconnected) */}
+                            {connectionStatus !== 'connected' && (
+                                <div className="absolute inset-0 bg-[#1e293b] flex flex-col items-center justify-center p-8 text-center transition-opacity duration-500">
+                                    <div className="size-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-6 shadow-inner border border-white/5">
+                                        <PhoneCall size={40} className="text-[#2E7D32] animate-bounce" />
+                                    </div>
+                                    <h3 className="text-white font-black text-xl mb-2">전문가가 상담방에 접근하고 있습니다</h3>
+                                    <p className="text-slate-400 text-sm max-w-sm leading-relaxed">
+                                        상담이 시작되면 전문가의 영상이 이곳에 자동으로 표시됩니다. 잠시만 대기해 주세요.
+                                    </p>
+                                    
+                                    <div className="absolute bottom-10 left-10 flex gap-4">
+                                        <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-lg text-white/50 text-[10px] font-black uppercase tracking-widest border border-white/5">
+                                            {connectionStatus === 'calling' ? 'Signal Incoming...' : 'Waiting for Expert...'}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
 
                             {/* Overlay Info */}
                             <div className="absolute top-4 left-4 flex gap-2">
@@ -318,14 +458,20 @@ export default function ChatPage() {
 
                             {/* Call Controls */}
                             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
-                                <button className="size-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all group">
-                                    <span className="material-symbols-outlined group-active:scale-90 transition-transform">mic</span>
+                                <button 
+                                    onClick={() => setIsMicOn(!isMicOn)}
+                                    className={`size-12 rounded-full flex items-center justify-center transition-all group ${isMicOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
+                                >
+                                    {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
+                                </button>
+                                <button 
+                                    onClick={() => setIsVideoOn(!isVideoOn)}
+                                    className={`size-12 rounded-full flex items-center justify-center transition-all group ${isVideoOn ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
+                                >
+                                    {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
                                 </button>
                                 <button className="size-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all group">
-                                    <span className="material-symbols-outlined group-active:scale-90 transition-transform">videocam</span>
-                                </button>
-                                <button className="size-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all group">
-                                    <span className="material-symbols-outlined group-active:scale-90 transition-transform">screen_share</span>
+                                    <Monitor size={20} />
                                 </button>
                                 <button className="size-12 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all group">
                                     <span className="material-symbols-outlined group-active:scale-90 transition-transform">more_horiz</span>
@@ -346,7 +492,7 @@ export default function ChatPage() {
                             <div className="p-4 border-b border-slate-50 flex items-center justify-between bg-[#E8F5E9]/30">
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[#2E7D32] font-bold">analytics</span>
-                                    <h3 className="font-black text-slate-800">AI Ear Analysis Report</h3>
+                                    <h3 className="font-black text-slate-800">Ear bom Analysis Report</h3>
                                 </div>
                                 <button className="text-[#2E7D32] text-xs font-bold hover:underline">상세보기</button>
                             </div>
@@ -451,6 +597,47 @@ export default function ChatPage() {
                                                             >
                                                                 처방전 저장하기
                                                             </button>
+                                                        </div>
+                                                    ) : msg.type === 'guide' ? (
+                                                        /* Visual Guide Card */
+                                                        <div className="bg-white rounded-2xl border border-[#2E7D32]/20 shadow-xl overflow-hidden group/guide">
+                                                            <div className="p-3 bg-[#E8F5E9]/50 border-b border-[#2E7D32]/10 flex items-center justify-between">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="size-6 bg-[#2E7D32] rounded flex items-center justify-center">
+                                                                        <span className="material-symbols-outlined text-white text-[14px]">map</span>
+                                                                    </div>
+                                                                    <p className="text-[11px] font-black text-[#1B5E20]">전문가 맞춤 혈자리 가이드</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative aspect-square sm:aspect-auto sm:h-[300px] w-full bg-slate-100 flex items-center justify-center">
+                                                                <img 
+                                                                    src={msg.earPhotoUrl} 
+                                                                    alt="Ear Guide" 
+                                                                    className="max-w-full max-h-full object-contain"
+                                                                />
+                                                                {/* Markers Overlay */}
+                                                                {msg.markers?.map((marker, idx) => (
+                                                                    <div 
+                                                                        key={idx}
+                                                                        className="absolute -translate-x-1/2 -translate-y-1/2 group/pin"
+                                                                        style={{ top: `${marker.y}%`, left: `${marker.x}%` }}
+                                                                    >
+                                                                        <div className="relative">
+                                                                            <div className="size-4 bg-[#2E7D32] border-2 border-white rounded-full shadow-lg group-hover/pin:scale-125 transition-transform"></div>
+                                                                            <div className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm shadow-xl border border-[#E8F5E9] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap font-black text-[#2E7D32] opacity-0 group-hover/pin:opacity-100 transition-opacity pointer-events-none">
+                                                                                {marker.label}
+                                                                            </div>
+                                                                            {/* Always show label on mobile/small cards */}
+                                                                            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[8px] text-white whitespace-nowrap font-bold">
+                                                                                {marker.label}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            <div className="p-3 bg-slate-50">
+                                                                <p className="text-[10px] text-slate-500 font-medium leading-relaxed">상담 중 전문가가 직접 표시한 혈자리 정보입니다. 지압판을 해당 위치에 정확히 부탁하여 자극해 주세요.</p>
+                                                            </div>
                                                         </div>
                                                     ) : (
                                                         <div className={`p-4 rounded-2xl text-sm leading-relaxed border ${msg.sender === 'user'
