@@ -21,7 +21,8 @@ import {
     Video,
     Mic,
     FileText,
-    AlertCircle
+    AlertCircle,
+    Activity
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
@@ -494,7 +495,7 @@ export default function DashboardPage() {
                                     <span className="bg-[#FFD54F] text-[#1B5E20] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Expert Opinion</span>
                                     <h3 className="text-2xl font-black text-white leading-tight mb-4">
                                         추천 자극 포인트:<br />
-                                        {latestDiagnosis.acupoints.substring(0, 30)}...
+                                        {latestDiagnosis.acupoints?.substring(0, 30)}...
                                     </h3>
                                     <p className="text-green-50/70 text-sm leading-relaxed mb-6 font-medium line-clamp-3">
                                         {latestDiagnosis.overallCondition}
