@@ -59,6 +59,7 @@ export default function ChatPage() {
     const [inputMessage, setInputMessage] = useState('');
     const [counselingNote, setCounselingNote] = useState('');
     const [latestEarPhoto, setLatestEarPhoto] = useState(null);
+    const [latestAcupoints, setLatestAcupoints] = useState([]);
     const [analysisData, setAnalysisData] = useState({ score: 0, stress: '-' });
     const [noteSavedId, setNoteSavedId] = useState(null);
     const [reportLoading, setReportLoading] = useState(true);
@@ -82,8 +83,8 @@ export default function ChatPage() {
         }
 
         if (user) {
-            // 1. 최신 귀 사진 로드
-            fetchLatestSurvey();
+            // 1. 최신 귀 사진 로드 (실시간 연동)
+            const unsubscribeSurvey = fetchLatestSurvey();
 
             // 2. 실시간 채팅 리스너 설정 (인덱스 미준비 시 폴백 로직 포함)
             const startChatListener = (useOrderBy = true) => {
@@ -117,6 +118,7 @@ export default function ChatPage() {
             initUserWebRTC();
 
             return () => {
+                if (unsubscribeSurvey) unsubscribeSurvey();
                 unsubscribe();
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
@@ -205,7 +207,7 @@ export default function ChatPage() {
         }
     };
 
-    const fetchLatestSurvey = async () => {
+    const fetchLatestSurvey = () => {
         setReportLoading(true);
         setReportError(false);
         try {
@@ -215,19 +217,26 @@ export default function ChatPage() {
                 orderBy('createdAt', 'desc'),
                 limit(1)
             );
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                const data = snapshot.docs[0].data();
-                setLatestEarPhoto(data.earPhotoUrl);
+            
+            // 실시간 리스너로 변경 (전문가가 마킹 저장 시 즉시 반영)
+            return onSnapshot(q, (snapshot) => {
+                if (!snapshot.empty) {
+                    const data = snapshot.docs[0].data();
+                    setLatestEarPhoto(data.earPhotoUrl);
+                    setLatestAcupoints(data.markedAcupoints || []);
 
-                if (data.answers) {
-                    calculateAnalysis(data.answers);
+                    if (data.answers) {
+                        calculateAnalysis(data.answers);
+                    }
                 }
-            }
-            setReportLoading(false);
+                setReportLoading(false);
+            }, (err) => {
+                console.warn("Survey data load error:", err.message);
+                setReportError(true);
+                setReportLoading(false);
+            });
         } catch (err) {
-            console.warn("Survey data load error (expected during index building):", err.message);
-            setReportError(true);
+            console.error("fetchLatestSurvey setup error:", err);
             setReportLoading(false);
         }
     };
@@ -510,20 +519,22 @@ export default function ChatPage() {
                                             <p className="text-xs font-bold">분석된 귀 사진이 없습니다</p>
                                         </div>
                                     )}
-                                    {/* Markers */}
-                                    <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                        <div className="relative">
-                                            <div className="absolute -inset-2 bg-[#2E7D32]/20 rounded-full animate-pulse"></div>
-                                            <div className="size-4 bg-[#2E7D32] border-2 border-white rounded-full shadow-lg"></div>
-                                            <div className="absolute left-6 top-0 bg-white shadow-xl border border-[#E8F5E9] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap font-black text-[#2E7D32]">신문 (Shenmen)</div>
+                                    {/* Real-time Markers */}
+                                    {latestAcupoints?.map((point, idx) => (
+                                        <div 
+                                            key={idx}
+                                            className="absolute -translate-x-1/2 -translate-y-1/2"
+                                            style={{ left: `${point.x}%`, top: `${point.y}%` }}
+                                        >
+                                            <div className="relative group/pin">
+                                                <div className="absolute -inset-2 bg-[#2E7D32]/20 rounded-full animate-pulse"></div>
+                                                <div className="size-3 bg-[#2E7D32] border-2 border-white rounded-full shadow-lg transition-transform hover:scale-150"></div>
+                                                <div className="absolute left-5 top-0 bg-white shadow-xl border border-[#E8F5E9] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap font-black text-[#2E7D32] opacity-100 group-hover/pin:scale-110 transition-transform">
+                                                    {point.label}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="absolute bottom-1/4 right-1/3">
-                                        <div className="relative">
-                                            <div className="size-4 bg-[#2E7D32]/60 border-2 border-white rounded-full shadow-lg"></div>
-                                            <div className="absolute left-6 top-0 bg-white shadow-xl border border-[#E8F5E9] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap font-black text-[#2E7D32]">위 (Stomach)</div>
-                                        </div>
-                                    </div>
+                                    ))}
                                     <div className="absolute top-3 right-3">
                                         <div className="px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-lg shadow-md text-[10px] font-black text-[#2E7D32] border border-[#E8F5E9]">매우 건강</div>
                                     </div>

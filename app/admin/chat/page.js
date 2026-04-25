@@ -60,7 +60,9 @@ function AdminChatContent() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [latestEarPhoto, setLatestEarPhoto] = useState(null);
+    const [latestAcupoints, setLatestAcupoints] = useState([]);
     const [analysisData, setAnalysisData] = useState({ score: 0, stress: '-' });
+    const [latestSurveyId, setLatestSurveyId] = useState(null);
     const [loading, setLoading] = useState(true);
     
     // WebRTC States
@@ -160,10 +162,12 @@ function AdminChatContent() {
 
                 // 분석 데이터는 항상 검색된 설문 중 가장 최근 것을 사용
                 const latestData = surveysSnapshot.docs[0].data();
+                setLatestSurveyId(surveysSnapshot.docs[0].id);
                 setAnalysisData({
                     score: latestData.score || 0,
                     stress: latestData.stressLevel || latestData.stress || '-'
                 });
+                setLatestAcupoints(latestData.markedAcupoints || []);
             } else {
                 console.warn('[DEBUG] No survey found for userId/uid:', userId);
                 setLatestEarPhoto(null);
@@ -310,14 +314,27 @@ function AdminChatContent() {
     const handleSaveGuide = async (markers) => {
         setIsMarkingModalOpen(false);
         try {
+            // 1. 채팅창에 가이드 전송
             await addDoc(collection(db, 'chats'), {
                 userId: userId,
                 sender: 'expert',
                 type: 'guide',
-                earPhotoUrl: latestEarPhoto,
+                earPhotoUrl: latestEarPhoto || '/demo_ear_photo.png',
                 markers: markers,
                 createdAt: serverTimestamp()
             });
+
+            // 2. 최신 설문 데이터에도 마킹 정보 업데이트 (사이드바 리포트 연동)
+            if (latestSurveyId) {
+                const surveyRef = doc(db, 'surveys', latestSurveyId);
+                await setDoc(surveyRef, {
+                    markedAcupoints: markers
+                }, { merge: true });
+            }
+
+            // 3. 로컬 상태 업데이트
+            setLatestAcupoints(markers);
+            alert('가이드가 환자에게 전송되었습니다.');
         } catch (error) {
             console.error("Error sending guide:", error);
             alert('가이드 전송 중 오류가 발생했습니다.');
@@ -470,15 +487,32 @@ function AdminChatContent() {
                             </div>
                         </div>
                         <div className="p-4 grid grid-cols-2 gap-4">
-                            <div className="aspect-square bg-black rounded-2xl border border-white/5 overflow-hidden relative">
+                            <div className="aspect-square bg-black rounded-2xl border border-white/5 overflow-hidden relative group cursor-pointer" onClick={() => setIsMarkingModalOpen(true)}>
                                 {latestEarPhoto ? (
-                                    <img src={latestEarPhoto} alt="Latest Ear" className="w-full h-full object-cover" />
+                                    <div className="relative w-full h-full">
+                                        <img src={latestEarPhoto} alt="Latest Ear" className="w-full h-full object-cover" />
+                                        {latestAcupoints?.map((point, idx) => (
+                                            <div 
+                                                key={idx}
+                                                className="absolute w-2 h-2 bg-red-500 border border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-sm animate-pulse"
+                                                style={{ left: `${point.x}%`, top: `${point.y}%` }}
+                                            >
+                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-black/80 text-white text-[8px] px-1.5 py-0.5 rounded-md whitespace-nowrap font-black">
+                                                    {point.label}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-700">
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-700 bg-white/5 gap-2">
                                         <Camera size={24} />
+                                        <span className="text-[10px] font-black uppercase opacity-50">No Photo</span>
                                     </div>
                                 )}
-                                <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-[10px] font-black rounded-md shadow-lg">Latest Scan</div>
+                                <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-[10px] font-black rounded-md shadow-lg z-10">Latest Scan</div>
+                                <div className="absolute inset-0 bg-green-500/0 group-hover:bg-green-500/10 transition-colors flex items-center justify-center">
+                                    <Activity size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
                             </div>
                             <div className="space-y-3 flex flex-col justify-center">
                                 <div className="p-4 bg-white/5 rounded-2xl border border-white/5 shadow-inner">
@@ -560,20 +594,16 @@ function AdminChatContent() {
                             <div className="flex gap-2">
                                 <button 
                                     onClick={sendPrescription}
-                                    className="px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600/30 transition-all flex items-center gap-2"
+                                    className="px-4 py-3 bg-white/5 text-slate-400 border border-white/10 rounded-xl text-xs font-black uppercase hover:bg-white/10 transition-all flex items-center gap-2"
                                 >
-                                    <ClipboardList size={14} />
-                                    디지털 처방전 발급
+                                    <ClipboardList size={16} />
+                                    처방전
                                 </button>
                                 <button 
-                                    onClick={() => {
-                                        console.log('[DEBUG] "혈자리 가이드 전송" clicked. latestEarPhoto:', latestEarPhoto);
-                                        // 정밀진단과 동일하게 모달은 항상 열리도록 함
-                                        setIsMarkingModalOpen(true);
-                                    }}
-                                    className="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-all flex items-center gap-2"
+                                    onClick={() => setIsMarkingModalOpen(true)}
+                                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-xs font-black uppercase hover:bg-green-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 active:scale-95 border border-green-400/20"
                                 >
-                                    <Activity size={14} />
+                                    <Activity size={16} />
                                     혈자리 가이드 전송
                                 </button>
                             </div>
@@ -603,7 +633,7 @@ function AdminChatContent() {
                 isOpen={isMarkingModalOpen}
                 onClose={() => setIsMarkingModalOpen(false)}
                 onSave={handleSaveGuide}
-                imageUrl={latestEarPhoto}
+                imageUrl={latestEarPhoto || '/demo_ear_photo.png'}
             />
 
             <style jsx>{`
