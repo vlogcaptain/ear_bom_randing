@@ -9,14 +9,16 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
     const [markers, setMarkers] = useState(initialMarkers);
     const [selectedMarker, setSelectedMarker] = useState(null);
     const [tempLabel, setTempLabel] = useState('');
+    const [displayUrl, setDisplayUrl] = useState(imageUrl || '/demo_ear_photo.png');
     const imageContainerRef = useRef(null);
 
     useEffect(() => {
         if (isOpen) {
             setMarkers(initialMarkers);
             setSelectedMarker(null);
+            setDisplayUrl(imageUrl || '/demo_ear_photo.png');
         }
-    }, [isOpen, initialMarkers]);
+    }, [isOpen, initialMarkers, imageUrl]);
 
     if (!isOpen) return null;
 
@@ -71,10 +73,14 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
                         onClick={handleImageClick}
                     >
                         <img 
-                            src={imageUrl} 
+                            src={displayUrl} 
                             alt="Ear to mark" 
                             className="max-w-full max-h-[700px] object-contain rounded-2xl shadow-2xl select-none"
                             draggable={false}
+                            onError={(e) => {
+                                console.log('[DEBUG] Image load error in MarkingModal, falling back to demo.');
+                                setDisplayUrl('/demo_ear_photo.png');
+                            }}
                         />
 
                         {/* Rendering Markers */}

@@ -490,7 +490,14 @@ function AdminChatContent() {
                             <div className="aspect-square bg-black rounded-2xl border border-white/5 overflow-hidden relative group cursor-pointer" onClick={() => setIsMarkingModalOpen(true)}>
                                 {latestEarPhoto ? (
                                     <div className="relative w-full h-full">
-                                        <img src={latestEarPhoto} alt="Latest Ear" className="w-full h-full object-cover" />
+                                        <img 
+                                            src={latestEarPhoto} 
+                                            alt="Latest Ear" 
+                                            className="w-full h-full object-cover" 
+                                            onError={(e) => {
+                                                e.target.src = '/demo_ear_photo.png';
+                                            }}
+                                        />
                                         {latestAcupoints?.map((point, idx) => (
                                             <div 
                                                 key={idx}
