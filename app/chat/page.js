@@ -74,9 +74,33 @@ export default function ChatPage() {
     const [isMicOn, setIsMicOn] = useState(true);
     const [isVideoOn, setIsVideoOn] = useState(true);
     const [connectionStatus, setConnectionStatus] = useState('offline'); // offline, ready, calling, connected
+    const [currentTime, setCurrentTime] = useState('');
+    const [duration, setDuration] = useState('00:00');
 
     const videoRef = useRef(null);
     const remoteVideoRef = useRef(null);
+    const startTimeRef = useRef(Date.now());
+
+    // 실시간 시계 및 상담 경과 시간 타이머
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            setCurrentTime(timeStr);
+
+            // 상담 진행 시간 계산
+            const diff = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+            const secs = (diff % 60).toString().padStart(2, '0');
+            setDuration(`${mins}:${secs}`);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -128,6 +152,20 @@ export default function ChatPage() {
             };
         }
     }, [user, loading, router]);
+
+    // Ensure local stream is bound to video element
+    useEffect(() => {
+        if (localStream && videoRef.current) {
+            videoRef.current.srcObject = localStream;
+        }
+    }, [localStream]);
+
+    // Ensure remote stream is bound to video element
+    useEffect(() => {
+        if (remoteStream && remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStream;
+        }
+    }, [remoteStream]);
 
     const initUserWebRTC = async () => {
         try {
@@ -362,7 +400,7 @@ export default function ChatPage() {
                                         className="object-contain invert brightness-0"
                                     />
                                 </div>
-                                <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy</span>
+                                <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy [VERIFIED]</span>
                             </Link>
                         </div>
                         <nav className="hidden lg:flex items-center gap-8 font-medium text-gray-500 mr-8">
@@ -380,7 +418,7 @@ export default function ChatPage() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2E7D32] opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2E7D32]"></span>
                                 </span>
-                                <span className="text-sm font-bold text-[#2E7D32] tabular-nums">12:45</span>
+                                <span className="text-sm font-bold text-[#2E7D32] tabular-nums">{currentTime || '12:45'}</span>
                             </div>
                             <button
                                 onClick={handleLogout}
@@ -447,7 +485,7 @@ export default function ChatPage() {
                                 <div className="size-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#2E7D32]/50">
                                     <img
                                         className="w-full h-full object-cover"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-Ji_JxRlpKIfnabmyC3E1yU85m2aWDSO6vZ0pQWKk6KDOABmyINQiRWdsfUafm7vfYRIV-V7AdI1kbIMNbJ-Ns0uzql9lGIoAhzQRtDAeL41yJXursQJej8kgLalO9XOhRZe7DX9sQ9TdIlvCupUyqR5645LipJW5jRD2fkErFWEAIZryXYsgymB2JhsA0__3PibiD3VpmBNgm-hPTrdup5qwPY3mqXIrGsdOf0l90HekXpoLhqeJsgz09QvZ0RQMdbMU7vqYsjUr"
+                                        src="/expert_baek.png"
                                         alt="Doctor Portrait"
                                     />
                                 </div>

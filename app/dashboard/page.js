@@ -31,11 +31,25 @@ import { collection, query, where, getDocs, orderBy, limit } from 'firebase/fire
 export default function DashboardPage() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
+    const [currentTime, setCurrentTime] = useState('');
     const [activeTab, setActiveTab] = useState('overview');
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(true);
     const [latestDiagnosis, setLatestDiagnosis] = useState(null);
     const [loadingDiagnosis, setLoadingDiagnosis] = useState(true);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            setCurrentTime(timeStr);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -259,14 +273,15 @@ export default function DashboardPage() {
                             )}
                         </div>
 
-                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500">
-                                    <Clock size={24} />
+                                    <Activity size={24} />
                                 </div>
+                                <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-tighter">New</span>
                             </div>
-                            <p className="text-slate-500 text-sm font-medium">서비스 이용 시간</p>
-                            <h3 className="text-2xl font-black text-slate-800 mt-1">128분</h3>
+                            <p className="text-slate-500 text-sm font-medium">누적 상담 횟수</p>
+                            <h3 className="text-2xl font-black text-slate-800 mt-1">{appointments.length}건</h3>
                         </div>
                     </div>
 
@@ -477,7 +492,10 @@ export default function DashboardPage() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="bg-[#1B5E20] rounded-3xl p-8 relative overflow-hidden group">
+                                <div 
+                                    onClick={() => alert('준비중입니다')}
+                                    className="bg-[#1B5E20] rounded-3xl p-8 relative overflow-hidden group cursor-pointer"
+                                >
                                     <div className="relative z-10 h-full flex flex-col">
                                         <span className="bg-[#FFD54F] text-[#1B5E20] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Today's Tip</span>
                                         <h3 className="text-2xl font-black text-white leading-tight mb-4">
@@ -486,7 +504,13 @@ export default function DashboardPage() {
                                         <p className="text-green-50/70 text-sm leading-relaxed mb-6 font-medium">
                                             스트레스 완화와 불면증 해소에 탁월한 효과가 있는 혈자리입니다. 귓바퀴 안쪽 상단의 움푹한 곳을 하루 3번, 1분씩 지압해 보세요.
                                         </p>
-                                        <button className="mt-auto w-full py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/20 font-bold transition-all backdrop-blur-sm">
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                alert('준비중입니다');
+                                            }}
+                                            className="mt-auto w-full py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/20 font-bold transition-all backdrop-blur-sm"
+                                        >
                                             더 많은 건강 꿀팁 보기
                                         </button>
                                     </div>

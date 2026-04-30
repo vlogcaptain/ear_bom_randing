@@ -25,9 +25,7 @@ function SignupContent() {
 
                 <UserSignupForm />
 
-                <p className="text-center text-slate-400 text-sm font-medium mt-8">
-                    이미 계정이 있으신가요? <Link href="/login" className="text-[#2E7D32] font-bold hover:underline">로그인하기</Link>
-                </p>
+
             </div>
         </div>
     );
