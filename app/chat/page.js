@@ -35,6 +35,8 @@ import {
     Monitor,
     X,
     PhoneCall,
+    PhoneOff,
+    MoreHorizontal,
     MapPin,
     CheckCircle2
 } from 'lucide-react';
