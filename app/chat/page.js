@@ -146,9 +146,7 @@ export default function ChatPage() {
             return () => {
                 if (unsubscribeSurvey) unsubscribeSurvey();
                 unsubscribe();
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                }
+                // 카메라 트랙 종료 로직을 제거하여 재렌더링 시 깜빡임 방지
             };
         }
     }, [user, loading, router]);
@@ -404,13 +402,13 @@ export default function ChatPage() {
                             </Link>
                         </div>
                         <nav className="hidden lg:flex items-center gap-8 font-medium text-gray-500 mr-8">
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/#concept">이침 원리</Link>
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/#how-it-works">사용방법</Link>
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/#features">주요기능</Link>
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/gallery">갤러리</Link>
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
-                            <Link className="hover:text-[#2E7D32] transition-colors" href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
-                            <Link className="text-[#2E7D32] font-semibold" href="/chat" target="_blank" rel="noopener noreferrer">실시간 상담</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/#concept">이침 원리</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/#how-it-works">사용방법</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/#features">주요기능</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/gallery">갤러리</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
+                            <Link className="hover:text-[#2E7D32] transition-colors w-max whitespace-nowrap" href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
+                            <Link className="text-[#2E7D32] font-semibold w-max whitespace-nowrap" href="/chat" target="_blank" rel="noopener noreferrer">실시간 상담</Link>
                         </nav>
                         <div className="flex items-center gap-4">
                             <div className="hidden md:flex items-center gap-3 px-4 py-1.5 bg-[#2E7D32]/10 rounded-full border border-[#2E7D32]/20 mr-2">
