@@ -12,7 +12,6 @@ service cloud.firestore {
     match /surveys/{docId} {
       allow create: if true;
       allow get, list: if isExpert() || 
-                       (resource.data.userId == 'demo-user-123') || 
                        (request.auth != null && resource.data.userId == request.auth.uid);
       allow update, delete: if isExpert();
     }
@@ -20,16 +19,13 @@ service cloud.firestore {
     // 회원 정보 (Users)
     match /users/{userId} {
       allow read, write: if isExpert() || 
-                           (userId == 'demo-user-123') || 
                            (request.auth != null && request.auth.uid == userId);
     }
 
     // 예약 데이터 (Appointments)
     match /appointments/{docId} {
-      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
-                       (request.resource.data.userId == 'demo-user-123');
+      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid);
       allow get, list: if isExpert() || 
-                       (resource.data.userId == 'demo-user-123') || 
                        (request.auth != null && resource.data.userId == request.auth.uid);
       allow update, delete: if isExpert();
     }
@@ -37,20 +33,16 @@ service cloud.firestore {
     // 채팅 메시지 (Chats)
     match /chats/{docId} {
       allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
-                       isExpert() || 
-                       (request.resource.data.userId == 'demo-user-123');
+                       isExpert();
       allow read, list: if isExpert() || 
-                        (resource.data.userId == 'demo-user-123') || 
                         (request.auth != null && resource.data.userId == request.auth.uid);
       allow update, delete: if isExpert();
     }
 
     // 상담 노트 (Notes)
     match /notes/{docId} {
-      allow create, update: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
-                               (request.resource.data.userId == 'demo-user-123');
+      allow create, update: if (request.auth != null && request.resource.data.userId == request.auth.uid);
       allow read: if isExpert() || 
-                        (resource.data.userId == 'demo-user-123') || 
                         (request.auth != null && resource.data.userId == request.auth.uid);
       allow delete: if isExpert();
     }
@@ -58,28 +50,23 @@ service cloud.firestore {
     // 결제 내역 (Payments)
     match /payments/{docId} {
       allow read: if isExpert() || 
-                    (request.auth != null && resource.data.customer.id == request.auth.uid) || 
-                    (resource.data.userId == 'demo-user-123');
+                    (request.auth != null && resource.data.customer.id == request.auth.uid);
       allow create: if true; 
     }
 
     // 화상 상담 신호 (Calls for WebRTC)
     match /calls/{userId} {
       allow create, update, delete: if isExpert() || 
-                                     (userId == 'demo-user-123') ||
                                      (request.auth != null && request.auth.uid == userId);
       allow get, list: if isExpert() || 
-                        (userId == 'demo-user-123') ||
                         (request.auth != null && request.auth.uid == userId);
       
       match /offerCandidates/{docId} {
         allow create, read, write: if isExpert() || 
-                                     (userId == 'demo-user-123') ||
                                      (request.auth != null && request.auth.uid == userId);
       }
       match /answerCandidates/{docId} {
         allow create, read, write: if isExpert() || 
-                                     (userId == 'demo-user-123') ||
                                      (request.auth != null && request.auth.uid == userId);
       }
     }

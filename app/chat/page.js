@@ -514,9 +514,6 @@ export default function ChatPage() {
                                             className="w-full h-full object-cover"
                                             src={latestEarPhoto}
                                             alt="Ear Analysis Scan"
-                                            onError={(e) => {
-                                                e.target.src = '/demo_ear_photo.png';
-                                            }}
                                         />
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 bg-slate-50">

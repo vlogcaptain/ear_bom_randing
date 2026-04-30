@@ -320,7 +320,7 @@ function AdminChatContent() {
                 userId: userId,
                 sender: 'expert',
                 type: 'guide',
-                earPhotoUrl: latestEarPhoto || '/demo_ear_photo.png',
+                earPhotoUrl: latestEarPhoto || '',
                 markers: markers,
                 createdAt: serverTimestamp()
             });
@@ -495,9 +495,6 @@ function AdminChatContent() {
                                             src={latestEarPhoto} 
                                             alt="Latest Ear" 
                                             className="w-full h-full object-cover" 
-                                            onError={(e) => {
-                                                e.target.src = '/demo_ear_photo.png';
-                                            }}
                                         />
                                         {latestAcupoints?.map((point, idx) => (
                                             <div 
@@ -641,7 +638,7 @@ function AdminChatContent() {
                 isOpen={isMarkingModalOpen}
                 onClose={() => setIsMarkingModalOpen(false)}
                 onSave={handleSaveGuide}
-                imageUrl={latestEarPhoto || '/demo_ear_photo.png'}
+                imageUrl={latestEarPhoto || ''}
             />
 
             <style jsx>{`

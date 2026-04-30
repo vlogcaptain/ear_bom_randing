@@ -83,46 +83,15 @@ export default function DashboardPage() {
                 ...doc.data()
             }));
 
-            // 실제 데이터가 있으면 그것을 표시하고, 없는데 데모 사용자라면 샘플 데이터를 표시합니다.
+            // 실제 데이터가 있으면 그것을 표시합니다.
             if (appts.length > 0) {
                 setAppointments(appts);
-            } else if (user?.uid === 'demo-user-123') {
-                setAppointments([
-                    {
-                        id: 'demo-1',
-                        expertName: '김이침 원장',
-                        date: '2026-03-04',
-                        time: '14:30',
-                        type: 'video',
-                        status: 'confirmed'
-                    },
-                    {
-                        id: 'demo-2',
-                        expertName: '김이침 원장',
-                        date: '2026-02-27',
-                        time: '16:00',
-                        type: 'chat',
-                        status: 'confirmed'
-                    }
-                ]);
             } else {
                 setAppointments([]);
             }
         } catch (error) {
             console.error("Error fetching appointments:", error);
-            // 에러 발생 시 데모 사용자라면 샘플 데이터로 폴백
-            if (user?.uid === 'demo-user-123') {
-                setAppointments([
-                    {
-                        id: 'demo-1',
-                        expertName: '김이침 원장',
-                        date: '2026-03-04',
-                        time: '14:30',
-                        type: 'video',
-                        status: 'confirmed'
-                    }
-                ]);
-            }
+            setAppointments([]);
         } finally {
             setLoadingAppointments(false);
         }
