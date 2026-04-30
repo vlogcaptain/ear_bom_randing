@@ -364,9 +364,18 @@ export default function UserSignupForm({ onSwitchToLogin }) {
 
             <div id="recaptcha-container-signup"></div>
 
-            <p className="text-center text-slate-400 text-sm font-medium mt-8">
-                이미 계정이 있으신가요? <button type="button" onClick={() => onSwitchToLogin ? onSwitchToLogin() : router.push('/login')} className="text-[#2E7D32] font-bold hover:underline cursor-pointer">로그인</button>
-            </p>
+            <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+                <p className="text-slate-500 text-sm font-medium mb-3">
+                    이미 계정이 있으신가요?
+                </p>
+                <button 
+                    type="button"
+                    onClick={() => onSwitchToLogin ? onSwitchToLogin() : router.push('/login')} 
+                    className="w-full py-4 bg-white border-2 border-[#2E7D32] text-[#2E7D32] rounded-2xl font-black text-lg hover:bg-[#2E7D32]/5 transition-all"
+                >
+                    로그인하고 계속하기
+                </button>
+            </div>
         </div>
     );
 }

@@ -268,9 +268,17 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             <div id="recaptcha-container" className="mt-4 flex justify-center"></div>
 
 
-            <p className="text-center text-slate-400 text-sm font-medium mt-6">
-                처음이신가요? <button onClick={() => router.push('/signup')} className="text-[#2E7D32] font-bold hover:underline cursor-pointer">회원가입</button>
-            </p>
+            <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+                <p className="text-slate-500 text-sm font-medium mb-3">
+                    처음이신가요?
+                </p>
+                <button 
+                    onClick={() => router.push('/signup')} 
+                    className="w-full py-4 bg-white border-2 border-[#2E7D32] text-[#2E7D32] rounded-2xl font-black text-lg hover:bg-[#2E7D32]/5 transition-all"
+                >
+                    회원가입하고 시작하기
+                </button>
+            </div>
 
             <div className="mt-10 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <div className="flex items-start gap-3">
