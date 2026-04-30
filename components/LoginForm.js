@@ -14,24 +14,10 @@ import { auth } from '@/lib/firebase';
 
 export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }) {
     const router = useRouter();
-    const { loginAsDemo } = useAuth();
     const [loading, setLoading] = useState(false);
     const [authMode, setAuthMode] = useState('phone'); // 'email' or 'phone'
     const recaptchaVerifierRef = useRef(null);
 
-    const handleGuestLogin = async () => {
-        setLoading(true);
-        try {
-            // Firebase 설정이 안 되어 있을 경우를 대비해 데모 로그인 수행
-            if (loginAsDemo) loginAsDemo();
-            if (onSuccess) onSuccess();
-            else router.push('/dashboard');
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Email Auth State
     const [email, setEmail] = useState('');
@@ -281,16 +267,6 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
 
             <div id="recaptcha-container" className="mt-4 flex justify-center"></div>
 
-            <div className="mt-8 flex flex-col gap-4">
-                <button
-                    onClick={handleGuestLogin}
-                    disabled={loading}
-                    className="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all disabled:opacity-50"
-                >
-                    <UserCircle size={18} />
-                    {loading ? '접속 중...' : '게스트로 둘러보기 (1초 만에 입장)'}
-                </button>
-            </div>
 
             <p className="text-center text-slate-400 text-sm font-medium mt-6">
                 처음이신가요? <button onClick={() => router.push('/signup')} className="text-[#2E7D32] font-bold hover:underline cursor-pointer">회원가입</button>

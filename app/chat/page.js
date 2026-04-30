@@ -34,7 +34,9 @@ import {
     Info,
     Monitor,
     X,
-    PhoneCall
+    PhoneCall,
+    MapPin,
+    CheckCircle2
 } from 'lucide-react';
 
 const servers = {
@@ -439,8 +441,8 @@ export default function ChatPage() {
                             {/* Expert Identity */}
                             <div className="absolute top-4 right-4 flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                                 <div className="text-right">
-                                    <p className="text-sm font-bold text-white">김이침 한의사</p>
-                                    <p className="text-[10px] text-[#FFD54F] font-bold uppercase tracking-wider">Expert Physician</p>
+                                    <p className="text-sm font-bold text-white">백정숙 수석지도사</p>
+                                    <p className="text-[10px] text-[#FFD54F] font-bold uppercase tracking-wider">Representative Physician</p>
                                 </div>
                                 <div className="size-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#2E7D32]/50">
                                     <img

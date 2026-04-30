@@ -35,6 +35,7 @@ import {
     User,
     LogOut,
     CheckCircle2,
+    MapPin,
     Monitor
 } from 'lucide-react';
 import MarkingModal from '@/components/MarkingModal';
@@ -89,7 +90,7 @@ function AdminChatContent() {
                 router.push('/admin/login');
                 return;
             }
-            if (admin.email !== 'vlogcaptain@gmail.com' && admin.email !== 'earbombeak@earbom.com') {
+            if (admin.email !== 'js100216@naver.com') {
                 router.push('/admin/login');
                 return;
             }

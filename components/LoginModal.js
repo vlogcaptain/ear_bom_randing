@@ -6,7 +6,7 @@ import LoginForm from './LoginForm';
 import UserSignupForm from './UserSignupForm';
 
 export default function LoginModal({ isOpen, onClose }) {
-    const [view, setView] = useState('login'); // 'login' or 'signup'
+    const [view, setView] = useState('login'); // 'login', 'signup', or 'gate'
     const [title, setTitle] = useState('로그인');
 
     if (!isOpen) return null;
@@ -14,6 +14,10 @@ export default function LoginModal({ isOpen, onClose }) {
     const handleClose = () => {
         onClose();
         setTimeout(() => setView('login'), 300); // 닫힐 때 초기화
+    };
+
+    const handleAuthSuccess = () => {
+        handleClose();
     };
 
     return (
@@ -44,13 +48,13 @@ export default function LoginModal({ isOpen, onClose }) {
                 <div className="px-8 pb-10">
                     {view === 'login' ? (
                         <LoginForm
-                            onSuccess={handleClose}
+                            onSuccess={handleAuthSuccess}
                             onTitleChange={(newTitle) => setTitle(newTitle)}
                             onSwitchToSignup={() => { setView('signup'); setTitle('회원가입'); }}
                         />
                     ) : (
                         <UserSignupForm
-                            onSuccess={handleClose}
+                            onSuccess={handleAuthSuccess}
                             onSwitchToLogin={() => { setView('login'); setTitle('로그인'); }}
                         />
                     )}

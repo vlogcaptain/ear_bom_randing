@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
     // 전문가 세션 확인
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && (user.email === 'vlogcaptain@gmail.com' || user.email === 'earbombeak@earbom.com')) {
+            if (user && user.email === 'js100216@naver.com') {
                 router.push('/admin');
             }
         });
@@ -31,11 +31,8 @@ export default function AdminLoginPage() {
         setError('');
 
         try {
-            // 사용자 요청에 따라 'earbombeak' 아이디를 전문가 이메일로 매핑
-            const emailToUse = id === 'earbombeak' ? 'vlogcaptain@gmail.com' : id;
-
             // Firebase Auth 로그인
-            await signInWithEmailAndPassword(auth, emailToUse, password);
+            await signInWithEmailAndPassword(auth, id, password);
             
             // 로그인 성공 시 useEffect의 onAuthStateChanged가 /admin으로 리다이렉트 처리함
         } catch (err) {

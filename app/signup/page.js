@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import UserSignupForm from '../../components/UserSignupForm';
 import { ChevronLeft } from 'lucide-react';
@@ -14,8 +14,12 @@ function SignupContent() {
                         <ChevronLeft size={16} /> 로그인으로 돌아가기
                     </Link>
                     <div className="text-center">
-                        <h2 className="text-4xl font-black text-[#1B5E20] mb-2">회원가입</h2>
-                        <p className="text-slate-500 font-medium">ear bom healthy의 새로운 가족이 되어보세요.</p>
+                        <h2 className="text-4xl font-black text-[#1B5E20] mb-2">
+                            회원가입
+                        </h2>
+                        <p className="text-slate-500 font-medium">
+                            ear bom healthy의 새로운 가족이 되어보세요.
+                        </p>
                     </div>
                 </div>
 

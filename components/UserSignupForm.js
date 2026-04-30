@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Phone, User, Loader2, Check } from 'lucide-react';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Mail, Lock, Phone, User, Loader2, Check, MessageSquare } from 'lucide-react';
+import { 
+    createUserWithEmailAndPassword, 
+    updateProfile, 
+    sendEmailVerification,
+    RecaptchaVerifier,
+    signInWithPhoneNumber
+} from 'firebase/auth';
+import { doc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
-export default function UserSignupForm() {
+export default function UserSignupForm({ onSwitchToLogin }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [authMode, setAuthMode] = useState('phone'); // 'email' or 'phone'
+    const recaptchaVerifierRef = useRef(null);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -21,16 +29,53 @@ export default function UserSignupForm() {
         phoneNumber: ''
     });
 
+    // Phone Auth State
+    const [verificationCode, setVerificationCode] = useState('');
+    const [confirmationResult, setConfirmationResult] = useState(null);
+
+    useEffect(() => {
+        const initRecaptcha = () => {
+            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current) {
+                try {
+                    const container = document.getElementById('recaptcha-container-signup');
+                    if (container) {
+                        const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
+                            'size': 'invisible',
+                            'callback': () => {
+                                console.log('reCAPTCHA solved');
+                            }
+                        });
+                        recaptchaVerifierRef.current = verifier;
+                    }
+                } catch (err) {
+                    console.error('reCAPTCHA initialization failed:', err);
+                }
+            }
+        };
+
+        if (authMode === 'phone') {
+            initRecaptcha();
+        }
+
+        return () => {
+            if (recaptchaVerifierRef.current) {
+                try {
+                    recaptchaVerifierRef.current.clear();
+                    recaptchaVerifierRef.current = null;
+                } catch (e) { }
+            }
+        };
+    }, [authMode]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSignup = async (e) => {
+    const handleEmailSignup = async (e) => {
         e.preventDefault();
         setError('');
 
-        // Validation
         if (formData.password !== formData.confirmPassword) {
             setError('비밀번호가 일치하지 않습니다.');
             return;
@@ -43,7 +88,6 @@ export default function UserSignupForm() {
 
         setLoading(true);
         try {
-            // 1. Create User in Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 formData.email,
@@ -51,15 +95,12 @@ export default function UserSignupForm() {
             );
             const user = userCredential.user;
 
-            // 2. Update Profile Name
             await updateProfile(user, {
                 displayName: formData.name
             });
 
-            // 3. Send Verification Email
             await sendEmailVerification(user);
 
-            // 4. Save additional info to Firestore
             await setDoc(doc(db, 'users', user.uid), {
                 uid: user.uid,
                 name: formData.name,
@@ -69,7 +110,7 @@ export default function UserSignupForm() {
                 role: 'user'
             });
 
-            alert('회원가입이 완료되었습니다! 입력하신 이메일함에서 인증 메일을 확인해 주세요.');
+            alert('회원가입이 완료되었습니다!');
             router.push('/dashboard');
         } catch (err) {
             console.error(err);
@@ -83,8 +124,91 @@ export default function UserSignupForm() {
         }
     };
 
+    const handleSendCode = async (e) => {
+        e.preventDefault();
+        if (!formData.name) {
+            setError('이름을 입력해 주세요.');
+            return;
+        }
+        if (!formData.phoneNumber) {
+            setError('전화번호를 입력해 주세요.');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+        try {
+            if (!recaptchaVerifierRef.current) {
+                throw new Error('reCAPTCHA 초기화 실패. 잠시 후 다시 시도해 주세요.');
+            }
+            const formattedPhone = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+82${formData.phoneNumber.replace(/^0/, '')}`;
+            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current);
+            setConfirmationResult(confirmation);
+        } catch (err) {
+            console.error('Phone Auth Error:', err);
+            setError(`인증번호 전송 실패: ${err.message || '번호를 확인해 주세요.'}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyAndSignup = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+            const result = await confirmationResult.confirm(verificationCode);
+            const user = result.user;
+
+            // Update display name
+            await updateProfile(user, {
+                displayName: formData.name
+            });
+
+            // Save to Firestore
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                await setDoc(doc(db, 'users', user.uid), {
+                    uid: user.uid,
+                    name: formData.name,
+                    phoneNumber: formData.phoneNumber,
+                    createdAt: serverTimestamp(),
+                    role: 'user'
+                });
+            }
+
+            alert('회원가입 및 로그인이 완료되었습니다!');
+            router.push('/dashboard');
+        } catch (err) {
+            setError('인증번호가 일치하지 않습니다.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <form onSubmit={handleSignup} className="space-y-5">
+        <div className="w-full">
+            {/* Tabs */}
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
+                <button
+                    type="button"
+                    onClick={() => { setAuthMode('phone'); setError(''); }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'phone' ? 'bg-white text-[#2E7D32] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <Phone size={16} />
+                    전화번호 가입
+                </button>
+                <button
+                    type="button"
+                    onClick={() => { setAuthMode('email'); setError(''); }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'email' ? 'bg-white text-[#2E7D32] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <Mail size={16} />
+                    이메일 가입
+                </button>
+            </div>
+
             {error && (
                 <div className="bg-red-50 text-red-500 p-4 rounded-xl text-xs font-bold mb-6 flex items-center gap-2 border border-red-100">
                     <span className="material-symbols-outlined text-sm">error</span>
@@ -92,99 +216,157 @@ export default function UserSignupForm() {
                 </div>
             )}
 
-            <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">이름</label>
-                <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
-                        placeholder="홍길동"
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">이메일</label>
-                <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
-                        placeholder="example@email.com"
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">전화번호</label>
-                <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                    <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
-                        placeholder="01012345678"
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 ml-1">비밀번호</label>
-                    <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
-                            placeholder="••••••••"
-                            required
-                        />
+            {authMode === 'email' ? (
+                <form onSubmit={handleEmailSignup} className="space-y-5">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700 ml-1">이름</label>
+                        <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                placeholder="홍길동"
+                                required
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 ml-1">비밀번호 확인</label>
-                    <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
-                            placeholder="••••••••"
-                            required
-                        />
-                    </div>
-                </div>
-            </div>
 
-            <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4 flex items-center justify-center gap-2"
-            >
-                {loading ? (
-                    <>
-                        <Loader2 className="animate-spin" size={24} />
-                        처리 중...
-                    </>
-                ) : '가입하기'}
-            </button>
-        </form>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700 ml-1">이메일</label>
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                placeholder="example@email.com"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700 ml-1">비밀번호</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700 ml-1">비밀번호 확인</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4"
+                    >
+                        {loading ? '처리 중...' : '이메일로 가입하기'}
+                    </button>
+                </form>
+            ) : (
+                <div className="space-y-5">
+                    {!confirmationResult ? (
+                        <form onSubmit={handleSendCode} className="space-y-5">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 ml-1">이름</label>
+                                <div className="relative">
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                        placeholder="홍길동"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 ml-1">전화번호</label>
+                                <div className="relative">
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                    <input
+                                        type="tel"
+                                        name="phoneNumber"
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange}
+                                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                        placeholder="01012345678"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4"
+                            >
+                                {loading ? '전송 중...' : '인증번호 받기'}
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleVerifyAndSignup} className="space-y-5">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 ml-1">인증번호</label>
+                                <div className="relative">
+                                    <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                    <input
+                                        type="text"
+                                        value={verificationCode}
+                                        onChange={(e) => setVerificationCode(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                        placeholder="6자리 숫자 입력"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4"
+                            >
+                                {loading ? '가입 처리 중...' : '인증 및 가입 완료'}
+                            </button>
+                        </form>
+                    )}
+                </div>
+            )}
+
+            <div id="recaptcha-container-signup"></div>
+
+            <p className="text-center text-slate-400 text-sm font-medium mt-8">
+                이미 계정이 있으신가요? <button type="button" onClick={() => onSwitchToLogin ? onSwitchToLogin() : router.push('/login')} className="text-[#2E7D32] font-bold hover:underline cursor-pointer">로그인</button>
+            </p>
+        </div>
     );
 }
