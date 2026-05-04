@@ -198,9 +198,9 @@ function DiagnoseContent() {
                 </div>
             )}
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
                 {/* Left Side: Image Viewer */}
-                <div className="w-1/2 bg-slate-900 relative flex items-center justify-center p-8">
+                <div className="w-full md:w-1/2 h-[400px] md:h-full bg-slate-900 relative flex items-center justify-center p-4 md:p-8 shrink-0">
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
                         <div className="bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[10px] font-black text-white uppercase tracking-widest mb-2">
                             User Submitted Photo
@@ -251,8 +251,7 @@ function DiagnoseContent() {
                         )}
                     </div>
 
-                    {/* Quick Survey Info overlay */}
-                    <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                    <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 hidden sm:block">
                         <h3 className="text-white font-black text-xs mb-2 flex items-center gap-2">
                             <Activity size={14} className="text-green-400" /> 설문 요약
                         </h3>
@@ -268,7 +267,7 @@ function DiagnoseContent() {
                 </div>
 
                 {/* Right Side: Inputs */}
-                <div className="w-1/2 bg-white overflow-y-auto p-10 custom-scrollbar">
+                <div className="w-full md:w-1/2 bg-white overflow-y-auto p-6 md:p-10 custom-scrollbar">
                     <div className="max-w-2xl mx-auto space-y-10">
                         
                         {/* Score Section */}
@@ -338,7 +337,7 @@ function DiagnoseContent() {
                             />
                         </section>
 
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             {/* Food Section */}
                             <section className="space-y-4">
                                 <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">

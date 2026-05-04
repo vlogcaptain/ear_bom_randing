@@ -391,9 +391,9 @@ function AdminChatContent() {
                 </div>
             </header>
 
-            <main className="flex flex-1 overflow-hidden p-4 gap-4">
+            <main className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden p-2 md:p-4 gap-2 md:gap-4">
                 {/* Left Side: Video Console */}
-                <div className="flex-1 flex flex-col gap-4 min-w-0">
+                <div className="w-full md:flex-1 flex flex-col gap-4 min-w-0 h-[400px] md:h-full shrink-0">
                     <div className="relative flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 group">
                         {/* Remote Video (User) */}
                         <video 
@@ -435,7 +435,7 @@ function AdminChatContent() {
                         </div>
 
                         {/* Self Video (Expert PIP) */}
-                        <div className="absolute bottom-6 right-6 w-48 aspect-video bg-slate-800 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl hover:scale-105 transition-transform duration-300">
+                        <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-32 md:w-48 aspect-video bg-slate-800 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl hover:scale-105 transition-transform duration-300">
                             <video 
                                 ref={localVideoRef}
                                 autoPlay
@@ -449,36 +449,36 @@ function AdminChatContent() {
                         </div>
 
                         {/* In-Call Controls */}
-                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 px-8 py-5 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl">
+                        <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-5 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-2xl md:rounded-3xl shadow-2xl">
                             <button 
                                 onClick={() => setIsMicOn(!isMicOn)}
-                                className={`size-12 rounded-2xl flex items-center justify-center transition-all ${isMicOn ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
+                                className={`size-10 md:size-12 rounded-xl md:rounded-2xl flex items-center justify-center transition-all ${isMicOn ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
                             >
-                                {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
+                                {isMicOn ? <Mic size={18} /> : <MicOff size={18} />}
                             </button>
                             <button 
                                 onClick={() => setIsVideoOn(!isVideoOn)}
-                                className={`size-12 rounded-2xl flex items-center justify-center transition-all ${isVideoOn ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
+                                className={`size-10 md:size-12 rounded-xl md:rounded-2xl flex items-center justify-center transition-all ${isVideoOn ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-red-500/20 text-red-500 hover:bg-red-500/30'}`}
                             >
-                                {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
+                                {isVideoOn ? <Video size={18} /> : <VideoOff size={18} />}
                             </button>
-                            <button className="size-12 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
+                            <button className="hidden sm:flex size-12 rounded-2xl bg-white/10 hover:bg-white/20 text-white items-center justify-center transition-all">
                                 <Monitor size={20} />
                             </button>
-                            <div className="w-[1px] h-8 bg-white/10 mx-2"></div>
+                            <div className="w-[1px] h-6 md:h-8 bg-white/10 mx-1 md:mx-2"></div>
                             <button 
                                 onClick={endCall}
-                                className="px-8 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black flex items-center gap-3 transition-all shadow-lg shadow-red-600/20 active:scale-95"
+                                className="px-4 md:px-8 py-2.5 md:py-3 rounded-xl md:rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xs md:text-sm flex items-center gap-2 md:gap-3 transition-all shadow-lg shadow-red-600/20 active:scale-95"
                             >
                                 <LogOut size={18} />
-                                상담 종료
+                                <span className="whitespace-nowrap">상담 종료</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Right Side: Information Console */}
-                <aside className="w-[450px] flex flex-col gap-4 shrink-0 overflow-hidden">
+                <aside className="w-full md:w-[450px] flex flex-col gap-4 shrink-0 overflow-hidden min-h-[500px] md:min-h-0">
                     {/* User Profile & Analysis */}
                     <div className="bg-[#1A1A1E] rounded-3xl border border-white/5 overflow-hidden flex flex-col">
                         <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">

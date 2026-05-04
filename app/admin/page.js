@@ -16,7 +16,8 @@ import {
     Loader2,
     MessageCircle,
     X,
-    Video as VideoIcon
+    Video as VideoIcon,
+    Menu
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
 import { collection, query, getDocs, orderBy, limit, where } from 'firebase/firestore';
@@ -36,6 +37,7 @@ export default function AdminDashboardPage() {
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
     const [noteLoading, setNoteLoading] = useState(false);
     const [activeUser, setActiveUser] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -137,15 +139,25 @@ export default function AdminDashboardPage() {
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
             {/* Admin Header */}
-            <header className="bg-[#17171A] text-white h-16 flex items-center justify-between px-8 sticky top-0 z-50">
-                <div className="flex items-center gap-6">
+            <header className="bg-[#17171A] text-white h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 z-50">
+                <div className="flex items-center gap-4 md:gap-6">
+                    {/* Mobile Menu Button */}
+                    <button 
+                        className="md:hidden p-2 text-slate-400 hover:text-white"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-[#2E7D32] rounded flex items-center justify-center p-1">
                             <Image src="/logo.png" alt="logo" width={24} height={24} className="invert brightness-0" />
                         </div>
-                        <span className="font-black tracking-tight text-lg">EAR BOM <span className="text-green-500">EXPERT</span></span>
+                        <span className="font-black tracking-tight text-base md:text-lg whitespace-nowrap">EAR BOM <span className="text-green-500">EXPERT</span></span>
                     </div>
-                    <nav className="flex gap-4 ml-8 text-sm font-bold text-slate-400">
+
+                    {/* Desktop Nav */}
+                    <nav className="hidden md:flex gap-4 ml-8 text-sm font-bold text-slate-400">
                         <button 
                             onClick={() => setActiveTab('diagnose')}
                             className={`${activeTab === 'diagnose' ? 'text-white' : 'hover:text-white'} transition-colors`}
@@ -166,8 +178,8 @@ export default function AdminDashboardPage() {
                         </button>
                     </nav>
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-xs font-bold text-slate-500 bg-slate-800 px-3 py-1.5 rounded-full">ADMIN SESSION ACTIVE</span>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <span className="hidden sm:inline-block text-[10px] md:text-xs font-bold text-slate-500 bg-slate-800 px-3 py-1.5 rounded-full">ADMIN SESSION ACTIVE</span>
                     <button 
                         onClick={handleLogout}
                         className="p-2 text-slate-400 hover:text-white transition-colors"
@@ -176,9 +188,33 @@ export default function AdminDashboardPage() {
                         <LogOut size={20} />
                     </button>
                 </div>
+
+                {/* Mobile Navigation Overlay */}
+                {isMobileMenuOpen && (
+                    <div className="absolute top-16 left-0 right-0 bg-[#17171A] border-t border-white/5 p-4 flex flex-col gap-2 md:hidden animate-in slide-in-from-top duration-200">
+                        <button 
+                            onClick={() => { setActiveTab('diagnose'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'diagnose' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            진단 대기함
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('members'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'members' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            회원 관리
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('logs'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'logs' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            분석 로그
+                        </button>
+                    </div>
+                )}
             </header>
 
-            <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
+            <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
                 {/* Stats Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
@@ -237,7 +273,8 @@ export default function AdminDashboardPage() {
 
                         {/* Main Data Table */}
                         <div className="bg-white border-x border-b border-slate-200 rounded-b-3xl shadow-sm overflow-hidden">
-                            <table className="w-full text-left">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left min-w-[800px] md:min-w-0">
                                 <thead>
                                     <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-wider">
                                         <th className="px-6 py-4">사용자</th>
@@ -315,6 +352,7 @@ export default function AdminDashboardPage() {
                                     )}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </>
                 ) : activeTab === 'members' ? (
@@ -332,7 +370,8 @@ export default function AdminDashboardPage() {
                                 />
                             </div>
                         </div>
-                        <table className="w-full text-left">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[800px] md:min-w-0">
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-wider">
                                     <th className="px-6 py-4">회원명/이메일</th>
@@ -405,6 +444,7 @@ export default function AdminDashboardPage() {
                                 )}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 ) : (
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -412,7 +452,8 @@ export default function AdminDashboardPage() {
                             <h3 className="font-black text-slate-800">진단 분석 로그 (최근 완료순)</h3>
                             <p className="text-xs font-bold text-slate-400">총 {surveys.filter(s => s.status === 'completed').length}건의 이력이 있습니다.</p>
                         </div>
-                        <table className="w-full text-left">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[800px] md:min-w-0">
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-wider">
                                     <th className="px-6 py-4">회원정보</th>
@@ -489,15 +530,16 @@ export default function AdminDashboardPage() {
                                 )}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 )}
             </main>
 
             {/* Consultation Notes Modal */}
             {isNotesModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsNotesModalOpen(false)}></div>
-                    <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                    <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
                             <div>
                                 <h3 className="font-black text-slate-800 text-lg">{activeUser?.name}님의 상담 노트</h3>
