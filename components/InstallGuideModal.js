@@ -1,9 +1,12 @@
 'use client';
 
-import { X, Smartphone, QrCode, Monitor } from 'lucide-react';
+import { useState } from 'react';
+import { X, Smartphone, QrCode, Monitor, Apple, Smartphone as AndroidIcon } from 'lucide-react';
 import Image from 'next/image';
 
 export default function InstallGuideModal({ isOpen, onClose }) {
+    const [activeTab, setActiveTab] = useState('ios'); // ios, android
+
     if (!isOpen) return null;
 
     const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://earbom.app";
@@ -15,7 +18,7 @@ export default function InstallGuideModal({ isOpen, onClose }) {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="px-8 pt-10 pb-6 text-center relative">
+                <div className="px-8 pt-10 pb-4 text-center relative">
                     <button
                         onClick={onClose}
                         className="absolute right-8 top-10 text-slate-300 hover:text-slate-600 transition-colors"
@@ -31,6 +34,26 @@ export default function InstallGuideModal({ isOpen, onClose }) {
                     <p className="text-slate-500 font-medium">
                         스마트폰으로 아래 QR 코드를 스캔해 주세요.
                     </p>
+                </div>
+
+                {/* Platform Tabs */}
+                <div className="px-8 pb-4">
+                    <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+                        <button
+                            onClick={() => setActiveTab('ios')}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all ${activeTab === 'ios' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <Apple size={16} />
+                            iOS
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('android')}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all ${activeTab === 'android' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <AndroidIcon size={16} />
+                            Android
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -65,10 +88,15 @@ export default function InstallGuideModal({ isOpen, onClose }) {
                             </div>
                             <div className="text-sm text-gray-600 leading-relaxed pt-1">
                                 <p className="font-bold text-gray-900 mb-1">홈 화면에 추가하기</p>
-                                <p className="text-xs">
-                                    <span className="text-indigo-600 font-bold">iOS:</span> [공유] → [홈 화면에 추가]<br />
-                                    <span className="text-[#2E7D32] font-bold">Android:</span> [설정/더보기] → [앱 설치]
-                                </p>
+                                {activeTab === 'ios' ? (
+                                    <p className="text-xs">
+                                        <span className="text-indigo-600 font-bold">iOS:</span> 브라우저 하단 <span className="font-bold">[공유]</span> 버튼 클릭 → <span className="font-bold">[홈 화면에 추가]</span> 선택
+                                    </p>
+                                ) : (
+                                    <p className="text-xs">
+                                        <span className="text-[#2E7D32] font-bold">Android:</span> 브라우저 우측 상단 <span className="font-bold">[설정/더보기]</span> 클릭 → <span className="font-bold">[앱 설치]</span> 또는 <span className="font-bold">[홈 화면에 추가]</span> 선택
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
