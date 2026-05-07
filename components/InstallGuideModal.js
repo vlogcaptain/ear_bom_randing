@@ -9,7 +9,10 @@ export default function InstallGuideModal({ isOpen, onClose }) {
 
     if (!isOpen) return null;
 
-    const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://earbom.app";
+    const qrUrls = {
+        ios: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://earbom.app?utm_source=qr_ios",
+        android: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://earbom.app?utm_source=qr_android"
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300 p-4">
@@ -59,16 +62,17 @@ export default function InstallGuideModal({ isOpen, onClose }) {
                 {/* Content */}
                 <div className="px-8 pb-10 flex flex-col items-center">
                     {/* QR Code Placeholder */}
-                    <div className="bg-slate-50 p-6 rounded-3xl border-2 border-dashed border-slate-200 mb-8 relative group">
+                    <div className={`p-6 rounded-3xl border-2 border-dashed mb-8 relative group transition-all duration-300 ${activeTab === 'ios' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-green-50/50 border-green-100'}`}>
                         <div className="w-48 h-48 bg-white rounded-2xl flex items-center justify-center shadow-inner overflow-hidden">
                             <img 
-                                src={qrUrl} 
-                                alt="QR Code to earbom.app"
+                                src={qrUrls[activeTab]} 
+                                alt={`QR Code for ${activeTab}`}
                                 className="w-full h-full object-contain"
                             />
                         </div>
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#FFB74D] text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md">
-                            earbom.app 접속
+                        <div className={`absolute -bottom-3 left-1/2 -translate-x-1/2 text-white px-4 py-1.5 rounded-full text-xs font-black shadow-md flex items-center gap-1.5 transition-all duration-300 ${activeTab === 'ios' ? 'bg-indigo-600' : 'bg-[#2E7D32]'}`}>
+                            {activeTab === 'ios' ? <Apple size={12} /> : <AndroidIcon size={12} />}
+                            {activeTab === 'ios' ? 'iOS 전용 접속' : 'Android 전용 접속'}
                         </div>
                     </div>
 
