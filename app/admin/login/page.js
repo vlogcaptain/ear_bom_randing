@@ -18,7 +18,8 @@ export default function AdminLoginPage() {
     // 전문가 세션 확인
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && user.email === 'js100216@naver.com') {
+            const adminEmails = ['js100216@naver.com', 'vlogcaptain@gmail.com', 'earbombeak@earbom.com'];
+            if (user && adminEmails.includes(user.email)) {
                 router.push('/admin');
             }
         });

@@ -46,7 +46,8 @@ export default function AdminDashboardPage() {
                 return;
             }
             // 전문가 권한 확인 (보안 규칙에서 걸러지지만 UI에서도 이메일 체크)
-            if (user.email !== 'js100216@naver.com') {
+            const adminEmails = ['js100216@naver.com', 'vlogcaptain@gmail.com', 'earbombeak@earbom.com'];
+            if (!adminEmails.includes(user.email)) {
                 router.push('/admin/login');
                 return;
             }

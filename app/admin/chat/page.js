@@ -90,7 +90,8 @@ function AdminChatContent() {
                 router.push('/admin/login');
                 return;
             }
-            if (admin.email !== 'js100216@naver.com') {
+            const adminEmails = ['js100216@naver.com', 'vlogcaptain@gmail.com', 'earbombeak@earbom.com'];
+            if (admin.email && !adminEmails.includes(admin.email)) {
                 router.push('/admin/login');
                 return;
             }
