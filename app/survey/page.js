@@ -171,8 +171,8 @@ export default function Survey() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-4">
                                         <div className="rounded-2xl overflow-hidden border-2 border-white shadow-sm h-48">
                                             <img 
-                                                src="/images/ear_sample.png" 
-                                                alt="Sample ear photo" 
+                                                src="/images/gallery/목 이물감 치루.png" 
+                                                alt="Ear Shooting Guide" 
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
