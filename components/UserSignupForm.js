@@ -197,7 +197,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
                 <div>
                     <p className="text-sm font-black text-emerald-900 mb-1">본인인증 시스템 업데이트 중! ✨</p>
                     <p className="text-xs text-emerald-700/90 font-bold leading-relaxed">
-                        더 안정적인 서비스를 위해 시스템을 개선하고 있어요. 당분간 이메일 가입을 이용해 주시면 정말 감사하겠습니다! 내일(월) 오후 중으로 복구될 예정이에요.
+                        더 안정적인 서비스를 위해 시스템을 개선하고 있어요. 당분간 이메일 로그인이나 회원가입을 이용해 주시면 정말 감사하겠습니다! 12일 복구될 예정이에요.
                     </p>
                 </div>
             </div>
