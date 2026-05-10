@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Mail, Lock, Check, Phone, MessageSquare, X, UserCircle } from 'lucide-react';
+import { Mail, Lock, Check, Phone, MessageSquare, X, UserCircle, Info } from 'lucide-react';
 import {
     signInWithEmailAndPassword,
     RecaptchaVerifier,
@@ -15,7 +15,7 @@ import { auth } from '@/lib/firebase';
 export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [authMode, setAuthMode] = useState('phone'); // 'email' or 'phone'
+    const [authMode, setAuthMode] = useState('email'); // 'email' or 'phone'
     const recaptchaVerifierRef = useRef(null);
 
 
@@ -140,6 +140,19 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
 
     return (
         <div className="w-full">
+            {/* Maintenance Notice */}
+            <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-[32px] mb-8 flex items-start gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="bg-emerald-100 p-2.5 rounded-2xl text-emerald-600 shrink-0">
+                    <Info size={20} />
+                </div>
+                <div>
+                    <p className="text-sm font-black text-emerald-900 mb-1">본인인증 시스템 업데이트 중! ✨</p>
+                    <p className="text-xs text-emerald-700/90 font-bold leading-relaxed">
+                        더 안정적인 서비스를 위해 시스템을 개선하고 있어요. 당분간 이메일 로그인을 이용해 주시면 정말 감사하겠습니다! 내일(월) 오후 중으로 복구될 예정이에요.
+                    </p>
+                </div>
+            </div>
+
             {/* Tabs */}
             <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
                 <button
