@@ -47,8 +47,13 @@ export default function Survey() {
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, setAnswers] = useState({});
     const [isSaving, setIsSaving] = useState(false);
-    const [earPhoto, setEarPhoto] = useState(null);
-    const [photoPreview, setPhotoPreview] = useState(null);
+    
+    // Ear Photos States
+    const [leftEarPhoto, setLeftEarPhoto] = useState(null);
+    const [rightEarPhoto, setRightEarPhoto] = useState(null);
+    const [leftPreview, setLeftPreview] = useState(null);
+    const [rightPreview, setRightPreview] = useState(null);
+    
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -69,15 +74,20 @@ export default function Survey() {
         setAnswers({ ...answers, [currentStep]: option });
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = (e, side) => {
         const file = e.target.files[0];
         if (file) {
-            setEarPhoto(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            if (side === 'left') {
+                setLeftEarPhoto(file);
+                const reader = new FileReader();
+                reader.onloadend = () => setLeftPreview(reader.result);
+                reader.readAsDataURL(file);
+            } else {
+                setRightEarPhoto(file);
+                const reader = new FileReader();
+                reader.onloadend = () => setRightPreview(reader.result);
+                reader.readAsDataURL(file);
+            }
         }
     };
 
@@ -88,18 +98,28 @@ export default function Survey() {
             // Finish survey and save to Firestore
             setIsSaving(true);
             try {
-                let photoUrl = null;
-                if (earPhoto) {
-                    const storageRef = ref(storage, `ear_photos/${user.uid}/${Date.now()}`);
-                    await uploadBytes(storageRef, earPhoto);
-                    photoUrl = await getDownloadURL(storageRef);
+                let leftUrl = null;
+                let rightUrl = null;
+
+                if (leftEarPhoto) {
+                    const leftRef = ref(storage, `ear_photos/${user.uid}/left_${Date.now()}`);
+                    await uploadBytes(leftRef, leftEarPhoto);
+                    leftUrl = await getDownloadURL(leftRef);
+                }
+
+                if (rightEarPhoto) {
+                    const rightRef = ref(storage, `ear_photos/${user.uid}/right_${Date.now()}`);
+                    await uploadBytes(rightRef, rightEarPhoto);
+                    rightUrl = await getDownloadURL(rightRef);
                 }
 
                 await addDoc(collection(db, 'surveys'), {
                     userId: user.uid,
                     userName: user.displayName || user.phoneNumber || '사용자',
                     answers: answers,
-                    earPhotoUrl: photoUrl,
+                    earPhotoUrl: leftUrl, // Backward compatibility
+                    leftEarUrl: leftUrl,
+                    rightEarUrl: rightUrl,
                     createdAt: serverTimestamp()
                 });
                 router.push('/dashboard');
@@ -140,50 +160,89 @@ export default function Survey() {
                     {/* Options / Upload Area */}
                     <div style={{ marginBottom: '40px' }}>
                         {currentStep === 5 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                {/* Tips Section */}
-                                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', marginBottom: '12px', fontWeight: 'bold' }}>
-                                        <Info size={18} />
-                                        <span>귀 사진 촬영 팁 (상담 전 확인!)</span>
+                            <div className="space-y-6">
+                                {/* Sample Image Guidance */}
+                                <div className="bg-pale p-6 rounded-[32px] border border-[#2E7D32]/10 overflow-hidden shadow-custom">
+                                    <div className="flex items-center gap-2 text-[#2E7D32] mb-4 font-black">
+                                        <Info size={20} />
+                                        <span>전문가 권장 촬영 가이드</span>
                                     </div>
-                                    <ul style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', paddingLeft: '20px', listStyleType: 'disc', lineHeight: '1.6' }}>
-                                        <li>밝은 조명 아래에서 그림자가 지지 않게 촬영해 주세요.</li>
-                                        <li>귀 전체(귓바퀴부터 귓불까지)가 한 화면에 나오도록 해주세요.</li>
-                                        <li>머리카락이나 안경, 귀걸이 등은 가급적 치워주시는 것이 좋습니다.</li>
-                                        <li>정면에서 선명하게 초점을 맞춰 촬영해 주세요.</li>
-                                    </ul>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-4">
+                                        <div className="rounded-2xl overflow-hidden border-2 border-white shadow-sm h-48">
+                                            <img 
+                                                src="/images/ear_sample.png" 
+                                                alt="Sample ear photo" 
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <ul className="text-sm text-slate-600 space-y-2 font-medium">
+                                            <li className="flex gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] mt-1.5 shrink-0" />
+                                                그늘지지 않게 밝은 곳에서 촬영
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] mt-1.5 shrink-0" />
+                                                귓바퀴부터 귓불까지 전체 포함
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] mt-1.5 shrink-0" />
+                                                머리카락이나 액세서리 정리
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] mt-1.5 shrink-0" />
+                                                측면에서 선명하게 초점 맞추기
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-[#2E7D32] text-white p-3 rounded-xl text-center text-xs font-bold">
+                                        ⚠️ 정확한 분석을 위해 반드시 "양쪽 귀" 모두 촬영해 주세요.
+                                    </div>
                                 </div>
 
-                                {/* Upload Buttons */}
-                                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr', gap: '12px' }}>
-                                    {isMobile && (
-                                        <label style={{
-                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '20px',
-                                            border: '2px dashed var(--primary)', borderRadius: '16px', cursor: 'pointer', background: 'white'
-                                        }}>
-                                            <Camera size={32} color="var(--primary)" />
-                                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>사진 찍기</span>
-                                            <input type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: 'none' }} />
+                                {/* Dual Upload Slots */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* Left Ear Slot */}
+                                    <div className="space-y-3">
+                                        <p className="text-center font-bold text-slate-700 text-sm">왼쪽 귀</p>
+                                        <label className={`
+                                            relative flex flex-col items-center justify-center gap-3 p-6 h-48 
+                                            border-2 border-dashed rounded-[24px] cursor-pointer transition-all overflow-hidden
+                                            ${leftPreview ? 'border-solid border-[#2E7D32] bg-white' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}
+                                        `}>
+                                            {leftPreview ? (
+                                                <img src={leftPreview} alt="Left Ear" className="absolute inset-0 w-full h-full object-cover" />
+                                            ) : (
+                                                <>
+                                                    <Camera size={32} className="text-slate-400" />
+                                                    <span className="text-xs font-bold text-slate-500">사진 등록</span>
+                                                </>
+                                            )}
+                                            <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'left')} className="hidden" />
                                         </label>
-                                    )}
-                                    <label style={{
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '20px',
-                                        border: '2px dashed #cbd5e1', borderRadius: '16px', cursor: 'pointer', background: 'white'
-                                    }}>
-                                        <Upload size={32} color="#64748b" />
-                                        <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>갤러리에서 선택</span>
-                                        <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
-                                    </label>
-                                </div>
-
-                                {/* Preview */}
-                                {photoPreview && (
-                                    <div style={{ position: 'relative', width: '100%', height: '200px', borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                                        <img src={photoPreview} alt="Ear preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.5)', color: 'white', padding: '4px 8px', borderRadius: '8px', fontSize: '0.7rem' }}>선택됨</div>
                                     </div>
-                                )}
+
+                                    {/* Right Ear Slot */}
+                                    <div className="space-y-3">
+                                        <p className="text-center font-bold text-slate-700 text-sm">오른쪽 귀</p>
+                                        <label className={`
+                                            relative flex flex-col items-center justify-center gap-3 p-6 h-48 
+                                            border-2 border-dashed rounded-[24px] cursor-pointer transition-all overflow-hidden
+                                            ${rightPreview ? 'border-solid border-[#2E7D32] bg-white' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}
+                                        `}>
+                                            {rightPreview ? (
+                                                <img src={rightPreview} alt="Right Ear" className="absolute inset-0 w-full h-full object-cover" />
+                                            ) : (
+                                                <>
+                                                    <Camera size={32} className="text-slate-400" />
+                                                    <span className="text-xs font-bold text-slate-500">사진 등록</span>
+                                                </>
+                                            )}
+                                            <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'right')} className="hidden" />
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -233,10 +292,10 @@ export default function Survey() {
 
                         <button
                             onClick={handleNext}
-                            disabled={(currentStep === questions.length - 1 ? !earPhoto : !answers[currentStep]) || isSaving}
+                            disabled={(currentStep === questions.length - 1 ? (!leftEarPhoto || !rightEarPhoto) : !answers[currentStep]) || isSaving}
                             className="btn btn-primary"
                             style={{
-                                opacity: (currentStep === questions.length - 1 ? !earPhoto : !answers[currentStep]) || isSaving ? 0.5 : 1,
+                                opacity: (currentStep === questions.length - 1 ? (!leftEarPhoto || !rightEarPhoto) : !answers[currentStep]) || isSaving ? 0.5 : 1,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px'

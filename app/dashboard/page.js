@@ -33,6 +33,7 @@ export default function DashboardPage() {
     const { user, loading, logout } = useAuth();
     const [currentTime, setCurrentTime] = useState('');
     const [activeTab, setActiveTab] = useState('overview');
+    const [activeEar, setActiveEar] = useState('left'); // 'left' or 'right'
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(true);
     const [latestDiagnosis, setLatestDiagnosis] = useState(null);
@@ -318,14 +319,35 @@ export default function DashboardPage() {
                                             </div>
                                             <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
                                                 {/* Ear Photo with Interactive Markers */}
-                                                <div className="flex-1 bg-slate-900 relative flex items-center justify-center p-6 min-h-[400px]">
-                                                    <div className="relative max-w-full max-h-full aspect-square md:aspect-auto">
+                                                <div className="flex-1 bg-slate-900 relative flex flex-col items-center justify-center p-6 min-h-[450px]">
+                                                    {/* Ear Toggle */}
+                                                    {(latestDiagnosis.leftEarUrl && latestDiagnosis.rightEarUrl) && (
+                                                        <div className="absolute top-4 z-10 flex bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10">
+                                                            <button 
+                                                                onClick={() => setActiveEar('left')}
+                                                                className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeEar === 'left' ? 'bg-white text-slate-900 shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                                            >
+                                                                왼쪽 귀
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => setActiveEar('right')}
+                                                                className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeEar === 'right' ? 'bg-white text-slate-900 shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                                            >
+                                                                오른쪽 귀
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="relative max-w-full max-h-full aspect-square md:aspect-auto mt-8">
                                                         <img 
-                                                            src={latestDiagnosis.earPhotoUrl} 
+                                                            src={activeEar === 'left' ? (latestDiagnosis.leftEarUrl || latestDiagnosis.earPhotoUrl) : (latestDiagnosis.rightEarUrl || latestDiagnosis.earPhotoUrl)} 
                                                             alt="Analyzed Ear" 
-                                                            className="rounded-2xl shadow-2xl max-w-full max-h-[500px] object-contain ring-4 ring-white/5"
+                                                            className="rounded-2xl shadow-2xl max-w-full max-h-[500px] object-contain ring-4 ring-white/5 transition-all duration-500"
                                                         />
-                                                        {latestDiagnosis.markedAcupoints.map((marker, idx) => (
+                                                        {/* Markers are only shown for the 'active' ear. 
+                                                           Note: In the current version, markers are likely saved against the 'main' image (left). 
+                                                           We'll show them only on the left ear for now to avoid misalignment. */}
+                                                        {activeEar === 'left' && latestDiagnosis.markedAcupoints.map((marker, idx) => (
                                                             <div 
                                                                 key={idx}
                                                                 className="absolute -translate-x-1/2 -translate-y-1/2 group/pin cursor-help"

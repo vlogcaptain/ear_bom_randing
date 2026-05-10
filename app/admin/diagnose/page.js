@@ -36,6 +36,7 @@ function DiagnoseContent() {
     const [showConfirm, setShowConfirm] = useState(false);
     const [isMarkingModalOpen, setIsMarkingModalOpen] = useState(false);
     const [markedAcupoints, setMarkedAcupoints] = useState([]);
+    const [activeEar, setActiveEar] = useState('left'); // 'left' or 'right'
     
     // 진단 7가지 필드 상태
     const [form, setForm] = useState({
@@ -207,6 +208,22 @@ function DiagnoseContent() {
                             User Submitted Photo
                         </div>
                         <div className="flex gap-2">
+                            {(survey?.leftEarUrl && survey?.rightEarUrl) && (
+                                <div className="flex bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10 mr-2">
+                                    <button 
+                                        onClick={() => setActiveEar('left')}
+                                        className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeEar === 'left' ? 'bg-white text-slate-900 shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                    >
+                                        L
+                                    </button>
+                                    <button 
+                                        onClick={() => setActiveEar('right')}
+                                        className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeEar === 'right' ? 'bg-white text-slate-900 shadow-lg' : 'text-white/60 hover:text-white'}`}
+                                    >
+                                        R
+                                    </button>
+                                </div>
+                            )}
                             <button onClick={() => setZoom(prev => Math.min(prev + 0.5, 4))} className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all">
                                 <ZoomIn size={18} />
                             </button>
@@ -221,21 +238,25 @@ function DiagnoseContent() {
                                 className="px-6 h-10 bg-green-600 hover:bg-green-500 text-white rounded-xl flex items-center gap-2 text-xs font-black transition-all shadow-lg"
                             >
                                 <MapPin size={16} />
-                                혈자리 마킹하기
+                                {activeEar === 'left' ? '왼쪽' : '오른쪽'} 마킹
                             </button>
                         </div>
                     </div>
 
                     <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300 ease-out" style={{ transform: `scale(${zoom})` }}>
-                        {survey?.earPhotoUrl ? (
+                        {(survey?.leftEarUrl || survey?.rightEarUrl || survey?.earPhotoUrl) ? (
                             <div className="relative">
                                 <img 
-                                    src={survey.earPhotoUrl} 
+                                    src={activeEar === 'left' ? (survey.leftEarUrl || survey.earPhotoUrl) : (survey.rightEarUrl || survey.earPhotoUrl)} 
                                     alt="Ear Photo" 
-                                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-all duration-500"
                                 />
-                                {/* Render markers on the small preview if needed, or just let users use the modal */}
-                                {markedAcupoints.map((point, idx) => (
+                                {/* Render markers for both ears if they are saved separately, 
+                                   but for now markers are likely a single array. 
+                                   In a real dual-ear marking system, we'd need side-specific markers.
+                                   We'll show them based on activeEar if they have a 'side' property, 
+                                   or just show them on 'left' (default). */}
+                                {markedAcupoints.filter(p => !p.side || p.side === activeEar).map((point, idx) => (
                                     <div 
                                         key={idx}
                                         className="absolute w-3 h-3 bg-red-500 border border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-sm"
@@ -387,11 +408,15 @@ function DiagnoseContent() {
                 isOpen={isMarkingModalOpen}
                 onClose={() => setIsMarkingModalOpen(false)}
                 onSave={(points) => {
-                    setMarkedAcupoints(points);
+                    // Add side information to markers
+                    const pointsWithSide = points.map(p => ({ ...p, side: activeEar }));
+                    // Merge with markers from the other side
+                    const otherSidePoints = markedAcupoints.filter(p => p.side && p.side !== activeEar);
+                    setMarkedAcupoints([...otherSidePoints, ...pointsWithSide]);
                     setIsMarkingModalOpen(false);
                 }}
-                imageUrl={survey?.earPhotoUrl}
-                initialMarkers={markedAcupoints}
+                imageUrl={activeEar === 'left' ? (survey?.leftEarUrl || survey?.earPhotoUrl) : (survey?.rightEarUrl || survey?.earPhotoUrl)}
+                initialMarkers={markedAcupoints.filter(p => p.side === activeEar)}
             />
 
             <style jsx>{`
