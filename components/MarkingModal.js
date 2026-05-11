@@ -9,6 +9,7 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
     const [markers, setMarkers] = useState(initialMarkers);
     const [selectedMarker, setSelectedMarker] = useState(null);
     const [tempLabel, setTempLabel] = useState('');
+    const [syncBothEars, setSyncBothEars] = useState(true);
     const [displayUrl, setDisplayUrl] = useState(imageUrl || '/demo_ear_photo.png');
     const imageContainerRef = useRef(null);
 
@@ -69,13 +70,13 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
                 <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden p-4 group">
                     <div 
                         ref={imageContainerRef}
-                        className="relative max-w-full max-h-full cursor-crosshair transition-transform duration-500 ease-out"
+                        className="relative cursor-crosshair transition-transform duration-500 ease-out"
                         onClick={handleImageClick}
                     >
                         <img 
                             src={displayUrl} 
                             alt="Ear to mark" 
-                            className="max-w-full max-h-[700px] object-contain rounded-2xl shadow-2xl select-none"
+                            className="max-w-full max-h-[700px] block rounded-2xl shadow-2xl select-none"
                             draggable={false}
                             onError={(e) => {
                                 console.log('[DEBUG] Image load error in MarkingModal, falling back to demo.');
@@ -171,6 +172,22 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
                         )}
 
                         {/* Markers List */}
+                        {/* Sync Toggle */}
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10 mb-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">양쪽 귀 동시 마킹</h4>
+                                    <p className="text-[9px] text-slate-500 font-bold mt-0.5">L/R 양쪽에 동일하게 적용</p>
+                                </div>
+                                <button 
+                                    onClick={() => setSyncBothEars(!syncBothEars)}
+                                    className={`relative w-10 h-5 rounded-full transition-colors ${syncBothEars ? 'bg-green-600' : 'bg-slate-700'}`}
+                                >
+                                    <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${syncBothEars ? 'translate-x-5' : ''}`}></div>
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">마킹된 혈자리 리스트 ({markers.length})</h4>
                             {markers.length === 0 ? (
@@ -215,7 +232,7 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
                     <div className="p-6 border-t border-white/5 space-y-3 bg-white/[0.02]">
                         <button 
                             disabled={markers.length === 0}
-                            onClick={() => onSave(markers)}
+                            onClick={() => onSave(markers, syncBothEars)}
                             className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-2xl font-black text-sm transition-all shadow-xl shadow-green-600/10 active:scale-95 flex items-center justify-center gap-2"
                         >
                             <Save size={18} />

@@ -249,7 +249,7 @@ function DiagnoseContent() {
                                 <img 
                                     src={activeEar === 'left' ? (survey.leftEarUrl || survey.earPhotoUrl) : (survey.rightEarUrl || survey.earPhotoUrl)} 
                                     alt="Ear Photo" 
-                                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-all duration-500"
+                                    className="max-w-full max-h-[700px] block rounded-lg shadow-2xl transition-all duration-500"
                                 />
                                 {/* Render markers for both ears if they are saved separately, 
                                    but for now markers are likely a single array. 
@@ -407,12 +407,19 @@ function DiagnoseContent() {
             <MarkingModal 
                 isOpen={isMarkingModalOpen}
                 onClose={() => setIsMarkingModalOpen(false)}
-                onSave={(points) => {
-                    // Add side information to markers
-                    const pointsWithSide = points.map(p => ({ ...p, side: activeEar }));
-                    // Merge with markers from the other side
-                    const otherSidePoints = markedAcupoints.filter(p => p.side && p.side !== activeEar);
-                    setMarkedAcupoints([...otherSidePoints, ...pointsWithSide]);
+                onSave={(points, sync) => {
+                    if (sync) {
+                        // Apply markers to both ears
+                        const leftPoints = points.map(p => ({ ...p, side: 'left' }));
+                        const rightPoints = points.map(p => ({ ...p, side: 'right' }));
+                        setMarkedAcupoints([...leftPoints, ...rightPoints]);
+                    } else {
+                        // Add side information to markers for the active side only
+                        const pointsWithSide = points.map(p => ({ ...p, side: activeEar }));
+                        // Merge with markers from the other side
+                        const otherSidePoints = markedAcupoints.filter(p => p.side && p.side !== activeEar);
+                        setMarkedAcupoints([...otherSidePoints, ...pointsWithSide]);
+                    }
                     setIsMarkingModalOpen(false);
                 }}
                 imageUrl={activeEar === 'left' ? (survey?.leftEarUrl || survey?.earPhotoUrl) : (survey?.rightEarUrl || survey?.earPhotoUrl)}

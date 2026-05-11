@@ -338,11 +338,11 @@ export default function DashboardPage() {
                                                         </div>
                                                     )}
 
-                                                    <div className="relative max-w-full max-h-full aspect-square md:aspect-auto mt-8">
+                                                    <div className="relative mt-8">
                                                         <img 
                                                             src={activeEar === 'left' ? (latestDiagnosis.leftEarUrl || latestDiagnosis.earPhotoUrl) : (latestDiagnosis.rightEarUrl || latestDiagnosis.earPhotoUrl)} 
                                                             alt="Analyzed Ear" 
-                                                            className="rounded-2xl shadow-2xl max-w-full max-h-[500px] object-contain ring-4 ring-white/5 transition-all duration-500"
+                                                            className="rounded-2xl shadow-2xl max-w-full max-h-[500px] block ring-4 ring-white/5 transition-all duration-500"
                                                         />
                                                         {/* Markers are only shown for the 'active' ear. 
                                                            Note: In the current version, markers are likely saved against the 'main' image (left). 
