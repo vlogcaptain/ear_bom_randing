@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { X, MapPin, Save, Trash2, Check, Plus } from 'lucide-react';
+import { X, MapPin, Save, Trash2, Check, Plus, CheckCircle } from 'lucide-react';
 
 const DEFAULT_MARKERS = [];
 
