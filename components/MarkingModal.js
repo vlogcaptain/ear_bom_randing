@@ -214,7 +214,7 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
 
                     <div className="p-6 border-t border-white/5 space-y-3 bg-white/[0.02]">
                         <button 
-                            disabled={markers.length === 0}
+                            disabled={false}
                             onClick={() => onSave(markers)}
                             className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-2xl font-black text-sm transition-all shadow-xl shadow-green-600/10 active:scale-95 flex items-center justify-center gap-2"
                         >

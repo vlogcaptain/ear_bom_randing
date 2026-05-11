@@ -224,10 +224,18 @@ function DiagnoseContent() {
                                     </button>
                                 </div>
                             )}
-                            <button onClick={() => setZoom(prev => Math.min(prev + 0.5, 4))} className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all">
+                            <button 
+                                onClick={() => setZoom(prev => Math.min(prev + 0.2, 3))}
+                                className={`w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all ${zoom >= 3 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                disabled={zoom >= 3}
+                            >
                                 <ZoomIn size={18} />
                             </button>
-                            <button onClick={() => setZoom(prev => Math.max(prev - 0.5, 1))} className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all">
+                            <button 
+                                onClick={() => setZoom(prev => Math.max(prev - 0.2, 0.5))}
+                                className={`w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all ${zoom <= 0.5 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                disabled={zoom <= 0.5}
+                            >
                                 <ZoomOut size={18} />
                             </button>
                             <button onClick={() => setZoom(1)} className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all">
@@ -251,11 +259,6 @@ function DiagnoseContent() {
                                     alt="Ear Photo" 
                                     className="max-w-full max-h-[700px] block rounded-lg shadow-2xl transition-all duration-500"
                                 />
-                                {/* Render markers for both ears if they are saved separately, 
-                                   but for now markers are likely a single array. 
-                                   In a real dual-ear marking system, we'd need side-specific markers.
-                                   We'll show them based on activeEar if they have a 'side' property, 
-                                   or just show them on 'left' (default). */}
                                 {markedAcupoints.filter(p => !p.side || p.side === activeEar).map((point, idx) => (
                                     <div 
                                         key={idx}
