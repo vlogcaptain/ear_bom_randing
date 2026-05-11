@@ -439,9 +439,12 @@ export default function DashboardPage() {
                                                     <Calendar size={14} /> 다음 상담 추천일
                                                 </h4>
                                                 <p className="text-2xl font-black">{latestDiagnosis.nextDate ? new Date(latestDiagnosis.nextDate).toLocaleDateString() : '분석 대기'}</p>
-                                                <button className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all">
+                                                <Link 
+                                                    href="/appointment" 
+                                                    className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
+                                                >
                                                     예약 페이지로 이동
-                                                </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
