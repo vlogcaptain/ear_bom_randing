@@ -218,10 +218,12 @@ export default function MarkingModal({ isOpen, onClose, onSave, imageUrl, initia
                             onClick={() => onSave(markers)}
                             className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-2xl font-black text-sm transition-all shadow-xl shadow-green-600/10 active:scale-95 flex items-center justify-center gap-2"
                         >
-                            <Save size={18} />
-                            마킹 정보 저장하기
+                            <CheckCircle size={18} />
+                            마킹 적용하기
                         </button>
-                        <p className="text-[9px] text-slate-600 text-center font-bold uppercase tracking-tighter">정보를 저장하면 회원 건강 리포트에 반영됩니다.</p>
+                        <p className="text-[10px] text-slate-500 text-center font-bold">
+                            * 메인 화면의 [진단 결과 전송] 버튼을 눌러야 최종 저장됩니다.
+                        </p>
                     </div>
                 </div>
             </div>
