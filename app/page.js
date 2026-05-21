@@ -12,6 +12,51 @@ import ResearchModal from '@/components/ResearchModal';
 import InstallGuideModal from '@/components/InstallGuideModal';
 import Footer from '@/components/Footer';
 
+const reviewsData = [
+  {
+    id: 1,
+    name: "김OO 님",
+    content: "수업 내용은 알차고 다양한 신체 관련 건강 지식도 배울 수 있어서 좋았습니다. 동영상 강의와 귀 모형을 통한 침점 교육도 도움이 많이 된 것 같습니다. 실습 시간이 부족한 것 같은 느낌이 유일한 단점인 것 같네요. 선생님도 전문적이고 친절하시고 재미있게 수업해 주셔서 즐거운 수업이 될 수 있었습니다. 감사합니다.",
+    images: ["/images/reviews/review_1.jpg"]
+  },
+  {
+    id: 2,
+    name: "김OO 님",
+    content: "새로운 세계를 알게 되어 감사하고, 가족과 주변인에게 아주 작은 나눔을 하게 되어 또한 감사합니다. 더 깊고 넓은 배움이 이어지길 바라며 선생님께 감사 인사드립니다.",
+    images: ["/images/reviews/review_2.jpg"]
+  },
+  {
+    id: 3,
+    name: "방OO 님",
+    content: "백정숙 선생님과 좋은 인연을 이어가게 되어 감사합니다. 건강해지고 싶어 수강하게 되었는데, 제 귀 모습을 보며.. 작은 변화가 보이고, 통증이 사라짐을 느끼며... 신기하고 호기심이 생깁니다. 부족함이 많아 선생님 지도하에 열심히 배워보겠습니다.",
+    images: ["/images/reviews/review_3.jpg"]
+  },
+  {
+    id: 4,
+    name: "김OO 님",
+    content: "우연히 이침 강좌를 수강하게 되어 3개월 동안 배웠지만 아직 실력은 미숙합니다. 그래도 나름 열심히 공부하여 주위 지인들에게 소개도 하며 부족한 실력으로 이침도 놓아주면 아주 좋아했습니다. 잘 가르쳐 주셔서 감사드립니다.!",
+    images: ["/images/reviews/review_4.jpg"]
+  },
+  {
+    id: 5,
+    name: "혜OO 님",
+    content: "정숙 선생님 :) 이번학기 수업도 선생님의 열정으로 정말 재밌게 들었어요. 이혈테라피라는 생소하기만 했던 공부를 이제는 저의 일상이 되어 다른 사람과 저의 건강을 돌볼 수 있게 되어 감사합니다. 늘 앞으로도 오래오래 인연을 이어가 늘 저의 나침반이 되어주시면 좋겠어요. ♡ 선생님의 미모와 열정이 제게는 늘 동기부여가 됩니다. 앞으로도 잘 부탁드려요.",
+    images: ["/images/reviews/review_5.jpg"]
+  },
+  {
+    id: 6,
+    name: "강OO 님",
+    content: "처음 교육을 접했을 때 반신반의했습니다. 과연 나에게 도움이 될까 하는 의문 때문이었습니다. 하지만 새로운 변화를 기대하는 마음으로 한 걸음 내딛게 되었습니다. 특히 기억에 남는 것은 작은 습관의 변화였습니다. 잘은 못하지만 1주일에 한 번씩 실습한다는 마음으로 꾸준히 연습을 했습니다. 손가락이 아파 구부릴 수가 없었는데 꾸준히 이침을 한 결과 손가락도 구부러지는 '기적!!'이 있었습니다.\n\n교육을 통해 얻은 가장 큰 수확은 자신감이었습니다. 적극적으로 무엇이든 할 수 있는 삶을 바라보게 되었고, 제 자신을 성장시키는 소중한 기회였습니다. 배운 것을 모두 실천할 수는 없지만 욕심을 내고 앞으로도 더욱 배워야 할 것 같습니다. 기회가 된다면 주위 사람들에게 이침의 장점을 많이 알리고, 이를 살려 건강을 챙길 수 있었으면 좋겠습니다.",
+    images: ["/images/reviews/review_6.jpg"]
+  },
+  {
+    id: 7,
+    name: "혜OO 님",
+    content: "12주가 금방 갔습니다. 아프고 나서 내 몸이 주는 신호를 잘 캐치해야지라는 생각만 있었는데, 귀를 통해 그 문이 열린 것 같아서 개인적으로 너무 기쁘고 감사합니다. 이제 시작이지만 시작이 반이니 앞으로도 이침하면서 건강을 잘 챙기도록 하겠습니다. 선생님도 건강하셔서 계속 멋진 강의 해주세요.",
+    images: ["/images/reviews/review_7.jpg"]
+  }
+];
+
 export default function Home() {
     const router = useRouter();
     const { user, loading } = useAuth();
@@ -21,6 +66,7 @@ export default function Home() {
     const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [selectedReviewImages, setSelectedReviewImages] = useState(null);
 
     useEffect(() => {
         setMounted(true);
@@ -538,6 +584,39 @@ export default function Home() {
                     </div>
                 </section>
 
+                {/* Reviews Section */}
+                <section className="py-24 bg-[#F9FBF9]" id="reviews">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <span className="text-[#2E7D32] font-bold text-lg mb-4 block">STUDENT REVIEWS</span>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B5E20]">수강생들이 증명하는 생생한 변화</h2>
+                            <p className="text-gray-500 mt-4">정성껏 써주신 자필 강의 참여 후기입니다.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {reviewsData.map((review) => (
+                                <div key={review.id} className="bg-white p-8 rounded-3xl border border-green-50 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="font-bold text-lg text-gray-800">{review.name}</span>
+                                            <span className="text-xs bg-green-50 text-[#2E7D32] px-3 py-1 rounded-full font-medium">수강생 후기</span>
+                                        </div>
+                                        <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">{review.content}</p>
+                                    </div>
+                                    {review.images && review.images.length > 0 && (
+                                        <button
+                                            onClick={() => setSelectedReviewImages(review.images)}
+                                            className="mt-6 flex items-center gap-2 text-xs font-bold text-[#2E7D32] hover:text-[#1B5E20] transition-colors self-end"
+                                        >
+                                            <span className="material-symbols-outlined text-sm">image</span>
+                                            원본 손글씨 보기
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
                 {/* Stats & Testimonial Section */}
                 <section className="py-24 bg-white">
                     <div className="max-w-5xl mx-auto px-6 text-center">
@@ -610,6 +689,37 @@ export default function Home() {
                     </div>
                 </section>
             </main>
+
+            {selectedReviewImages && (
+                <div 
+                    className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                    onClick={() => setSelectedReviewImages(null)}
+                >
+                    <div className="relative max-w-4xl w-full bg-white rounded-3xl p-6 md:p-10 shadow-2xl flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                        <button 
+                            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 transition-colors"
+                            onClick={() => setSelectedReviewImages(null)}
+                        >
+                            <X size={28} />
+                        </button>
+                        <h4 className="text-lg font-bold text-gray-900 mb-6">자필 후기 원본 보기</h4>
+                        
+                        <div className="flex flex-col md:flex-row gap-6 justify-center items-center w-full max-h-[70vh] overflow-y-auto">
+                            {selectedReviewImages.map((imgSrc, idx) => (
+                                <div key={idx} className="relative w-full max-w-[420px] aspect-square rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-50">
+                                    <Image
+                                        src={imgSrc}
+                                        alt={`자필 후기 원본 ${idx + 1}`}
+                                        fill
+                                        className="object-contain"
+                                        unoptimized
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>
