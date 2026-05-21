@@ -372,10 +372,11 @@ export default function Home() {
                                             </h4>
                                             <ul className="space-y-2">
                                                 {[
-                                                    "(현) 국제이침협회 수석지도사",
-                                                    "(현) 서울시립대학교 평생교육원 강사",
-                                                    "(현) 서울 성동문화재단 강사",
-                                                    "(전) 서울 광진문화원 강사",
+                                                    "(現) 국제이침협회 수석지도사",
+                                                    "(現) 서울시립대학교 평생교육원 강사",
+                                                    "(現) 국립금오공과대학교 평생교육원 강사",
+                                                    "(現) 서울 성동문화재단 강사",
+                                                    "(前) 서울 광진문화원 강사",
                                                 ].map((item, idx) => (
                                                     <li key={idx} className="flex items-start gap-2 text-gray-600 text-sm">
                                                         <span className="text-primary mt-1">•</span>
@@ -396,6 +397,7 @@ export default function Home() {
                                                     "국제이침협회 귀상담사 지도사",
                                                     "국제이침협회 귀상담사 1급",
                                                     "사회복지사 2급",
+                                                    "치매예방활동가",
                                                 ].map((item, idx) => (
                                                     <li key={idx} className="flex items-start gap-2 text-gray-600 text-sm">
                                                         <span className="text-primary mt-1">•</span>
@@ -412,11 +414,12 @@ export default function Home() {
                                             </h4>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                                                 {[
-                                                    "국제이침협회 서울교육장 취미반/자격증반",
+                                                    "국제이침협회 서울교육장 취미반",
+                                                    "국제이침협회 서울교육장 자격증반",
                                                     "서울시립대학교 평생교육원",
                                                     "서울 성동문화재단 건강강좌",
                                                     "서울 광진문화원 생활문화강좌",
-                                                    "MG새마을금고 배봉 문화대학 건강특강",
+                                                    "MG새마을금고 문화대학 건강특강",
                                                     "NH농협 여성대학 건강특강",
                                                     "서울 성동근로자복지센터 건강특강 외 다수",
                                                 ].map((item, idx) => (
