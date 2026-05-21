@@ -127,9 +127,23 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         setLoading(true);
         setError('');
         try {
-            await confirmationResult.confirm(verificationCode);
-            if (onSuccess) onSuccess();
-            else router.push('/dashboard');
+            const result = await confirmationResult.confirm(verificationCode);
+            const user = result.user;
+
+            // Check if user document exists in Firestore
+            const { doc, getDoc } = await import('firebase/firestore');
+            const { db } = await import('@/lib/firebase');
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+            if (userDoc.exists()) {
+                if (onSuccess) onSuccess();
+                else router.push('/dashboard');
+            } else {
+                // If user doesn't exist in our DB, show guidance message
+                setError('등록된 회원 정보가 없는 번호입니다. 회원가입을 먼저 진행해 주세요.');
+                // Optional: You might want to provide a way to switch to signup view here
+                // For now, we'll just show the error message.
+            }
         } catch (err) {
             setError('인증번호가 일치하지 않습니다.');
             console.error(err);
@@ -140,18 +154,8 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
 
     return (
         <div className="w-full">
-            {/* Maintenance Notice */}
-            <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-[32px] mb-8 flex items-start gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                <div className="bg-emerald-100 p-2.5 rounded-2xl text-emerald-600 shrink-0">
-                    <Info size={20} />
-                </div>
-                <div>
-                    <p className="text-sm font-black text-emerald-900 mb-1">본인인증 시스템 업데이트 중! ✨</p>
-                    <p className="text-xs text-emerald-700/90 font-bold leading-relaxed">
-                        더 안정적인 서비스를 위해 시스템을 개선하고 있어요. 당분간 이메일 로그인이나 회원가입을 이용해 주시면 정말 감사하겠습니다! 12일 복구될 예정이에요.
-                    </p>
-                </div>
-            </div>
+
+
 
             {/* Tabs */}
             <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
@@ -233,7 +237,13 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                                         required
                                     />
                                 </div>
-                                <p className="text-[11px] text-slate-400 ml-1">'-' 없이 숫자만 입력해 주세요.</p>
+                                <div className="mt-2 space-y-1 ml-1">
+                                    <p className="text-[11px] text-slate-400 font-medium">'-' 없이 숫자만 입력해 주세요.</p>
+                                    <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                                        <Info size={12} />
+                                        인증번호는 Google 시스템을 통해 국외발송됩니다. 스팸 차단 설정을 확인해 주세요.
+                                    </p>
+                                </div>
                             </div>
                             <button
                                 type="submit"

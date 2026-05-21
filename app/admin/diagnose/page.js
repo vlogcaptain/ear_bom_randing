@@ -80,7 +80,21 @@ function DiagnoseContent() {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                setSurvey(data);
+                
+                let realName = '';
+                if (data.userId) {
+                    try {
+                        const userSnap = await getDoc(doc(db, 'users', data.userId));
+                        if (userSnap.exists()) {
+                            const uData = userSnap.data();
+                            realName = uData.name || uData.displayName || '';
+                        }
+                    } catch (userErr) {
+                        console.error("Error fetching user profile for survey:", userErr);
+                    }
+                }
+                
+                setSurvey({ ...data, realName });
                 // 기존 데이터가 있으면 채워넣기 (수정 모드 대비)
                 if (data.status === 'completed') {
                     setForm({
@@ -155,7 +169,7 @@ function DiagnoseContent() {
                     </button>
                     <div className="h-4 w-[1px] bg-slate-200 ml-2"></div>
                     <h1 className="text-sm font-black text-slate-800">
-                        {survey?.userName} <span className="text-slate-400 font-bold ml-1">사용자 정밀 진단</span>
+                        {survey?.realName || survey?.userName} <span className="text-slate-400 font-bold ml-1">사용자 정밀 진단</span>
                     </h1>
                 </div>
                 <div className="flex items-center gap-3">
@@ -276,25 +290,29 @@ function DiagnoseContent() {
                         )}
                     </div>
 
-                    <div className="absolute bottom-6 left-6 right-6 bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 hidden sm:block">
-                        <h3 className="text-white font-black text-xs mb-2 flex items-center gap-2">
-                            <Activity size={14} className="text-green-400" /> 설문 요약
-                        </h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            {survey?.answers && Object.entries(survey.answers).map(([key, value]) => (
-                                <div key={key} className="flex gap-2 text-[10px]">
-                                    <span className="text-slate-400 font-bold shrink-0">{key}:</span>
-                                    <span className="text-white/80 truncate">{value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Right Side: Inputs */}
                 <div className="w-full md:w-1/2 bg-white overflow-y-auto p-6 md:p-10 custom-scrollbar">
                     <div className="max-w-2xl mx-auto space-y-10">
                         
+                        {/* Survey Summary Section */}
+                        {survey?.answers && Object.keys(survey.answers).length > 0 && (
+                            <section className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <Activity size={16} className="text-green-600" /> 설문 요약
+                                </h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+                                    {Object.entries(survey.answers).map(([key, value]) => (
+                                        <div key={key} className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm">
+                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">{key}</span>
+                                            <span className="text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">{value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                         {/* Score Section */}
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">

@@ -125,15 +125,21 @@ export default function AdminDashboardPage() {
         router.push('/admin/login');
     };
 
+    const getUserRealName = (userId, fallbackName) => {
+        const found = users.find(u => u.id === userId || u.uid === userId);
+        return found?.name || found?.displayName || fallbackName || '이름 없음';
+    };
+
     const filteredSurveys = surveys.filter(s => {
-        const matchesSearch = s.userName?.toLowerCase().includes(searchTerm.toLowerCase());
+        const realName = getUserRealName(s.userId, s.userName);
+        const matchesSearch = realName.toLowerCase().includes(searchTerm.toLowerCase());
         const status = s.status || 'pending';
         if (filterStatus === 'all') return matchesSearch;
         return matchesSearch && status === filterStatus;
     });
 
     const filteredUsers = users.filter(u => 
-        u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (u.name || u.displayName)?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -299,10 +305,10 @@ export default function AdminDashboardPage() {
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-700 font-black text-xs border border-green-100 uppercase">
-                                                            {survey.userName?.substring(0, 1)}
+                                                            {getUserRealName(survey.userId, survey.userName).substring(0, 1)}
                                                         </div>
                                                         <div>
-                                                            <p className="font-black text-slate-800 text-sm">{survey.userName}</p>
+                                                            <p className="font-black text-slate-800 text-sm">{getUserRealName(survey.userId, survey.userName)}</p>
                                                             <p className="text-[10px] text-slate-400 font-bold">{survey.userId?.substring(0, 8)}...</p>
                                                         </div>
                                                     </div>
@@ -395,10 +401,10 @@ export default function AdminDashboardPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 font-bold text-xs uppercase">
-                                                        {user.displayName?.substring(0, 1) || user.email?.substring(0, 1)}
+                                                        {(user.name || user.displayName)?.substring(0, 1) || user.email?.substring(0, 1)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-slate-800 text-sm">{user.displayName || '이름 없음'}</p>
+                                                        <p className="font-bold text-slate-800 text-sm">{user.name || user.displayName || '이름 없음'}</p>
                                                         <p className="text-[10px] text-slate-400 font-medium">{user.email}</p>
                                                     </div>
                                                 </div>
@@ -416,7 +422,7 @@ export default function AdminDashboardPage() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center gap-2 justify-end">
                                                     <button 
-                                                        onClick={() => fetchUserNotes(user.id, user.displayName || user.email)}
+                                                        onClick={() => fetchUserNotes(user.id, user.name || user.displayName || user.email)}
                                                         className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
                                                         title="상담 노트 보기"
                                                     >
@@ -475,7 +481,10 @@ export default function AdminDashboardPage() {
                                 ) : surveys.filter(s => s.status === 'completed').length > 0 ? (
                                     surveys
                                         .filter(s => s.status === 'completed')
-                                        .filter(s => s.userName?.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        .filter(s => {
+                                            const realName = getUserRealName(s.userId, s.userName);
+                                            return realName.toLowerCase().includes(searchTerm.toLowerCase());
+                                        })
                                         .sort((a, b) => {
                                             const dateA = a.diagnosedAt?.toDate() || a.createdAt?.toDate() || 0;
                                             const dateB = b.diagnosedAt?.toDate() || b.createdAt?.toDate() || 0;
@@ -486,10 +495,10 @@ export default function AdminDashboardPage() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black text-[10px] uppercase">
-                                                            {log.userName?.substring(0, 1)}
+                                                            {getUserRealName(log.userId, log.userName).substring(0, 1)}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-slate-800 text-sm">{log.userName}</p>
+                                                            <p className="font-bold text-slate-800 text-sm">{getUserRealName(log.userId, log.userName)}</p>
                                                             <p className="text-[10px] text-slate-400 font-medium">{log.userId?.substring(0, 8)}...</p>
                                                         </div>
                                                     </div>

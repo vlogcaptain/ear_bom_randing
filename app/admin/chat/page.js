@@ -376,7 +376,7 @@ function AdminChatContent() {
                             <User size={16} />
                         </div>
                         <div>
-                            <p className="text-xs font-black text-white">{userProfile?.displayName || '이름 없음'}</p>
+                            <p className="text-xs font-black text-white">{userProfile?.name || userProfile?.displayName || '이름 없음'}</p>
                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{connectionStatus === 'connected' ? 'Connected' : 'Consulting Room'}</p>
                         </div>
                     </div>
@@ -426,11 +426,11 @@ function AdminChatContent() {
                         <div className="absolute top-6 left-6 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                             <div className="size-10 rounded-full bg-slate-800 overflow-hidden border-2 border-slate-700">
                                 <div className="w-full h-full flex items-center justify-center text-slate-500 font-black">
-                                    {userProfile?.displayName?.substring(0, 1) || 'U'}
+                                    {(userProfile?.name || userProfile?.displayName)?.substring(0, 1) || 'U'}
                                 </div>
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-white">{userProfile?.displayName}</p>
+                                <p className="text-sm font-bold text-white">{userProfile?.name || userProfile?.displayName || '이름 없음'}</p>
                                 <p className="text-[10px] text-green-400 font-black uppercase tracking-wider">Patient</p>
                             </div>
                         </div>
