@@ -141,12 +141,12 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative overflow-hidden p-1.5 shadow-sm">
+                            <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
                                     alt="ear bom healthy logo"
-                                    width={40}
-                                    height={40}
+                                    width={52}
+                                    height={52}
                                     className="object-contain invert brightness-0"
                                 />
                             </div>

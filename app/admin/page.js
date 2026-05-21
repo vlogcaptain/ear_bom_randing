@@ -151,8 +151,8 @@ export default function AdminDashboardPage() {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-[#2E7D32] rounded flex items-center justify-center p-1">
-                            <Image src="/logo.png" alt="logo" width={24} height={24} className="invert brightness-0" />
+                        <div className="w-8 h-8 bg-[#2E7D32] rounded flex items-center justify-center">
+                            <Image src="/logo.png" alt="logo" width={42} height={42} className="invert brightness-0" />
                         </div>
                         <span className="font-black tracking-tight text-base md:text-lg whitespace-nowrap">EAR BOM <span className="text-green-500">EXPERT</span></span>
                     </div>

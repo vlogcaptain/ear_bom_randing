@@ -54,12 +54,12 @@ export default function AdminLoginPage() {
             <div className="w-full max-w-md">
                 {/* Logo & Header */}
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-16 h-16 bg-[#2E7D32] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-green-900/10 p-2.5">
+                    <div className="w-16 h-16 bg-[#2E7D32] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-green-900/10">
                         <Image
                             src="/logo.png"
                             alt="ear bom healthy logo"
-                            width={50}
-                            height={50}
+                            width={84}
+                            height={84}
                             className="object-contain invert brightness-0"
                         />
                     </div>

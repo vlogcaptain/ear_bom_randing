@@ -10,12 +10,12 @@ export default function Footer() {
                 <div className="grid md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative overflow-hidden p-1 shadow-sm">
+                            <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
                                     alt="ear bom healthy logo"
-                                    width={32}
-                                    height={32}
+                                    width={42}
+                                    height={42}
                                     className="object-contain invert brightness-0"
                                 />
                             </div>

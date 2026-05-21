@@ -233,8 +233,8 @@ export default function ChatPage() {
             <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-green-100">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative overflow-hidden p-1.5 shadow-sm">
-                            <Image src="/logo.png" alt="logo" width={40} height={40} className="invert brightness-0" />
+                        <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
+                            <Image src="/logo.png" alt="logo" width={52} height={52} className="invert brightness-0" />
                         </div>
                         <span className="text-2xl font-extrabold text-[#1B5E20]">ear bom healthy</span>
                     </Link>
