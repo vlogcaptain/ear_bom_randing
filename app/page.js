@@ -67,6 +67,7 @@ export default function Home() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [selectedReviewImages, setSelectedReviewImages] = useState(null);
+    const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -104,6 +105,13 @@ export default function Home() {
             <LoginModal
                 isOpen={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
+                onSuccess={(isNewUser) => {
+                    if (isNewUser) {
+                        router.push('/survey');
+                    } else {
+                        router.push('/dashboard');
+                    }
+                }}
             />
             <HistoryModal
                 isOpen={isHistoryModalOpen}
@@ -124,18 +132,19 @@ export default function Home() {
                         <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image
                                 src="/logo.png"
-                                alt="ear bom healthy logo"
+                                alt="earbom healthy logo"
                                 width={52}
                                 height={52}
                                 className="object-contain invert brightness-0"
                             />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8 font-medium text-gray-500">
                         <Link className="hover:text-primary transition-colors" href="#concept">이침 원리</Link>
                         <Link className="hover:text-primary transition-colors" href="#how-it-works">사용방법</Link>
                         <Link className="hover:text-primary transition-colors" href="#features">주요기능</Link>
+                        <Link className="hover:text-primary transition-colors" href="#course">강좌 수강</Link>
                         <Link className="hover:text-primary transition-colors" href="/gallery">갤러리</Link>
                         <Link className="hover:text-primary transition-colors" href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
                         <Link className="hover:text-primary transition-colors" href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
@@ -165,13 +174,13 @@ export default function Home() {
                                 <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative shadow-sm">
                                     <Image
                                         src="/logo.png"
-                                        alt="ear bom healthy logo"
+                                        alt="earbom healthy logo"
                                         width={42}
                                         height={42}
                                         className="invert brightness-0"
                                     />
                                 </div>
-                                <span className="text-xl font-black text-[#1B5E20]">ear bom healthy</span>
+                                <span className="text-xl font-black text-[#1B5E20]">earbom healthy</span>
                             </div>
                             <button 
                                 className="p-2 text-gray-800"
@@ -184,6 +193,7 @@ export default function Home() {
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#concept">이침 원리</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#how-it-works">사용방법</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#features">주요기능</Link>
+                            <Link onClick={() => setIsMobileMenuOpen(false)} href="#course">강좌 수강</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/gallery">갤러리</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
@@ -197,7 +207,7 @@ export default function Home() {
                                 }}
                                 className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl text-xl font-bold shadow-xl"
                             >
-                                무료 진단 시작하기
+                                진단 무료 시작하기
                             </button>
                         </div>
                     </div>
@@ -225,7 +235,7 @@ export default function Home() {
                                     onClick={handleStartClick}
                                     className="bg-[#2E7D32] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#1B5E20] transition-all shadow-lg shadow-green-900/10 min-w-[200px]"
                                 >
-                                    무료로 시작하기
+                                    진단 무료 시작하기
                                 </button>
                                 <div className="flex flex-col gap-3 w-full sm:w-auto">
                                     <button
@@ -386,7 +396,7 @@ export default function Home() {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-dark">ear bom healthy와 함께하는 전문가</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-dark">earbom healthy와 함께하는 전문가</h2>
                             <p className="text-gray-500">풍부한 경험을 바탕으로 한 신뢰할 수 있는 데이터로 검수합니다</p>
                         </div>
                         <div className="bg-white rounded-[40px] shadow-custom border border-green-50 overflow-hidden">
@@ -400,7 +410,7 @@ export default function Home() {
                                     />
                                 </div>
                                 <div className="p-8 md:p-16 flex flex-col justify-center">
-                                    <span className="text-primary font-bold mb-4 block text-lg">ear bom healthy 대표 전문가</span>
+                                    <span className="text-primary font-bold mb-4 block text-lg">earbom healthy 대표 전문가</span>
                                     <h3 className="text-4xl font-extrabold mb-4 text-gray-800">백정숙 수석지도사</h3>
                                     <div className="flex flex-wrap gap-2 mb-8">
                                         {["#통증관리", "#스트레스케어", "#이침전문가"].map((tag, idx) => (
@@ -539,13 +549,20 @@ export default function Home() {
                                         ))}
                                     </div>
                                     
-                                    <div className="mt-12">
+                                    <div className="mt-12 flex flex-col sm:flex-row gap-4">
                                         <Link 
                                             href="/appointment"
-                                            className="inline-flex items-center gap-2 bg-[#2E7D32] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#1B5E20] transition-all shadow-lg"
+                                            className="inline-flex items-center justify-center gap-2 bg-[#2E7D32] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#1B5E20] transition-all shadow-lg text-center"
                                         >
                                             강좌 수강 문의하기
                                             <span className="material-symbols-outlined">arrow_forward</span>
+                                        </Link>
+                                        <Link 
+                                            href="#reviews"
+                                            className="inline-flex items-center justify-center gap-2 bg-white text-[#2E7D32] border-2 border-[#2E7D32] px-8 py-4 rounded-2xl text-lg font-bold hover:bg-green-50 transition-all text-center"
+                                        >
+                                            강좌 후기 확인하기
+                                            <span className="material-symbols-outlined">visibility</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -587,12 +604,26 @@ export default function Home() {
                 {/* Reviews Section */}
                 <section className="py-24 bg-[#F9FBF9]" id="reviews">
                     <div className="max-w-7xl mx-auto px-6">
-                        <div className="text-center mb-16">
+                        <div 
+                            className="text-center mb-16 cursor-pointer md:cursor-default select-none"
+                            onClick={() => {
+                                if (window.innerWidth < 768) {
+                                    setIsReviewsExpanded(!isReviewsExpanded);
+                                }
+                            }}
+                        >
                             <span className="text-[#2E7D32] font-bold text-lg mb-4 block">STUDENT REVIEWS</span>
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B5E20]">수강생들이 증명하는 생생한 변화</h2>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B5E20] flex items-center justify-center gap-2">
+                                수강생들이 증명하는 생생한 변화
+                                <span className="inline-block md:hidden text-xs font-normal text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full ml-1">
+                                    {isReviewsExpanded ? '▲ 접기' : '▼ 후기 보기'}
+                                </span>
+                            </h2>
                             <p className="text-gray-500 mt-4">정성껏 써주신 자필 강의 참여 후기입니다.</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 overflow-hidden ${
+                            isReviewsExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 md:max-h-[5000px] opacity-0 md:opacity-100'
+                        }`}>
                             {reviewsData.map((review) => (
                                 <div key={review.id} className="bg-white p-8 rounded-3xl border border-green-50 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                                     <div>
@@ -657,18 +688,8 @@ export default function Home() {
                                     onClick={handleStartClick}
                                     className="bg-white text-green-900 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-100 transition-all flex items-center justify-center gap-3"
                                 >
-                                    무료 진단 시작하기
+                                    진단 무료 시작하기
                                 </button>
-                                <a 
-                                    href="https://earbom.app" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    onClick={handleInstallClick}
-                                    className="bg-transparent border-2 border-white/50 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined">install_mobile</span>
-                                    앱 설치하고 시작하기
-                                </a>
                             </div>
                         </div>
                     </div>

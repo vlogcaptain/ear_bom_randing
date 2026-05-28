@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata = {
-    title: "ear bom healthy - 귀 하나로 읽는 당신의 건강",
+    title: "earbom healthy - 귀 하나로 읽는 당신의 건강",
     description: "동양의학의 지름길, AI 기반 스마트 건강 진단 서비스",
 };
 

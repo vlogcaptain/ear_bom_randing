@@ -18,7 +18,7 @@ function SignupContent() {
                             회원가입
                         </h2>
                         <p className="text-slate-500 font-medium">
-                            ear bom healthy의 새로운 가족이 되어보세요.
+                            earbom healthy의 새로운 가족이 되어보세요.
                         </p>
                     </div>
                 </div>

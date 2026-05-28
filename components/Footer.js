@@ -13,16 +13,16 @@ export default function Footer() {
                             <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
-                                    alt="ear bom healthy logo"
+                                    alt="earbom healthy logo"
                                     width={42}
                                     height={42}
                                     className="object-contain invert brightness-0"
                                 />
                             </div>
-                            <span className="text-xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy</span>
+                            <span className="text-xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
                         </div>
                         <p className="text-gray-500 leading-relaxed max-w-lg mb-6 text-sm">
-                            ear bom healthy는 이침(耳鍼) 요법의 지혜를 현대 기술과 결합하여<br />
+                            earbom healthy는 이침(耳鍼) 요법의 지혜를 현대 기술과 결합하여<br />
                             모든 사람이 일상에서 쉽게 건강을 관리할 수 있도록 돕습니다.
                         </p>
                         
@@ -52,7 +52,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-green-200 text-xs text-gray-400 gap-4">
-                    <p>© 2026 ear bom healthy (이노홈 홀딩스). All rights reserved.</p>
+                    <p>© 2026 earbom healthy (이노홈 홀딩스). All rights reserved.</p>
                     <div className="flex gap-6 items-center">
                         <a className="hover:text-[#2E7D32]" href="#">Instagram</a>
                         <a className="hover:text-[#2E7D32]" href="#">Facebook</a>

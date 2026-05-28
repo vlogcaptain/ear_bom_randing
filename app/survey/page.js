@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ArrowLeft, CheckCircle, Loader2, Camera, Upload, Info } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle, Loader2, Camera, Upload, Info, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -43,8 +43,17 @@ const questions = [
 
 export default function Survey() {
     const router = useRouter();
-    const { user, loading } = useAuth();
+    const { user, loading, logout } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
     const [answers, setAnswers] = useState({});
     const [isSaving, setIsSaving] = useState(false);
     
@@ -142,7 +151,39 @@ export default function Survey() {
     const progress = ((currentStep + 1) / questions.length) * 100;
 
     return (
-        <div className="section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)' }}>
+        <div className="section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', position: 'relative' }}>
+            {/* Floating Logout Button */}
+            <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 50 }}>
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 16px',
+                        borderRadius: '12px',
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        color: '#ef4444',
+                        fontSize: '0.85rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                        transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fef2f2';
+                        e.currentTarget.style.borderColor = '#fca5a5';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                >
+                    <LogOut size={14} />
+                    <span>로그아웃</span>
+                </button>
+            </div>
             <div className="container" style={{ maxWidth: '600px' }}>
                 <div style={{ background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
 

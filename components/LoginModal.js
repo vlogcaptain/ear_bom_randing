@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 import LoginForm from './LoginForm';
 import UserSignupForm from './UserSignupForm';
 
-export default function LoginModal({ isOpen, onClose }) {
+export default function LoginModal({ isOpen, onClose, onSuccess }) {
     const [view, setView] = useState('login'); // 'login', 'signup', or 'gate'
     const [title, setTitle] = useState('로그인');
 
@@ -16,8 +16,9 @@ export default function LoginModal({ isOpen, onClose }) {
         setTimeout(() => setView('login'), 300); // 닫힐 때 초기화
     };
 
-    const handleAuthSuccess = () => {
+    const handleAuthSuccess = (isNewUser) => {
         handleClose();
+        if (onSuccess) onSuccess(isNewUser);
     };
 
     return (

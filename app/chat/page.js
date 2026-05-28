@@ -236,7 +236,7 @@ export default function ChatPage() {
                         <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image src="/logo.png" alt="logo" width={52} height={52} className="invert brightness-0" />
                         </div>
-                        <span className="text-2xl font-extrabold text-[#1B5E20]">ear bom healthy</span>
+                        <span className="text-2xl font-extrabold text-[#1B5E20]">earbom healthy</span>
                     </Link>
                     <nav className="hidden lg:flex items-center gap-8 font-medium text-gray-500">
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/#concept">이침 원리</Link>

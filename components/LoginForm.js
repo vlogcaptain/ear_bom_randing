@@ -8,14 +8,15 @@ import {
     signInWithEmailAndPassword,
     RecaptchaVerifier,
     signInWithPhoneNumber,
-    signInAnonymously
+    signInAnonymously,
+    updateProfile
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [authMode, setAuthMode] = useState('email'); // 'email' or 'phone'
+    const [authMode, setAuthMode] = useState('phone'); // 'email' or 'phone'
     const recaptchaVerifierRef = useRef(null);
 
 
@@ -28,6 +29,16 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
     const [verificationCode, setVerificationCode] = useState('');
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [error, setError] = useState('');
+    const [name, setName] = useState('');
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedName = localStorage.getItem('ear_bom_name');
+            const savedPhone = localStorage.getItem('ear_bom_phone');
+            if (savedName) setName(savedName);
+            if (savedPhone) setPhoneNumber(savedPhone);
+        }
+    }, []);
 
     useEffect(() => {
         const initRecaptcha = () => {
@@ -77,7 +88,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         setError('');
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            if (onSuccess) onSuccess();
+            if (onSuccess) onSuccess(false);
             else router.push('/dashboard');
         } catch (err) {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
@@ -86,9 +97,16 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             setLoading(false);
         }
     };
-
     const handleSendCode = async (e) => {
         e.preventDefault();
+        if (!name.trim()) {
+            setError('이름을 입력해 주세요.');
+            return;
+        }
+        if (!phoneNumber.trim()) {
+            setError('전화번호를 입력해 주세요.');
+            return;
+        }
         setLoading(true);
         setError('');
         try {
@@ -131,18 +149,39 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             const user = result.user;
 
             // Check if user document exists in Firestore
-            const { doc, getDoc } = await import('firebase/firestore');
+            const { doc, getDoc, setDoc, serverTimestamp } = await import('firebase/firestore');
             const { db } = await import('@/lib/firebase');
             const userDoc = await getDoc(doc(db, 'users', user.uid));
 
             if (userDoc.exists()) {
-                if (onSuccess) onSuccess();
+                // Existing user: Save to localStorage and redirect
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('ear_bom_name', name.trim() || userDoc.data().name || '');
+                    localStorage.setItem('ear_bom_phone', phoneNumber);
+                }
+                if (onSuccess) onSuccess(false);
                 else router.push('/dashboard');
             } else {
-                // If user doesn't exist in our DB, show guidance message
-                setError('등록된 회원 정보가 없는 번호입니다. 회원가입을 먼저 진행해 주세요.');
-                // Optional: You might want to provide a way to switch to signup view here
-                // For now, we'll just show the error message.
+                // New user: Create user document and update Firebase profile
+                await updateProfile(user, {
+                    displayName: name.trim()
+                });
+
+                await setDoc(doc(db, 'users', user.uid), {
+                    uid: user.uid,
+                    name: name.trim(),
+                    phoneNumber: user.phoneNumber || phoneNumber,
+                    createdAt: serverTimestamp(),
+                    role: 'user'
+                });
+
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('ear_bom_name', name.trim());
+                    localStorage.setItem('ear_bom_phone', phoneNumber);
+                }
+
+                if (onSuccess) onSuccess(true);
+                else router.push('/survey');
             }
         } catch (err) {
             setError('인증번호가 일치하지 않습니다.');
@@ -160,14 +199,23 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             {/* Tabs */}
             <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
                 <button
-                    onClick={() => { setAuthMode('phone'); setConfirmationResult(null); setError(''); if (onTitleChange) onTitleChange('로그인'); }}
+                    onClick={() => { 
+                        setAuthMode('phone'); 
+                        setConfirmationResult(null); 
+                        setError(''); 
+                        if (onTitleChange) onTitleChange('로그인'); 
+                    }}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'phone' ? 'bg-white text-[#2E7D32] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                     <Phone size={16} />
                     전화번호 인증
                 </button>
                 <button
-                    onClick={() => { setAuthMode('email'); setError(''); if (onTitleChange) onTitleChange('로그인'); }}
+                    onClick={() => { 
+                        setAuthMode('email'); 
+                        setError(''); 
+                        if (onTitleChange) onTitleChange('로그인'); 
+                    }}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'email' ? 'bg-white text-[#2E7D32] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                     <Mail size={16} />
@@ -225,6 +273,20 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                     {!confirmationResult ? (
                         <form onSubmit={handleSendCode} className="space-y-5">
                             <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700 ml-1">이름</label>
+                                <div className="relative">
+                                    <UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/5 transition-all"
+                                        placeholder="홍길동"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700 ml-1">전화번호</label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
@@ -237,8 +299,12 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                                         required
                                     />
                                 </div>
-                                <div className="mt-2 space-y-1 ml-1">
+                                <div className="mt-2 space-y-1.5 ml-1">
                                     <p className="text-[11px] text-slate-400 font-medium">'-' 없이 숫자만 입력해 주세요.</p>
+                                    <p className="text-[11px] text-[#2E7D32] font-extrabold flex items-center gap-1">
+                                        <Info size={12} className="text-[#2E7D32]" />
+                                        첫 방문이신 경우, 입력하신 이름으로 회원가입이 자동으로 완료됩니다.
+                                    </p>
                                     <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
                                         <Info size={12} />
                                         인증번호는 Google 시스템을 통해 국외발송됩니다. 스팸 차단 설정을 확인해 주세요.
@@ -270,7 +336,11 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={() => setConfirmationResult(null)}
+                                    onClick={() => {
+                                        setConfirmationResult(null);
+                                        setError('');
+                                        if (onTitleChange) onTitleChange('로그인');
+                                    }}
                                     className="text-xs text-[#2E7D32] font-bold hover:underline ml-1"
                                 >
                                     번호 재입력
@@ -291,17 +361,22 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             <div id="recaptcha-container" className="mt-4 flex justify-center"></div>
 
 
-            <div className="mt-8 pt-8 border-t border-slate-100 text-center">
-                <p className="text-slate-500 text-sm font-medium mb-3">
-                    처음이신가요?
-                </p>
-                <button 
-                    onClick={() => router.push('/signup')} 
-                    className="w-full py-4 bg-white border-2 border-[#2E7D32] text-[#2E7D32] rounded-2xl font-black text-lg hover:bg-[#2E7D32]/5 transition-all"
-                >
-                    회원가입하고 시작하기
-                </button>
-            </div>
+            {!confirmationResult && authMode === 'email' && (
+                <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+                    <p className="text-slate-500 text-sm font-medium mb-3">
+                        처음이신가요?
+                    </p>
+                    <button 
+                        onClick={() => {
+                            if (onSwitchToSignup) onSwitchToSignup();
+                            else router.push('/signup');
+                        }} 
+                        className="w-full py-4 bg-white border-2 border-[#2E7D32] text-[#2E7D32] rounded-2xl font-black text-lg hover:bg-[#2E7D32]/5 transition-all"
+                    >
+                        회원가입하고 시작하기
+                    </button>
+                </div>
+            )}
 
             <div className="mt-10 p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <div className="flex items-start gap-3">

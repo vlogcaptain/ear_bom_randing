@@ -144,13 +144,13 @@ export default function DashboardPage() {
                             <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
-                                    alt="ear bom healthy logo"
+                                    alt="earbom healthy logo"
                                     width={52}
                                     height={52}
                                     className="object-contain invert brightness-0"
                                 />
                             </div>
-                            <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy</span>
+                            <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
                         </Link>
                     </div>
 
@@ -169,6 +169,14 @@ export default function DashboardPage() {
                                 <User size={20} />
                             </div>
                         </div>
+                        <div className="h-8 w-[1px] bg-slate-200 mx-1"></div>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold transition-all"
+                        >
+                            <LogOut size={14} />
+                            <span>로그아웃</span>
+                        </button>
                     </div>
                 </div>
             </header>
@@ -551,7 +559,7 @@ export default function DashboardPage() {
             {/* Footer */}
             <footer className="bg-white border-t border-slate-200 py-8 px-6 mt-auto">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[11px] font-black text-slate-400 tracking-wider">© 2026 ear bom healthy. All rights reserved.</p>
+                    <p className="text-[11px] font-black text-slate-400 tracking-wider">© 2026 earbom healthy. All rights reserved.</p>
                     <div className="flex gap-6 text-[11px] font-black text-slate-400 uppercase tracking-tighter">
                         <Link href="#" className="hover:text-[#2E7D32] transition-colors">이용약관</Link>
                         <Link href="#" className="hover:text-[#2E7D32] transition-colors">개인정보처리방침</Link>

@@ -14,13 +14,13 @@ export default function PrivacyPage() {
                         <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center shadow-sm">
                             <Image
                                 src="/logo.png"
-                                alt="ear bom healthy logo"
+                                alt="earbom healthy logo"
                                 width={52}
                                 height={52}
                                 className="object-contain invert brightness-0"
                             />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">ear bom healthy</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
                     </Link>
                 </div>
             </header>

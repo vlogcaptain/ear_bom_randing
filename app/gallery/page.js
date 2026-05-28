@@ -2,9 +2,23 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Image as ImageIcon, ZoomIn } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon, ZoomIn, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function GalleryPage() {
+    const { user, logout } = useAuth();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     // 업로드된 이미지 리스트 (파일명 기준)
     const images = [
         "갑상선저하증 편두통(우).png", "갑상선저하증 편두통(좌).png",
@@ -46,10 +60,21 @@ export default function GalleryPage() {
                             <p className="text-sm text-slate-500 hidden sm:block">다양한 임상 사례를 통한 이침의 효과 확인</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
-                        <ImageIcon className="w-5 h-5 text-emerald-600" />
-                        <span className="font-semibold text-emerald-700">{images.length}</span>
-                        <span className="text-emerald-600 text-sm">Cases</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
+                            <ImageIcon className="w-5 h-5 text-emerald-600" />
+                            <span className="font-semibold text-emerald-700">{images.length}</span>
+                            <span className="text-emerald-600 text-sm">Cases</span>
+                        </div>
+                        {user && (
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold transition-all"
+                            >
+                                <LogOut size={14} />
+                                <span>로그아웃</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>
