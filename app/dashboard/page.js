@@ -36,7 +36,8 @@ export default function DashboardPage() {
     const [activeEar, setActiveEar] = useState('left'); // 'left' or 'right'
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(true);
-    const [latestDiagnosis, setLatestDiagnosis] = useState(null);
+    const [diagnoses, setDiagnoses] = useState([]);
+    const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
     const [loadingDiagnosis, setLoadingDiagnosis] = useState(true);
 
     useEffect(() => {
@@ -60,25 +61,28 @@ export default function DashboardPage() {
 
         if (user) {
             fetchAppointments();
-            fetchLatestDiagnosis();
+            fetchDiagnoses();
         }
     }, [user, loading, router]);
 
-    const fetchLatestDiagnosis = async () => {
+    const fetchDiagnoses = async () => {
         try {
             const q = query(
                 collection(db, 'surveys'),
                 where('userId', '==', user.uid),
-                orderBy('createdAt', 'desc'),
-                limit(1)
+                orderBy('createdAt', 'desc')
             );
             const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                const data = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
-                setLatestDiagnosis(data);
+            const list = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setDiagnoses(list);
+            if (list.length > 0) {
+                setSelectedDiagnosis(list[0]);
             }
         } catch (error) {
-            console.error("Error fetching diagnosis:", error);
+            console.error("Error fetching diagnoses:", error);
         } finally {
             setLoadingDiagnosis(false);
         }
@@ -244,15 +248,15 @@ export default function DashboardPage() {
                                 <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
                                     <ClipboardList size={24} />
                                 </div>
-                                {latestDiagnosis?.status === 'completed' ? (
+                                {selectedDiagnosis?.status === 'completed' ? (
                                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2.5 py-1 rounded-full">분석 완료</span>
-                                ) : latestDiagnosis ? (
+                                ) : selectedDiagnosis ? (
                                     <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2.5 py-1 rounded-full animate-pulse">분석 대기중</span>
                                 ) : null}
                             </div>
-                            <p className="text-slate-500 text-sm font-medium">최근 진단 점수</p>
+                            <p className="text-slate-500 text-sm font-medium">진단 점수</p>
                             <h3 className="text-2xl font-black text-slate-800 mt-1">
-                                {latestDiagnosis?.status === 'completed' ? `${latestDiagnosis.score}점` : '-'}
+                                {selectedDiagnosis?.status === 'completed' ? `${selectedDiagnosis.score}점` : '-'}
                             </h3>
                         </div>
 
@@ -297,19 +301,45 @@ export default function DashboardPage() {
                     {/* Tab Navigation Content */}
                     {activeTab === 'reports' && (
                         <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <h3 className="text-2xl font-black text-slate-800 tracking-tight">상세 진단 리포트</h3>
-                                {latestDiagnosis?.diagnosedAt && (
-                                    <span className="text-xs font-bold text-slate-400">
-                                        진단 일시: {latestDiagnosis.diagnosedAt.toDate ? latestDiagnosis.diagnosedAt.toDate().toLocaleDateString() : 'N/A'}
-                                    </span>
-                                )}
+                                <div className="flex items-center gap-4">
+                                    {diagnoses.length > 1 && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-slate-400">진단 회차 선택:</span>
+                                            <select
+                                                value={selectedDiagnosis?.id || ''}
+                                                onChange={(e) => {
+                                                    const diag = diagnoses.find(d => d.id === e.target.value);
+                                                    if (diag) setSelectedDiagnosis(diag);
+                                                }}
+                                                className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#2E7D32]"
+                                            >
+                                                {diagnoses.map((diag, index) => {
+                                                    const dateStr = diag.createdAt?.toDate 
+                                                        ? diag.createdAt.toDate().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) 
+                                                        : '진단일 미정';
+                                                    return (
+                                                        <option key={diag.id} value={diag.id}>
+                                                            {index === 0 ? `[최신] ${dateStr}` : `${diagnoses.length - index}회차 - ${dateStr}`}
+                                                        </option>
+                                                    );
+                                                })}
+                                            </select>
+                                        </div>
+                                    )}
+                                    {selectedDiagnosis?.diagnosedAt && (
+                                        <span className="text-xs font-bold text-slate-400">
+                                            진단 일시: {selectedDiagnosis.diagnosedAt.toDate ? selectedDiagnosis.diagnosedAt.toDate().toLocaleDateString() : 'N/A'}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
-                            {latestDiagnosis?.status === 'completed' ? (
+                            {selectedDiagnosis ? (
                                 <div className="space-y-8">
                                     {/* Medical Visualization Section */}
-                                    {latestDiagnosis.markedAcupoints && latestDiagnosis.markedAcupoints.length > 0 && (
+                                    {(selectedDiagnosis.leftEarUrl || selectedDiagnosis.rightEarUrl || selectedDiagnosis.earPhotoUrl) && (
                                         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in zoom-in duration-700">
                                             <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
@@ -317,19 +347,21 @@ export default function DashboardPage() {
                                                         <Activity size={18} className="text-white" />
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-sm font-black text-slate-800">전문가 시각적 분석 가이드</h4>
+                                                        <h4 className="text-sm font-black text-slate-800">
+                                                            {selectedDiagnosis.status === 'completed' ? '전문가 시각적 분석 가이드' : '회원 업로드 귀 사진 (분석 대기 중)'}
+                                                        </h4>
                                                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Expert Visual Guidance</p>
                                                     </div>
                                                 </div>
                                                 <span className="px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-[10px] font-black rounded-full border border-[#2E7D32]/10 uppercase">
-                                                    Personalized
+                                                    {selectedDiagnosis.status === 'completed' ? 'Personalized' : 'Pending'}
                                                 </span>
                                             </div>
                                             <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
                                                 {/* Ear Photo with Interactive Markers */}
                                                 <div className="flex-1 bg-slate-900 relative flex flex-col items-center justify-center p-6 min-h-[450px]">
                                                     {/* Ear Toggle */}
-                                                    {(latestDiagnosis.leftEarUrl && latestDiagnosis.rightEarUrl) && (
+                                                    {(selectedDiagnosis.leftEarUrl && selectedDiagnosis.rightEarUrl) && (
                                                         <div className="absolute top-4 z-10 flex bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10">
                                                             <button 
                                                                 onClick={() => setActiveEar('left')}
@@ -348,14 +380,11 @@ export default function DashboardPage() {
 
                                                     <div className="relative mt-8">
                                                         <img 
-                                                            src={activeEar === 'left' ? (latestDiagnosis.leftEarUrl || latestDiagnosis.earPhotoUrl) : (latestDiagnosis.rightEarUrl || latestDiagnosis.earPhotoUrl)} 
+                                                            src={activeEar === 'left' ? (selectedDiagnosis.leftEarUrl || selectedDiagnosis.earPhotoUrl) : (selectedDiagnosis.rightEarUrl || selectedDiagnosis.earPhotoUrl)} 
                                                             alt="Analyzed Ear" 
                                                             className="rounded-2xl shadow-2xl max-w-full max-h-[500px] block ring-4 ring-white/5 transition-all duration-500"
                                                         />
-                                                        {/* Markers are only shown for the 'active' ear. 
-                                                           Note: In the current version, markers are likely saved against the 'main' image (left). 
-                                                           We'll show them only on the left ear for now to avoid misalignment. */}
-                                                        {activeEar === 'left' && latestDiagnosis.markedAcupoints.map((marker, idx) => (
+                                                        {activeEar === 'left' && selectedDiagnosis.markedAcupoints && selectedDiagnosis.markedAcupoints.map((marker, idx) => (
                                                             <div 
                                                                 key={idx}
                                                                 className="absolute -translate-x-1/2 -translate-y-1/2 group/pin cursor-help"
@@ -374,16 +403,24 @@ export default function DashboardPage() {
                                                 {/* Sidebar Point List */}
                                                 <div className="w-full lg:w-72 bg-slate-50/30 p-6 space-y-4">
                                                     <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">마킹된 혈자리 리스트</h5>
-                                                    <div className="space-y-2">
-                                                        {latestDiagnosis.markedAcupoints.map((marker, idx) => (
-                                                            <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                                                                <div className="size-6 bg-[#E8F5E9] rounded-lg flex items-center justify-center text-[10px] font-black text-[#2E7D32]">
-                                                                    {idx + 1}
+                                                    {selectedDiagnosis.markedAcupoints && selectedDiagnosis.markedAcupoints.length > 0 ? (
+                                                        <div className="space-y-2">
+                                                            {selectedDiagnosis.markedAcupoints.map((marker, idx) => (
+                                                                <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                                                    <div className="size-6 bg-[#E8F5E9] rounded-lg flex items-center justify-center text-[10px] font-black text-[#2E7D32]">
+                                                                        {idx + 1}
+                                                                    </div>
+                                                                    <span className="text-xs font-bold text-slate-700">{marker.label}</span>
                                                                 </div>
-                                                                <span className="text-xs font-bold text-slate-700">{marker.label}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-center py-12 text-slate-400 text-xs font-bold">
+                                                            {selectedDiagnosis.status === 'completed' 
+                                                                ? '등록된 침점이 없습니다.' 
+                                                                : '전문가의 침점 분석이 완료되면 이곳에 표시됩니다.'}
+                                                        </div>
+                                                    )}
                                                     <div className="p-4 bg-[#2E7D32]/5 rounded-2xl border border-[#2E7D32]/10 mt-6">
                                                         <p className="text-[10px] text-[#2E7D32] font-bold leading-relaxed">
                                                             표시된 위치를 손가락이나 이침 패치로 지압해 주세요. 매일 3회씩 꾸준히 자극하면 건강 개선에 도움이 됩니다.
@@ -395,75 +432,85 @@ export default function DashboardPage() {
                                     )}
 
                                     {/* Structured Report Details */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
-                                            <div>
-                                                <h4 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <FileText size={14} /> 종합 소견
-                                                </h4>
-                                                <p className="text-slate-700 text-sm leading-relaxed font-medium">{latestDiagnosis.overallCondition}</p>
-                                            </div>
-                                            <div>
-                                                <h4 className="text-xs font-black text-green-600 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <TrendingUp size={14} /> 추천 습관
-                                                </h4>
-                                                <p className="text-slate-700 text-sm leading-relaxed font-medium">{latestDiagnosis.recommendations}</p>
-                                            </div>
-                                            <div>
-                                                <h4 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <CheckCircle2 size={14} /> 추천 자극 포인트
-                                                </h4>
-                                                <p className="text-slate-700 text-sm leading-relaxed font-medium">{latestDiagnosis.acupoints}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                                                <h4 className="text-xs font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                    <LayoutDashboard size={14} /> 주의할 요인
-                                                </h4>
-                                                <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex items-start gap-4">
-                                                    <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm shrink-0">
-                                                        <AlertCircle size={18} />
-                                                    </div>
-                                                    <p className="text-red-700 text-sm font-bold leading-tight">{latestDiagnosis.forbiddenFoods || '주의할 음식을 식별 중입니다.'}</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                                    {selectedDiagnosis.status === 'completed' ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
                                                 <div>
-                                                    <h4 className="text-xs font-black text-pink-500 uppercase tracking-widest mb-1 flex items-center gap-2">
-                                                        <Mic size={14} /> 추천 영양제
+                                                    <h4 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                        <FileText size={14} /> 종합 소견
                                                     </h4>
-                                                    <p className="text-slate-700 text-sm font-bold">{latestDiagnosis.supplements || '없음'}</p>
+                                                    <p className="text-slate-700 text-sm leading-relaxed font-medium">{selectedDiagnosis.overallCondition}</p>
                                                 </div>
-                                                <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-pink-500">
-                                                    <CheckCircle2 size={24} />
+                                                <div>
+                                                    <h4 className="text-xs font-black text-green-600 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                        <TrendingUp size={14} /> 추천 습관
+                                                    </h4>
+                                                    <p className="text-slate-700 text-sm leading-relaxed font-medium">{selectedDiagnosis.recommendations}</p>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-xs font-black text-purple-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                        <CheckCircle2 size={14} /> 추천 자극 포인트
+                                                    </h4>
+                                                    <p className="text-slate-700 text-sm leading-relaxed font-medium">{selectedDiagnosis.acupoints}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-8 rounded-3xl shadow-lg text-white">
-                                                <h4 className="text-xs font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <Calendar size={14} /> 다음 상담 추천일
-                                                </h4>
-                                                <p className="text-2xl font-black">{latestDiagnosis.nextDate ? new Date(latestDiagnosis.nextDate).toLocaleDateString() : '분석 대기'}</p>
-                                                <Link 
-                                                    href="/appointment" 
-                                                    className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
-                                                >
-                                                    예약 페이지로 이동
-                                                </Link>
+                                            <div className="space-y-6">
+                                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                                    <h4 className="text-xs font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                                        <LayoutDashboard size={14} /> 주의할 요인
+                                                    </h4>
+                                                    <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex items-start gap-4">
+                                                        <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm shrink-0">
+                                                            <AlertCircle size={18} />
+                                                        </div>
+                                                        <p className="text-red-700 text-sm font-bold leading-tight">{selectedDiagnosis.forbiddenFoods || '주의할 음식을 식별 중입니다.'}</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+                                                    <div>
+                                                        <h4 className="text-xs font-black text-pink-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                                            <Mic size={14} /> 추천 영양제
+                                                        </h4>
+                                                        <p className="text-slate-700 text-sm font-bold">{selectedDiagnosis.supplements || '없음'}</p>
+                                                    </div>
+                                                    <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-pink-500">
+                                                        <CheckCircle2 size={24} />
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-8 rounded-3xl shadow-lg text-white">
+                                                    <h4 className="text-xs font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                        <Calendar size={14} /> 다음 상담 추천일
+                                                    </h4>
+                                                    <p className="text-2xl font-black">{selectedDiagnosis.nextDate ? new Date(selectedDiagnosis.nextDate).toLocaleDateString() : '분석 대기'}</p>
+                                                    <Link 
+                                                        href="/appointment" 
+                                                        className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
+                                                    >
+                                                        예약 페이지로 이동
+                                                    </Link>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="bg-white p-20 rounded-3xl border border-slate-200 shadow-sm text-center">
+                                            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                                <Clock className="text-slate-300 animate-pulse" size={32} />
+                                            </div>
+                                            <h4 className="text-xl font-black text-slate-800 mb-2">진단 결과를 준비 중입니다</h4>
+                                            <p className="text-slate-400 font-medium max-w-sm mx-auto">전문가가 회원님의 귀 사진을 정밀하게 분석하고 있습니다. 완료되면 이곳에서 상세 리포트 소견을 확인하실 수 있습니다.</p>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="bg-white p-20 rounded-3xl border border-slate-200 shadow-sm text-center">
                                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <Clock className="text-slate-300 animate-pulse" size={32} />
                                     </div>
-                                    <h4 className="text-xl font-black text-slate-800 mb-2">진단 결과를 준비 중입니다</h4>
-                                    <p className="text-slate-400 font-medium max-w-sm mx-auto">전문가가 회원님의 귀 사진을 정밀하게 분석하고 있습니다. 완료되면 이곳에서 상세 리포트를 확인하실 수 있습니다.</p>
+                                    <h4 className="text-xl font-black text-slate-800 mb-2">신청한 진단 내역이 없습니다</h4>
+                                    <p className="text-slate-400 font-medium max-w-sm mx-auto">우측 상단의 "새 건강 진단 시작" 버튼을 눌러 첫 진단을 받아보세요.</p>
                                 </div>
                             )}
                         </div>
@@ -507,15 +554,15 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Analysis Tip or Quick Report Preview */}
-                            {latestDiagnosis?.status === 'completed' ? (
+                            {selectedDiagnosis?.status === 'completed' ? (
                                 <div className="bg-[#1B5E20] rounded-3xl p-8 relative overflow-hidden group flex flex-col">
                                     <span className="bg-[#FFD54F] text-[#1B5E20] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Expert Opinion</span>
                                     <h3 className="text-2xl font-black text-white leading-tight mb-4">
                                         추천 자극 포인트:<br />
-                                        {latestDiagnosis.acupoints?.substring(0, 30)}...
+                                        {selectedDiagnosis.acupoints?.substring(0, 30)}...
                                     </h3>
                                     <p className="text-green-50/70 text-sm leading-relaxed mb-6 font-medium line-clamp-3">
-                                        {latestDiagnosis.overallCondition}
+                                        {selectedDiagnosis.overallCondition}
                                     </p>
                                     <button 
                                         onClick={() => setActiveTab('reports')}
