@@ -83,9 +83,32 @@ export default function Survey() {
         setAnswers({ ...answers, [currentStep]: option });
     };
 
-    const handleFileChange = (e, side) => {
-        const file = e.target.files[0];
+    const handleFileChange = async (e, side) => {
+        let file = e.target.files[0];
         if (file) {
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            if (fileExt === 'heic' || fileExt === 'heif') {
+                try {
+                    const heic2any = (await import('heic2any')).default;
+                    const convertedBlob = await heic2any({
+                        blob: file,
+                        toType: 'image/jpeg',
+                        quality: 0.8
+                    });
+                    
+                    const actualBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+                    file = new File(
+                        [actualBlob],
+                        file.name.replace(/\.(heic|heif)$/i, '.jpg'),
+                        { type: 'image/jpeg' }
+                    );
+                } catch (err) {
+                    console.error("HEIC conversion failed:", err);
+                    alert("HEIC 이미지 변환 중 오류가 발생했습니다. 가능하면 일반 사진(JPG/PNG)을 업로드해 주세요.");
+                    return;
+                }
+            }
+
             if (side === 'left') {
                 setLeftEarPhoto(file);
                 const reader = new FileReader();
@@ -99,6 +122,7 @@ export default function Survey() {
             }
         }
     };
+
 
     const handleNext = async () => {
         if (currentStep < questions.length - 1) {
