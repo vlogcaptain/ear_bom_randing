@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { User, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, Mic, MessageSquare, MapPin } from 'lucide-react';
+import { User, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, Mic, MessageSquare, MapPin, FileText } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import Footer from '@/components/Footer';
@@ -439,7 +439,7 @@ export default function AppointmentPage() {
                                         onChange={(e) => setAgreementChecked(e.target.checked)}
                                     />
                                     <span className="group-hover:text-slate-800 transition-colors leading-relaxed">
-                                        예약 전 <Link href="/terms" target="_blank" className="underline font-bold text-[#2E7D32]">취소 및 환불 규정</Link>을 확인하였으며, 이에 동의합니다.
+                                        예약 전 <Link href="/terms" className="underline font-bold text-[#2E7D32]">취소 및 환불 규정</Link>을 확인하였으며, 이에 동의합니다.
                                     </span>
                                 </label>
                                 <button

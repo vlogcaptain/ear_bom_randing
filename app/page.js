@@ -146,9 +146,14 @@ export default function Home() {
                         <Link className="hover:text-primary transition-colors" href="#features">주요기능</Link>
                         <Link className="hover:text-primary transition-colors" href="#course">강좌 수강</Link>
                         <Link className="hover:text-primary transition-colors" href="/gallery">갤러리</Link>
-                        <Link className="hover:text-primary transition-colors" href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
-                        <Link className="hover:text-primary transition-colors" href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
-                        <Link className="hover:text-primary transition-colors" href="/chat" target="_blank" rel="noopener noreferrer">실시간 상담</Link>
+                        <Link className="hover:text-primary transition-colors" href="/dashboard">대시보드</Link>
+                        <Link className="hover:text-primary transition-colors" href="/appointment">상담예약</Link>
+                        <button 
+                            onClick={() => alert('실시간 상담 기능은 준비 중입니다. 대면/비대면 상담 예약을 이용해 주시기 바랍니다.')}
+                            className="hover:text-primary transition-colors font-medium text-gray-500 text-left cursor-not-allowed"
+                        >
+                            실시간 상담
+                        </button>
                     </nav>
 
                     {/* Mobile Menu Button */}
@@ -195,9 +200,17 @@ export default function Home() {
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#features">주요기능</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#course">강좌 수강</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/gallery">갤러리</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard" target="_blank" rel="noopener noreferrer">대시보드</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/appointment" target="_blank" rel="noopener noreferrer">상담예약</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/chat" target="_blank" rel="noopener noreferrer">실시간 상담</Link>
+                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard">대시보드</Link>
+                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/appointment">상담예약</Link>
+                            <button 
+                                onClick={() => {
+                                    setIsMobileMenuOpen(false);
+                                    alert('실시간 상담 기능은 준비 중입니다. 대면/비대면 상담 예약을 이용해 주시기 바랍니다.');
+                                }} 
+                                className="text-left font-black text-gray-400 cursor-not-allowed"
+                            >
+                                실시간 상담 (준비중)
+                            </button>
                         </nav>
                         <div className="mt-auto p-8 border-t border-gray-50">
                             <button
