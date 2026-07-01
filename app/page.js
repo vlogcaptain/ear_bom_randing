@@ -132,13 +132,13 @@ export default function Home() {
                         <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image
                                 src="/logo.png"
-                                alt="earbom healthy logo"
+                                alt="earbom wellness logo"
                                 width={52}
                                 height={52}
                                 className="object-contain invert brightness-0"
                             />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8 font-medium text-gray-500">
                         <Link className="hover:text-primary transition-colors" href="#concept">이침 원리</Link>
@@ -174,13 +174,13 @@ export default function Home() {
                                 <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative shadow-sm">
                                     <Image
                                         src="/logo.png"
-                                        alt="earbom healthy logo"
+                                        alt="earbom wellness logo"
                                         width={42}
                                         height={42}
                                         className="invert brightness-0"
                                     />
                                 </div>
-                                <span className="text-xl font-black text-[#1B5E20]">earbom healthy</span>
+                                <span className="text-xl font-black text-[#1B5E20]">earbom wellness</span>
                             </div>
                             <button 
                                 className="p-2 text-gray-800"
@@ -227,7 +227,7 @@ export default function Home() {
                                 당신의 귀로<br />건강을 읽다
                             </h1>
                             <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed">
-                                이침(耳鍼) 요법의 지혜와 Smart한 기술의 만남.<br />
+                                이침(耳鍼) 요법의 지혜와 전문가의 분석력과의 만남.<br />
                                 복잡한 검사 없이 귀 사진 한 장으로 당신의 오늘을 진단합니다.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start max-w-4xl">
@@ -396,7 +396,7 @@ export default function Home() {
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-dark">earbom healthy와 함께하는 전문가</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-dark">earbom wellness와 함께하는 전문가</h2>
                             <p className="text-gray-500">풍부한 경험을 바탕으로 한 신뢰할 수 있는 데이터로 검수합니다</p>
                         </div>
                         <div className="bg-white rounded-[40px] shadow-custom border border-green-50 overflow-hidden">
@@ -410,7 +410,7 @@ export default function Home() {
                                     />
                                 </div>
                                 <div className="p-8 md:p-16 flex flex-col justify-center">
-                                    <span className="text-primary font-bold mb-4 block text-lg">earbom healthy 대표 전문가</span>
+                                    <span className="text-primary font-bold mb-4 block text-lg">earbom wellness 대표 전문가</span>
                                     <h3 className="text-4xl font-extrabold mb-4 text-gray-800">백정숙 수석지도사</h3>
                                     <div className="flex flex-wrap gap-2 mb-8">
                                         {["#통증관리", "#스트레스케어", "#이침전문가"].map((tag, idx) => (
@@ -418,7 +418,7 @@ export default function Home() {
                                         ))}
                                     </div>
                                     <p className="text-gray-500 text-lg leading-relaxed mb-10">
-                                        "수천 년간 이어져 온 전통 이침 요법의 지혜를 현대적인 AI 기술과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다. 데이터에 근거한 정밀한 분석과 따뜻한 인술의 조화를 통해 현대인들의 무너진 건강 밸런스를 되찾아 드리는 것이 저의 철학입니다."
+                                        "수천 년간 이어져 온 전통 이침 요법의 지혜를 전문가의 분석력과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다. 데이터에 근거한 정밀한 분석과 따뜻한 인술의 조화를 통해 현대인들의 무너진 건강 밸런스를 되찾아 드리는 것이 저의 철학입니다."
                                     </p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-4">

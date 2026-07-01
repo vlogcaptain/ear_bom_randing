@@ -40,10 +40,10 @@ export default function AppointmentPage() {
 
         const expert = {
         name: "백정숙 수석지도사",
-        title: "earbom healthy 대표 전문가",
+        title: "earbom wellness 대표 전문가",
         image: "/expert_baek.png",
         tags: ["#통증관리", "#스트레스케어", "#이침전문가"],
-        description: "수천 년간 이어져 온 전통 이침 요법의 지혜를 현대적인 AI 기술과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다."
+        description: "수천 년간 이어져 온 전통 이침 요법의 지혜를 전문가의 분석력과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다."
     };
 
     const availability = {
@@ -214,7 +214,7 @@ export default function AppointmentPage() {
                         <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image src="/logo.png" alt="logo" width={52} height={52} className="object-contain invert brightness-0" />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
                     </Link>
                     <div className="flex items-center gap-4">
                         <button onClick={handleLogout} className="text-sm font-bold text-slate-500 hover:text-[#2E7D32] transition-colors">로그아웃</button>

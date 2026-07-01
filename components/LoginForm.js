@@ -18,7 +18,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
     const [loading, setLoading] = useState(false);
     const [authMode, setAuthMode] = useState('phone'); // 'email' or 'phone'
     const recaptchaVerifierRef = useRef(null);
-
+    const [mounted, setMounted] = useState(false);
 
     // Email Auth State
     const [email, setEmail] = useState('');
@@ -32,17 +32,22 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
     const [name, setName] = useState('');
 
     useEffect(() => {
+        setMounted(true);
         if (typeof window !== 'undefined') {
-            const savedName = localStorage.getItem('ear_bom_name');
-            const savedPhone = localStorage.getItem('ear_bom_phone');
-            if (savedName) setName(savedName);
-            if (savedPhone) setPhoneNumber(savedPhone);
+            try {
+                const savedName = localStorage.getItem('ear_bom_name');
+                const savedPhone = localStorage.getItem('ear_bom_phone');
+                if (savedName) setName(savedName);
+                if (savedPhone) setPhoneNumber(savedPhone);
+            } catch (e) {
+                console.warn("[DEBUG] localStorage is disabled or restricted in this browser:", e);
+            }
         }
     }, []);
 
     useEffect(() => {
         const initRecaptcha = () => {
-            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current) {
+            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current && auth) {
                 try {
                     const container = document.getElementById('recaptcha-container');
                     if (container) {
@@ -65,7 +70,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             }
         };
 
-        if (authMode === 'phone') {
+        if (mounted && authMode === 'phone') {
             initRecaptcha();
         }
 
@@ -80,7 +85,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                 }
             }
         };
-    }, [authMode]);
+    }, [authMode, mounted]);
 
     const handleEmailLogin = async (e) => {
         e.preventDefault();
@@ -156,8 +161,12 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
             if (userDoc.exists()) {
                 // Existing user: Save to localStorage and redirect
                 if (typeof window !== 'undefined') {
-                    localStorage.setItem('ear_bom_name', name.trim() || userDoc.data().name || '');
-                    localStorage.setItem('ear_bom_phone', phoneNumber);
+                    try {
+                        localStorage.setItem('ear_bom_name', name.trim() || userDoc.data().name || '');
+                        localStorage.setItem('ear_bom_phone', phoneNumber);
+                    } catch (e) {
+                        console.warn("[DEBUG] localStorage setItem failed:", e);
+                    }
                 }
                 if (onSuccess) onSuccess(false);
                 else router.push('/dashboard');
@@ -176,8 +185,12 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                 });
 
                 if (typeof window !== 'undefined') {
-                    localStorage.setItem('ear_bom_name', name.trim());
-                    localStorage.setItem('ear_bom_phone', phoneNumber);
+                    try {
+                        localStorage.setItem('ear_bom_name', name.trim());
+                        localStorage.setItem('ear_bom_phone', phoneNumber);
+                    } catch (e) {
+                        console.warn("[DEBUG] localStorage setItem failed:", e);
+                    }
                 }
 
                 if (onSuccess) onSuccess(true);

@@ -153,13 +153,13 @@ export default function DashboardPage() {
                             <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
-                                    alt="earbom healthy logo"
+                                    alt="earbom wellness logo"
                                     width={52}
                                     height={52}
                                     className="object-contain invert brightness-0"
                                 />
                             </div>
-                            <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom healthy</span>
+                            <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
                         </Link>
                     </div>
 
@@ -672,7 +672,7 @@ export default function DashboardPage() {
             {/* Footer */}
             <footer className="bg-white border-t border-slate-200 py-8 px-6 mt-auto">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[11px] font-black text-slate-400 tracking-wider">© 2026 earbom healthy. All rights reserved.</p>
+                    <p className="text-[11px] font-black text-slate-400 tracking-wider">© 2026 earbom wellness. All rights reserved.</p>
                     <div className="flex gap-6 text-[11px] font-black text-slate-400 uppercase tracking-tighter">
                         <Link href="#" className="hover:text-[#2E7D32] transition-colors">이용약관</Link>
                         <Link href="#" className="hover:text-[#2E7D32] transition-colors">개인정보처리방침</Link>

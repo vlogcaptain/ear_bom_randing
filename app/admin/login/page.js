@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
                     <div className="w-16 h-16 bg-[#2E7D32] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-green-900/10">
                         <Image
                             src="/logo.png"
-                            alt="earbom healthy logo"
+                            alt="earbom wellness logo"
                             width={84}
                             height={84}
                             className="object-contain invert brightness-0"
@@ -132,7 +132,7 @@ export default function AdminLoginPage() {
                 </div>
 
                 <div className="mt-8 text-center text-slate-400 text-xs font-medium">
-                    © 2026 earbom healthy. Authorized expert only.
+                    © 2026 earbom wellness. Authorized expert only.
                 </div>
             </div>
         </div>

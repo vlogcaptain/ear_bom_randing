@@ -19,6 +19,11 @@ export default function UserSignupForm({ onSwitchToLogin }) {
     const [error, setError] = useState('');
     const [authMode, setAuthMode] = useState('email'); // 'email' or 'phone'
     const recaptchaVerifierRef = useRef(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -35,7 +40,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
 
     useEffect(() => {
         const initRecaptcha = () => {
-            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current) {
+            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current && auth) {
                 try {
                     const container = document.getElementById('recaptcha-container-signup');
                     if (container) {
@@ -53,7 +58,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
             }
         };
 
-        if (authMode === 'phone') {
+        if (mounted && authMode === 'phone') {
             initRecaptcha();
         }
 
@@ -65,7 +70,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
                 } catch (e) { }
             }
         };
-    }, [authMode]);
+    }, [authMode, mounted]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
