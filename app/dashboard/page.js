@@ -43,6 +43,17 @@ export default function DashboardPage() {
     useEffect(() => {
         setActiveTooltipIdx(null);
     }, [selectedDiagnosis, activeEar]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            if (tab === 'reports') {
+                setActiveTab('reports');
+            }
+        }
+    }, []);
+
     const [loadingDiagnosis, setLoadingDiagnosis] = useState(true);
 
     useEffect(() => {
@@ -207,11 +218,14 @@ export default function DashboardPage() {
                         <ClipboardList size={20} />
                         <span>진단 리포트</span>
                     </button>
-                    <Link href="/chat" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all duration-200 font-bold">
+                    <button
+                        onClick={() => alert('실시간 상담 기능은 준비 중입니다. 대면/비대면 상담 예약을 이용해 주시기 바랍니다.')}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-50 transition-all duration-200 font-bold w-full text-left"
+                    >
                         <MessageSquare size={20} />
-                        <span>실시간 상담</span>
-                    </Link>
-                    <Link href="/appointment" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all duration-200 font-bold">
+                        <span>실시간 상담 (준비중)</span>
+                    </button>
+                    <Link href="/appointment" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 transition-all duration-200 font-bold">
                         <Calendar size={20} />
                         <span>상담 예약</span>
                     </Link>
@@ -240,10 +254,22 @@ export default function DashboardPage() {
                             </h2>
                             <p className="text-slate-400 mt-2 font-medium">오늘도 당신의 귀를 통해 건강을 체크해 보세요.</p>
                         </div>
-                        <Link href="/survey" className="bg-[#2E7D32] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#1B5E20] transition-all duration-300 shadow-lg shadow-[#2E7D32]/20 hover:-translate-y-1">
-                            <PlusCircle size={20} />
-                            <span>새 건강 진단 시작</span>
-                        </Link>
+                        {activeTab === 'reports' ? (
+                            <Link 
+                                href="https://map.naver.com/v5/entry/place/1460591745" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="bg-[#2E7D32] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#1B5E20] transition-all duration-300 shadow-lg shadow-[#2E7D32]/20 hover:-translate-y-1"
+                            >
+                                <Calendar size={20} />
+                                <span>상담 예약 및 대면 치료 신청</span>
+                            </Link>
+                        ) : (
+                            <Link href="/survey" className="bg-[#2E7D32] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#1B5E20] transition-all duration-300 shadow-lg shadow-[#2E7D32]/20 hover:-translate-y-1">
+                                <PlusCircle size={20} />
+                                <span>새 건강 진단 시작</span>
+                            </Link>
+                        )}
                     </div>
 
                     {/* Stats Grid */}
@@ -510,7 +536,9 @@ export default function DashboardPage() {
                                                     </h4>
                                                     <p className="text-2xl font-black">{selectedDiagnosis.nextDate ? new Date(selectedDiagnosis.nextDate).toLocaleDateString() : '분석 대기'}</p>
                                                     <Link 
-                                                        href="/appointment" 
+                                                        href="https://map.naver.com/v5/entry/place/1460591745" 
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
                                                     >
                                                         예약 페이지로 이동
@@ -697,19 +725,15 @@ export default function DashboardPage() {
                     <ClipboardList size={20} />
                     <span className="text-[10px] font-bold">진단 리포트</span>
                 </button>
-                <Link 
-                    href="/chat" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#2E7D32] transition-all"
+                <button 
+                    onClick={() => alert('실시간 상담 기능은 준비 중입니다. 대면/비대면 상담 예약을 이용해 주시기 바랍니다.')}
+                    className="flex flex-col items-center gap-1 text-slate-300 transition-all cursor-not-allowed"
                 >
                     <MessageSquare size={20} />
                     <span className="text-[10px] font-bold">실시간 상담</span>
-                </Link>
+                </button>
                 <Link 
                     href="/appointment" 
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#2E7D32] transition-all"
                 >
                     <Calendar size={20} />
