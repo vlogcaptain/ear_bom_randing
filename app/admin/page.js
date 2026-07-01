@@ -38,6 +38,8 @@ export default function AdminDashboardPage() {
     const [noteLoading, setNoteLoading] = useState(false);
     const [activeUser, setActiveUser] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [appointments, setAppointments] = useState([]);
+    const [loadingAppointments, setLoadingAppointments] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -90,6 +92,17 @@ export default function AdminDashboardPage() {
                 completed: completedCount,
                 totalUsers: userData.length
             });
+
+            // 상담 예약 가져오기
+            setLoadingAppointments(true);
+            const appQ = query(collection(db, 'appointments'), orderBy('createdAt', 'desc'));
+            const appSnapshot = await getDocs(appQ);
+            const appData = appSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setAppointments(appData);
+            setLoadingAppointments(false);
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
         } finally {
@@ -130,6 +143,15 @@ export default function AdminDashboardPage() {
         return found?.name || found?.displayName || fallbackName || '이름 없음';
     };
 
+    const getUserContact = (userId) => {
+        const found = users.find(u => u.id === userId || u.uid === userId);
+        if (!found) return { email: '', phone: '' };
+        return {
+            email: found.email || '',
+            phone: found.phoneNumber || ''
+        };
+    };
+
     const filteredSurveys = surveys.filter(s => {
         const realName = getUserRealName(s.userId, s.userName);
         const matchesSearch = realName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -142,6 +164,12 @@ export default function AdminDashboardPage() {
         (u.name || u.displayName)?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const filteredAppointments = appointments.filter(a => {
+        const realName = getUserRealName(a.userId, a.userName);
+        return realName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+               a.expertName?.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -170,6 +198,12 @@ export default function AdminDashboardPage() {
                             className={`${activeTab === 'diagnose' ? 'text-white' : 'hover:text-white'} transition-colors`}
                         >
                             진단 대기함
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('appointments')}
+                            className={`${activeTab === 'appointments' ? 'text-white' : 'hover:text-white'} transition-colors`}
+                        >
+                            예약 관리
                         </button>
                         <button 
                             onClick={() => setActiveTab('members')}
@@ -204,6 +238,12 @@ export default function AdminDashboardPage() {
                             className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'diagnose' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
                         >
                             진단 대기함
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('appointments'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'appointments' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            예약 관리
                         </button>
                         <button 
                             onClick={() => { setActiveTab('members'); setIsMobileMenuOpen(false); }}
@@ -309,7 +349,18 @@ export default function AdminDashboardPage() {
                                                         </div>
                                                         <div>
                                                             <p className="font-black text-slate-800 text-sm">{getUserRealName(survey.userId, survey.userName)}</p>
-                                                            <p className="text-[10px] text-slate-400 font-bold">{survey.userId?.substring(0, 8)}...</p>
+                                                            <p className="text-[10px] text-slate-400 font-bold flex flex-wrap gap-2 mt-1">
+                                                                {getUserContact(survey.userId).phone && (
+                                                                    <span className="text-green-700 font-extrabold bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
+                                                                        📞 {getUserContact(survey.userId).phone}
+                                                                    </span>
+                                                                )}
+                                                                {getUserContact(survey.userId).email && (
+                                                                    <span className="text-blue-700 font-extrabold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                                                                        ✉️ {getUserContact(survey.userId).email}
+                                                                    </span>
+                                                                )}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -362,6 +413,92 @@ export default function AdminDashboardPage() {
                             </div>
                         </div>
                     </>
+                ) : activeTab === 'appointments' ? (
+                    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 className="font-black text-slate-800">예약 신청 내역 ({filteredAppointments.length}건)</h3>
+                            <div className="relative w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input 
+                                    type="text"
+                                    placeholder="예약자명 검색..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none"
+                                />
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[900px] md:min-w-0">
+                            <thead>
+                                <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4">예약자 정보</th>
+                                    <th className="px-6 py-4">상담 방식</th>
+                                    <th className="px-6 py-4">희망 일정</th>
+                                    <th className="px-6 py-4">상담하고 싶은 내용</th>
+                                    <th className="px-6 py-4">신청일</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {loadingAppointments ? (
+                                    <tr>
+                                        <td colSpan="5" className="py-20 text-center">
+                                            <Loader2 className="animate-spin mx-auto mb-2 text-green-600" />
+                                            <p className="text-slate-400 text-sm">예약 목록을 로딩 중...</p>
+                                        </td>
+                                    </tr>
+                                ) : filteredAppointments.length > 0 ? (
+                                    filteredAppointments.map((appt) => (
+                                        <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 font-bold text-xs uppercase">
+                                                        {getUserRealName(appt.userId, appt.userName).substring(0, 1)}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-slate-800 text-sm">{getUserRealName(appt.userId, appt.userName)}</p>
+                                                        <p className="text-[10px] text-slate-400 font-medium">✉️ {getUserContact(appt.userId).email || '이메일 없음'}</p>
+                                                        <p className="text-[10px] text-green-600 font-semibold">📞 {getUserContact(appt.userId).phone || '연락처 없음'}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {appt.type === 'offline' ? (
+                                                    <span className="px-2 py-1 bg-green-50 text-green-700 rounded-md text-[10px] font-black uppercase border border-green-100">
+                                                        대면 (방문)
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-black uppercase border border-blue-100">
+                                                        비대면 (상담)
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <p className="text-xs text-slate-700 font-bold">{appt.date} ({appt.time})</p>
+                                            </td>
+                                            <td className="px-6 py-4 max-w-[300px]">
+                                                <p className="text-xs text-slate-500 font-medium whitespace-pre-wrap leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                    {appt.memo || '상담 요청 사항이 기재되지 않았습니다.'}
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <p className="text-[10px] text-slate-400 font-medium">
+                                                    {appt.createdAt?.toDate ? appt.createdAt.toDate().toLocaleDateString() : '-'}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="py-20 text-center text-slate-300 font-bold text-sm">
+                                            상담 예약 정보가 없습니다.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
                 ) : activeTab === 'members' ? (
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -405,7 +542,8 @@ export default function AdminDashboardPage() {
                                                     </div>
                                                     <div>
                                                         <p className="font-bold text-slate-800 text-sm">{user.name || user.displayName || '이름 없음'}</p>
-                                                        <p className="text-[10px] text-slate-400 font-medium">{user.email}</p>
+                                                        <p className="text-[10px] text-slate-400 font-medium">{user.email || '이메일 없음'}</p>
+                                                        <p className="text-[10px] text-green-600 font-semibold">{user.phoneNumber || '연락처 없음'}</p>
                                                     </div>
                                                 </div>
                                             </td>

@@ -18,6 +18,7 @@ export default function AppointmentPage() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState('');
     const [consultationType, setConsultationType] = useState('video');
+    const [consultationMemo, setConsultationMemo] = useState('');
     const [bookingLoading, setBookingLoading] = useState(false);
     const [agreementChecked, setAgreementChecked] = useState(false);
 
@@ -145,6 +146,7 @@ export default function AppointmentPage() {
                 date: selectedDate.toISOString().split('T')[0],
                 time: selectedTime,
                 type: consultationType,
+                memo: consultationMemo || '',
                 status: 'confirmed',
                 paymentStatus: consultationType === 'offline' ? 'paid' : 'free',
                 createdAt: serverTimestamp()
@@ -325,12 +327,10 @@ export default function AppointmentPage() {
                             <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
                                 <Video className="text-[#2E7D32]" size={24} /> 3. 상담 방식
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {[
-                                    { id: 'video', label: '화상 상담', icon: <Video /> },
-                                    { id: 'offline', label: '방문 상담', icon: <MapPin /> },
-                                    { id: 'voice', label: '음성 상담', icon: <Mic /> },
-                                    { id: 'chat', label: '채팅 상담', icon: <MessageSquare /> }
+                                    { id: 'offline', label: '대면 상담 (방문)', icon: <MapPin /> },
+                                    { id: 'video', label: '비대면 상담', icon: <Video /> }
                                 ].map(type => (
                                     <button
                                         key={type.id}
@@ -359,6 +359,19 @@ export default function AppointmentPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Consultation Memo */}
+                        <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-green-50 space-y-6">
+                            <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
+                                <FileText className="text-[#2E7D32]" size={24} /> 4. 상담하고 싶은 내용 (원하는 상담 내용)
+                            </h3>
+                            <textarea
+                                value={consultationMemo}
+                                onChange={(e) => setConsultationMemo(e.target.value)}
+                                placeholder="원하는 상담 주제, 증상 등 상담 지도사에게 전하고 싶은 내용을 자유롭게 작성해 주세요 (예: 최근 허리 통증 완화, 스트레스 불면증 해소 등)"
+                                className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-all font-medium text-sm resize-none"
+                            />
+                        </div>
                     </div>
 
                     {/* Summary Sidebar */}
@@ -386,9 +399,7 @@ export default function AppointmentPage() {
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">상담 방식</p>
                                             <p className="font-bold text-slate-800">
-                                                {consultationType === 'video' ? '화상 상담' :
-                                                    consultationType === 'voice' ? '음성 상담' :
-                                                        consultationType === 'chat' ? '채팅 상담' : '방문 상담'} (30분)
+                                                {consultationType === 'offline' ? '대면 상담 (방문)' : '비대면 상담'} (30분)
                                             </p>
                                         </div>
                                     </div>
