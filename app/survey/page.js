@@ -155,11 +155,11 @@ export default function Survey() {
                     rightEarUrl: rightUrl,
                     createdAt: serverTimestamp()
                 });
-                router.push('/dashboard');
+                router.push('/survey/complete');
             } catch (error) {
                 console.error("Error saving survey:", error);
-                alert("결과 저장 중 오류가 발생했습니다. 하지만 대시보드로 이동합니다.");
-                router.push('/dashboard');
+                alert("결과 저장 중 오류가 발생했습니다. 하지만 안내 페이지로 이동합니다.");
+                router.push('/survey/complete');
             } finally {
                 setIsSaving(false);
             }
@@ -372,7 +372,7 @@ export default function Survey() {
                                 </>
                             ) : (
                                 <>
-                                    {currentStep === questions.length - 1 ? '결과 분석하기' : '다음'}
+                                    {currentStep === questions.length - 1 ? '분석 요청하기' : '다음'}
                                     {currentStep !== questions.length - 1 && <ArrowRight size={20} />}
                                 </>
                             )}

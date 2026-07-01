@@ -10,7 +10,7 @@ function LoginContent() {
     const searchParams = useSearchParams();
     const { user, loading } = useAuth();
     const [title, setTitle] = useState('로그인');
-    const from = searchParams.get('from') || '/dashboard';
+    const from = searchParams.get('from') || '/survey';
 
     if (loading) {
         return (

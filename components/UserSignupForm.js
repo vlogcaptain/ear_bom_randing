@@ -116,7 +116,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
             });
 
             alert('회원가입이 완료되었습니다!');
-            router.push('/dashboard');
+            router.push('/survey');
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/email-already-in-use') {
@@ -183,7 +183,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
             }
 
             alert('회원가입 및 로그인이 완료되었습니다!');
-            router.push('/dashboard');
+            router.push('/survey');
         } catch (err) {
             setError('인증번호가 일치하지 않습니다.');
             console.error(err);

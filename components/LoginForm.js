@@ -94,7 +94,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         try {
             await signInWithEmailAndPassword(auth, email, password);
             if (onSuccess) onSuccess(false);
-            else router.push('/dashboard');
+            else router.push('/survey');
         } catch (err) {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
             console.error(err);
@@ -169,7 +169,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                     }
                 }
                 if (onSuccess) onSuccess(false);
-                else router.push('/dashboard');
+                else router.push('/survey');
             } else {
                 // New user: Create user document and update Firebase profile
                 await updateProfile(user, {

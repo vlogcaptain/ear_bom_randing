@@ -75,7 +75,7 @@ export default function Home() {
 
     const handleStartClick = () => {
         if (!loading && user) {
-            router.push('/dashboard');
+            router.push('/survey');
         } else {
             setIsLoginModalOpen(true);
         }
@@ -109,7 +109,7 @@ export default function Home() {
                     if (isNewUser) {
                         router.push('/survey');
                     } else {
-                        router.push('/dashboard');
+                        router.push('/survey');
                     }
                 }}
             />
