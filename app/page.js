@@ -105,11 +105,15 @@ export default function Home() {
             <LoginModal
                 isOpen={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
-                onSuccess={(isNewUser) => {
+                onSuccess={(isNewUser, hasHistory) => {
                     if (isNewUser) {
                         router.push('/survey');
                     } else {
-                        router.push('/survey');
+                        if (hasHistory) {
+                            router.push('/dashboard');
+                        } else {
+                            router.push('/survey');
+                        }
                     }
                 }}
             />

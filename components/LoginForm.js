@@ -87,14 +87,39 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         };
     }, [authMode, mounted]);
 
+    const checkDiagnoseHistory = async (uid) => {
+        try {
+            const { collection, query, where, getDocs, limit } = await import('firebase/firestore');
+            const { db } = await import('@/lib/firebase');
+            
+            // Check surveys collection
+            const surveyQ = query(collection(db, 'surveys'), where('userId', '==', uid), limit(1));
+            const surveySnapshot = await getDocs(surveyQ);
+            if (!surveySnapshot.empty) return true;
+
+            // Check diagnose collection
+            const diagnoseQ = query(collection(db, 'diagnose'), where('userId', '==', uid), limit(1));
+            const diagnoseSnapshot = await getDocs(diagnoseQ);
+            return !diagnoseSnapshot.empty;
+        } catch (e) {
+            console.error("Failed to check history:", e);
+            return false;
+        }
+    };
+
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            if (onSuccess) onSuccess(false);
-            else router.push('/survey');
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            const user = result.user;
+            const hasHistory = await checkDiagnoseHistory(user.uid);
+            if (onSuccess) onSuccess(false, hasHistory);
+            else {
+                if (hasHistory) router.push('/dashboard');
+                else router.push('/survey');
+            }
         } catch (err) {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
             console.error(err);
@@ -168,8 +193,12 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                         console.warn("[DEBUG] localStorage setItem failed:", e);
                     }
                 }
-                if (onSuccess) onSuccess(false);
-                else router.push('/survey');
+                const hasHistory = await checkDiagnoseHistory(user.uid);
+                if (onSuccess) onSuccess(false, hasHistory);
+                else {
+                    if (hasHistory) router.push('/dashboard');
+                    else router.push('/survey');
+                }
             } else {
                 // New user: Create user document and update Firebase profile
                 await updateProfile(user, {
@@ -193,7 +222,7 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
                     }
                 }
 
-                if (onSuccess) onSuccess(true);
+                if (onSuccess) onSuccess(true, false);
                 else router.push('/survey');
             }
         } catch (err) {

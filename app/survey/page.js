@@ -55,6 +55,7 @@ export default function Survey() {
         }
     };
     const [answers, setAnswers] = useState({});
+    const [etcDetail, setEtcDetail] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     
     // Ear Photos States
@@ -146,10 +147,15 @@ export default function Survey() {
                     rightUrl = await getDownloadURL(rightRef);
                 }
 
+                const finalAnswers = { ...answers };
+                if (finalAnswers[0] === '기타 / 예방 차원') {
+                    finalAnswers[0] = `기타 / 예방 차원: ${etcDetail || '상세내용 없음'}`;
+                }
+
                 await addDoc(collection(db, 'surveys'), {
                     userId: user.uid,
                     userName: user.displayName || user.phoneNumber || '사용자',
-                    answers: answers,
+                    answers: finalAnswers,
                     earPhotoUrl: leftUrl, // Backward compatibility
                     leftEarUrl: leftUrl,
                     rightEarUrl: rightUrl,
@@ -334,6 +340,27 @@ export default function Survey() {
                                         {answers[currentStep] === option && <CheckCircle size={20} />}
                                     </button>
                                 ))}
+                                {currentStep === 0 && answers[0] === '기타 / 예방 차원' && (
+                                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }} className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <label className="text-xs font-bold text-[#2E7D32]">기타 원하시는 건강 상담 및 예방 목적을 자유롭게 적어주세요</label>
+                                        <textarea
+                                            value={etcDetail}
+                                            onChange={(e) => setEtcDetail(e.target.value)}
+                                            placeholder="예: 이명 완화 목적, 최근 수면 보조 등 상세 내용을 입력해주세요."
+                                            style={{
+                                                width: '100%',
+                                                height: '100px',
+                                                padding: '12px',
+                                                borderRadius: '12px',
+                                                border: '1px solid #e2e8f0',
+                                                fontSize: '0.9rem',
+                                                outline: 'none',
+                                                resize: 'none'
+                                            }}
+                                            className="focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

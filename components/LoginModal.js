@@ -16,9 +16,9 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
         setTimeout(() => setView('login'), 300); // 닫힐 때 초기화
     };
 
-    const handleAuthSuccess = (isNewUser) => {
+    const handleAuthSuccess = (isNewUser, hasHistory) => {
         handleClose();
-        if (onSuccess) onSuccess(isNewUser);
+        if (onSuccess) onSuccess(isNewUser, hasHistory);
     };
 
     return (

@@ -52,10 +52,17 @@ export default function TermsPage() {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">제4조 (결제 및 환불)</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">제4조 (예약 결제, 취소 및 환불 규정)</h2>
                         <ol className="list-decimal pl-5 space-y-2">
-                            <li>이용자는 회사가 정한 결제 수단을 통해 유료 서비스(전문가 상담 등)를 이용할 수 있습니다.</li>
-                            <li>환불 규정은 전자상거래법 등 관련 법령 및 회사의 내부 운영 정책에 따릅니다. 상담 시작 전 취소 시 전액 환불이 가능하나, 상담이 시작된 이후에는 환불이 제한될 수 있습니다.</li>
+                            <li>이용자는 회사가 정한 결제 수단을 통해 유료 서비스(대면 상담 등)를 예약하고 결제할 수 있습니다.</li>
+                            <li><strong>예약 취소 및 환불 기준:</strong>
+                                <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-500 text-sm">
+                                    <li>상담 예약 시간 24시간 전 취소 신청 시: 결제 금액의 100% 전액 환불</li>
+                                    <li>상담 예약 시간 12시간 전 ~ 24시간 전 취소 신청 시: 결제 금액의 50% 환불</li>
+                                    <li>상담 예약 시간 12시간 미만 취소 신청 또는 예약 당일 미참석(노쇼) 시: 환불 불가</li>
+                                </ul>
+                            </li>
+                            <li>대면 상담의 무료 예약 특강 등 이벤트 성격의 무료 상담 예약 건은 취소 패널티가 없으나, 사전에 취소 의사를 밝혀주시는 것을 권장합니다.</li>
                         </ol>
                     </section>
 

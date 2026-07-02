@@ -33,11 +33,15 @@ function LoginContent() {
                 </div>
 
                 <LoginForm
-                    onSuccess={(isNewUser) => {
+                    onSuccess={(isNewUser, hasHistory) => {
                         if (isNewUser) {
                             router.push('/survey');
                         } else {
-                            router.push(from);
+                            if (from === '/survey' && hasHistory) {
+                                router.push('/dashboard');
+                            } else {
+                                router.push(from);
+                            }
                         }
                     }}
                     onTitleChange={(newTitle) => setTitle(newTitle)}
