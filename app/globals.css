@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --primary-dark: #1B5E20;
-  --primary: #2E7D32;
-  --primary-light: #4CAF50;
-  --primary-pale: #E8F5E9;
+  --primary-dark: #C6566D;
+  --primary: #F697AB;
+  --primary-light: #FFB3C3;
+  --primary-pale: #FFF0F2;
   --accent: #F9A825;
   --accent-deep: #E65100;
   --gray-800: #17171A;
@@ -34,5 +34,5 @@ body {
 }
 
 .shadow-custom {
-  box-shadow: 0 10px 30px -10px rgba(46, 125, 50, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(246, 151, 171, 0.15);
 }

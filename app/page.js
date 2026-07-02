@@ -133,7 +133,7 @@ export default function Home() {
             <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-green-100">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
+                        <div className="w-10 h-10 bg-[#F697AB] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image
                                 src="/logo.png"
                                 alt="earbom wellness logo"
@@ -142,7 +142,7 @@ export default function Home() {
                                 className="object-contain invert brightness-0"
                             />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#C6566D]">earbom wellness</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8 font-medium text-gray-500">
                         <Link className="hover:text-primary transition-colors" href="#concept">이침 원리</Link>
@@ -180,7 +180,7 @@ export default function Home() {
                     <div className="flex flex-col h-full bg-white">
                         <div className="flex items-center justify-between p-6 border-b border-gray-50">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center relative shadow-sm">
+                                <div className="w-8 h-8 bg-[#F697AB] rounded-lg flex items-center justify-center relative shadow-sm">
                                     <Image
                                         src="/logo.png"
                                         alt="earbom wellness logo"
@@ -189,7 +189,7 @@ export default function Home() {
                                         className="invert brightness-0"
                                     />
                                 </div>
-                                <span className="text-xl font-black text-[#1B5E20]">earbom wellness</span>
+                                <span className="text-xl font-black text-[#C6566D]">earbom wellness</span>
                             </div>
                             <button 
                                 className="p-2 text-gray-800"
@@ -222,7 +222,7 @@ export default function Home() {
                                     setIsMobileMenuOpen(false);
                                     handleStartClick();
                                 }}
-                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl text-xl font-bold shadow-xl"
+                                className="w-full bg-[#F697AB] text-white py-5 rounded-2xl text-xl font-bold shadow-xl"
                             >
                                 진단 무료 시작하기
                             </button>
@@ -250,14 +250,14 @@ export default function Home() {
                             <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start max-w-4xl">
                                 <button
                                     onClick={handleStartClick}
-                                    className="bg-[#2E7D32] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#1B5E20] transition-all shadow-lg shadow-green-900/10 min-w-[200px]"
+                                    className="bg-[#F697AB] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#C6566D] transition-all shadow-lg shadow-green-900/10 min-w-[200px]"
                                 >
                                     진단 무료 시작하기
                                 </button>
                                 <div className="flex flex-col gap-3 w-full sm:w-auto">
                                     <button
                                         onClick={() => setIsHistoryModalOpen(true)}
-                                        className="bg-white text-[#2E7D32] border-2 border-[#2E7D32] px-6 py-4 rounded-2xl text-lg font-bold hover:bg-green-50 transition-all text-center whitespace-nowrap"
+                                        className="bg-white text-[#F697AB] border-2 border-[#F697AB] px-6 py-4 rounded-2xl text-lg font-bold hover:bg-[#FFF0F2] transition-all text-center whitespace-nowrap"
                                     >
                                         자세히 알아보기
                                     </button>
@@ -370,7 +370,7 @@ export default function Home() {
                                 { step: "03", icon: "analytics", title: "이침 전문가 정밀 분석", desc: "이침 전문가의 혈자리 분석을 바탕으로 맞춤형 결과 리포트를 제공합니다." },
                             ].map((item, idx) => (
                                 <div key={idx} className="text-center group">
-                                    <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                    <div className="w-24 h-24 bg-[#FFF0F2] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                                         <span className="material-symbols-outlined !text-7xl text-primary">{item.icon}</span>
                                     </div>
                                     <div className="text-orange-600 font-bold mb-2">STEP {item.step}</div>
@@ -383,7 +383,7 @@ export default function Home() {
                 </section>
 
                 {/* Features Section */}
-                <section className="py-24 bg-green-50/50" id="features">
+                <section className="py-24 bg-[#FFF0F2]/50" id="features">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                             <div>
@@ -398,7 +398,7 @@ export default function Home() {
                                 { icon: "spa", title: "데일리 웰니스 가이드", desc: "나에게 꼭 필요한 이침 자극법과 생활 습관 가이드로 일상의 건강을 챙깁니다." },
                             ].map((item, idx) => (
                                 <div key={idx} className="bg-white p-10 rounded-[32px] shadow-sm hover:shadow-xl transition-shadow border border-green-100">
-                                    <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center mb-6">
+                                    <div className="w-20 h-20 bg-[#FFF0F2] rounded-2xl flex items-center justify-center mb-6">
                                         <span className="material-symbols-outlined text-primary !text-5xl">{item.icon}</span>
                                     </div>
                                     <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
@@ -431,7 +431,7 @@ export default function Home() {
                                     <h3 className="text-4xl font-extrabold mb-4 text-gray-800">백정숙 수석지도사</h3>
                                     <div className="flex flex-wrap gap-2 mb-8">
                                         {["#통증관리", "#스트레스케어", "#이침전문가"].map((tag, idx) => (
-                                            <span key={idx} className="text-primary text-sm font-semibold bg-green-50 px-3 py-1.5 rounded-full border border-green-100">{tag}</span>
+                                            <span key={idx} className="text-primary text-sm font-semibold bg-[#FFF0F2] px-3 py-1.5 rounded-full border border-green-100">{tag}</span>
                                         ))}
                                     </div>
                                     <p className="text-gray-500 text-lg leading-relaxed mb-10">
@@ -516,13 +516,13 @@ export default function Home() {
                         <div className="bg-white rounded-[40px] shadow-xl border border-green-100 p-8 md:p-16">
                             <div className="flex flex-col lg:flex-row gap-12">
                                 <div className="lg:w-1/2">
-                                    <div className="inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full text-primary text-sm font-semibold mb-6">
+                                    <div className="inline-flex items-center gap-2 bg-[#FFF0F2] px-4 py-2 rounded-full text-primary text-sm font-semibold mb-6">
                                         <span className="material-symbols-outlined text-sm">workspace_premium</span>
                                         민간자격등록번호: 2023-000664 (문체부 주무)
                                     </div>
                                     <h2 className="text-3xl md:text-4xl font-extrabold text-primary-dark mb-8 leading-tight">
                                         국제이침협회 <br className="hidden md:block" />
-                                        <span className="text-[#2E7D32]">귀 상담사 1급</span> 자격증반
+                                        <span className="text-[#F697AB]">귀 상담사 1급</span> 자격증반
                                     </h2>
                                     
                                     <div className="space-y-8">
@@ -555,7 +555,7 @@ export default function Home() {
                                             }
                                         ].map((item, idx) => (
                                             <div key={idx} className="flex gap-4">
-                                                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <div className="w-12 h-12 bg-[#FFF0F2] rounded-xl flex items-center justify-center shrink-0">
                                                     <span className="material-symbols-outlined text-primary">{item.icon}</span>
                                                 </div>
                                                 <div>
@@ -569,14 +569,14 @@ export default function Home() {
                                     <div className="mt-12 flex flex-col sm:flex-row gap-4">
                                         <Link 
                                             href="/appointment"
-                                            className="inline-flex items-center justify-center gap-2 bg-[#2E7D32] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#1B5E20] transition-all shadow-lg text-center"
+                                            className="inline-flex items-center justify-center gap-2 bg-[#F697AB] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#C6566D] transition-all shadow-lg text-center"
                                         >
                                             강좌 수강 문의하기
                                             <span className="material-symbols-outlined">arrow_forward</span>
                                         </Link>
                                         <Link 
                                             href="#reviews"
-                                            className="inline-flex items-center justify-center gap-2 bg-white text-[#2E7D32] border-2 border-[#2E7D32] px-8 py-4 rounded-2xl text-lg font-bold hover:bg-green-50 transition-all text-center"
+                                            className="inline-flex items-center justify-center gap-2 bg-white text-[#F697AB] border-2 border-[#F697AB] px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#FFF0F2] transition-all text-center"
                                         >
                                             강좌 후기 확인하기
                                             <span className="material-symbols-outlined">visibility</span>
@@ -585,7 +585,7 @@ export default function Home() {
                                 </div>
                                 
                                 <div className="lg:w-1/2">
-                                    <div className="bg-green-50/50 rounded-3xl p-8 md:p-10 border border-green-100 flex flex-col h-full gap-6">
+                                    <div className="bg-[#FFF0F2]/50 rounded-3xl p-8 md:p-10 border border-green-100 flex flex-col h-full gap-6">
                                         <h3 className="text-2xl font-bold text-center text-gray-800 shrink-0">
                                             국제이현협회의 <span className="text-primary">귀상담사 교육</span>은?
                                         </h3>
@@ -629,8 +629,8 @@ export default function Home() {
                                 }
                             }}
                         >
-                            <span className="text-[#2E7D32] font-bold text-lg mb-4 block">STUDENT REVIEWS</span>
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B5E20] flex items-center justify-center gap-2">
+                            <span className="text-[#F697AB] font-bold text-lg mb-4 block">STUDENT REVIEWS</span>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#C6566D] flex items-center justify-center gap-2">
                                 수강생들이 증명하는 생생한 변화
                                 <span className="inline-block md:hidden text-xs font-normal text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full ml-1">
                                     {isReviewsExpanded ? '▲ 접기' : '▼ 후기 보기'}
@@ -646,14 +646,14 @@ export default function Home() {
                                     <div>
                                         <div className="flex items-center justify-between mb-4">
                                             <span className="font-bold text-lg text-gray-800">{review.name}</span>
-                                            <span className="text-xs bg-green-50 text-[#2E7D32] px-3 py-1 rounded-full font-medium">수강생 후기</span>
+                                            <span className="text-xs bg-[#FFF0F2] text-[#F697AB] px-3 py-1 rounded-full font-medium">수강생 후기</span>
                                         </div>
                                         <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">{review.content}</p>
                                     </div>
                                     {review.images && review.images.length > 0 && (
                                         <button
                                             onClick={() => setSelectedReviewImages(review.images)}
-                                            className="mt-6 flex items-center gap-2 text-xs font-bold text-[#2E7D32] hover:text-[#1B5E20] transition-colors self-end"
+                                            className="mt-6 flex items-center gap-2 text-xs font-bold text-[#F697AB] hover:text-[#C6566D] transition-colors self-end"
                                         >
                                             <span className="material-symbols-outlined text-sm">image</span>
                                             원본 손글씨 보기
@@ -681,7 +681,7 @@ export default function Home() {
                                 <p className="text-gray-500">다양한 임상 사례와 동양의학<br />데이터베이스를 바탕으로 구축</p>
                             </div>
                         </div>
-                        <div className="mt-20 p-12 rounded-[32px] bg-green-50/50 border border-green-100 italic text-green-800">
+                        <div className="mt-20 p-12 rounded-[32px] bg-[#FFF0F2]/50 border border-green-100 italic text-green-800">
                             "단순히 증상을 알려주는 것을 넘어, 내 몸의 소리에 귀 기울일 수 있는 좋은 습관이 되었습니다."<br />
                             <span className="font-bold mt-4 block not-italic">— 실제 사용자 김OO 님</span>
                         </div>
@@ -691,8 +691,8 @@ export default function Home() {
                 {/* CTA Section */}
                 <section className="py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-6">
-                        <div className="bg-[#1B5E20] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#2E7D32] rounded-full -mr-32 -mt-32 opacity-20"></div>
+                        <div className="bg-[#C6566D] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#F697AB] rounded-full -mr-32 -mt-32 opacity-20"></div>
                             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#F9A825] rounded-full -ml-24 -mb-24 opacity-20"></div>
                             <h2 className="text-3xl md:text-5xl font-extrabold mb-8 relative z-10">
                                 지금 바로 당신의<br />건강 상태를 체크해보세요

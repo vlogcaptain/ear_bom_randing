@@ -37,28 +37,28 @@ export default function Footer() {
                     <div>
                         <h4 className="font-bold mb-6">서비스</h4>
                         <ul className="space-y-4 text-gray-500 text-sm">
-                            <li><Link className="hover:text-[#2E7D32]" href="/#concept">이침 원리 소개</Link></li>
-                            <li><Link className="hover:text-[#2E7D32]" href="/gallery">갤러리</Link></li>
-                            <li><Link className="hover:text-[#2E7D32]" href="/appointment">상담예약</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/#concept">이침 원리 소개</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/gallery">갤러리</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/appointment">상담예약</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-bold mb-6">고객지원</h4>
                         <ul className="space-y-4 text-gray-500 text-sm">
-                            <li><Link className="hover:text-[#2E7D32]" href="/terms">이용약관</Link></li>
-                            <li><Link className="hover:text-[#2E7D32]" href="/privacy">개인정보처리방침</Link></li>
-                            <li><Link className="hover:text-[#2E7D32]" href="/terms">취소 및 환불규정</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/terms">이용약관</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/privacy">개인정보처리방침</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/terms">취소 및 환불규정</Link></li>
                         </ul>
                     </div>
                 </div>
-                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-green-200 text-xs text-gray-400 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-pink-100 text-xs text-gray-400 gap-4">
                     <p>© 2026 earbom wellness (이노홈 홀딩스). All rights reserved.</p>
                     <div className="flex gap-6 items-center">
-                        <a className="hover:text-[#2E7D32]" href="#">Instagram</a>
-                        <a className="hover:text-[#2E7D32]" href="#">Facebook</a>
-                        <a className="hover:text-[#2E7D32]" href="#">YouTube</a>
+                        <a className="hover:text-[#F697AB]" href="#">Instagram</a>
+                        <a className="hover:text-[#F697AB]" href="#">Facebook</a>
+                        <a className="hover:text-[#F697AB]" href="#">YouTube</a>
                         <span className="w-px h-3 bg-gray-200 ml-2"></span>
-                        <Link className="hover:text-[#2E7D32] text-gray-300 font-medium ml-2" href="/admin/login">전문가 전용</Link>
+                        <Link className="hover:text-[#F697AB] text-gray-300 font-medium ml-2" href="/admin/login">전문가 전용</Link>
                     </div>
                 </div>
             </div>

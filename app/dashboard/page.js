@@ -136,7 +136,7 @@ export default function DashboardPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-[#2E7D32] border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-12 h-12 border-4 border-[#F697AB] border-t-transparent rounded-full animate-spin"></div>
                     <p className="text-slate-500 font-medium">인증 정보를 확인 중입니다...</p>
                 </div>
             </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
+                            <div className="w-10 h-10 bg-[#F697AB] rounded-xl flex items-center justify-center relative shadow-sm">
                                 <Image
                                     src="/logo.png"
                                     alt="earbom wellness logo"
@@ -170,12 +170,12 @@ export default function DashboardPage() {
                                     className="object-contain invert brightness-0"
                                 />
                             </div>
-                            <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
+                            <span className="text-2xl font-extrabold tracking-tight text-[#C6566D]">earbom wellness</span>
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="p-2 text-slate-400 hover:text-[#2E7D32] transition-colors relative">
+                        <button className="p-2 text-slate-400 hover:text-[#F697AB] transition-colors relative">
                             <Bell size={20} />
                             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                         </button>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                                 <p className="text-sm font-bold text-slate-800">{user.displayName || user.phoneNumber || '이름 없음'}</p>
                                 <p className="text-[11px] text-slate-400 font-medium">{user.email || '회원님'}</p>
                             </div>
-                            <div className="w-10 h-10 bg-[#E8F5E9] rounded-full flex items-center justify-center text-[#2E7D32] border border-[#C8E6C9]">
+                            <div className="w-10 h-10 bg-[#FFF0F2] rounded-full flex items-center justify-center text-[#F697AB] border border-[#C8E6C9]">
                                 <User size={20} />
                             </div>
                         </div>
@@ -206,14 +206,14 @@ export default function DashboardPage() {
                 <aside className="w-64 border-r border-slate-200 bg-white hidden lg:flex flex-col py-8 px-4 gap-2 text-sm">
                     <button
                         onClick={() => setActiveTab('overview')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === 'overview' ? 'bg-[#E8F5E9] text-[#2E7D32] font-black shadow-sm' : 'text-slate-500 hover:bg-slate-50 font-bold'}`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === 'overview' ? 'bg-[#FFF0F2] text-[#F697AB] font-black shadow-sm' : 'text-slate-500 hover:bg-slate-50 font-bold'}`}
                     >
                         <LayoutDashboard size={20} />
                         <span>대시보드 홈</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('reports')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === 'reports' ? 'bg-[#E8F5E9] text-[#2E7D32] font-black shadow-sm' : 'text-slate-500 hover:bg-slate-50 font-bold'}`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === 'reports' ? 'bg-[#FFF0F2] text-[#F697AB] font-black shadow-sm' : 'text-slate-500 hover:bg-slate-50 font-bold'}`}
                     >
                         <ClipboardList size={20} />
                         <span>진단 리포트</span>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                         <div>
                             <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                                <span className="text-[#2E7D32]">{user.displayName || (user.phoneNumber ? '새로운' : '반가워요!')}</span> 회원님, 안녕하세요!
+                                <span className="text-[#F697AB]">{user.displayName || (user.phoneNumber ? '새로운' : '반가워요!')}</span> 회원님, 안녕하세요!
                             </h2>
                             <p className="text-slate-400 mt-2 font-medium">오늘도 당신의 귀를 통해 건강을 체크해 보세요.</p>
                         </div>
@@ -259,13 +259,13 @@ export default function DashboardPage() {
                                 href="https://map.naver.com/v5/entry/place/1460591745" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="bg-[#2E7D32] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#1B5E20] transition-all duration-300 shadow-lg shadow-[#2E7D32]/20 hover:-translate-y-1"
+                                className="bg-[#F697AB] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#C6566D] transition-all duration-300 shadow-lg shadow-[#F697AB]/20 hover:-translate-y-1"
                             >
                                 <Calendar size={20} />
                                 <span>상담 예약 및 대면 치료 신청</span>
                             </Link>
                         ) : (
-                            <Link href="/survey" className="bg-[#2E7D32] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#1B5E20] transition-all duration-300 shadow-lg shadow-[#2E7D32]/20 hover:-translate-y-1">
+                            <Link href="/survey" className="bg-[#F697AB] text-white px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-[#C6566D] transition-all duration-300 shadow-lg shadow-[#F697AB]/20 hover:-translate-y-1">
                                 <PlusCircle size={20} />
                                 <span>새 건강 진단 시작</span>
                             </Link>
@@ -296,10 +296,10 @@ export default function DashboardPage() {
                             {nextAppointment ? (
                                 <>
                                     <div className="flex items-center justify-between mb-4">
-                                        <div className="w-12 h-12 bg-[#E8F5E9] rounded-2xl flex items-center justify-center text-[#2E7D32]">
+                                        <div className="w-12 h-12 bg-[#FFF0F2] rounded-2xl flex items-center justify-center text-[#F697AB]">
                                             <Calendar size={24} />
                                         </div>
-                                        <span className="text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-2.5 py-1 rounded-full">예약 완료</span>
+                                        <span className="text-xs font-bold text-[#F697AB] bg-[#FFF0F2] px-2.5 py-1 rounded-full">예약 완료</span>
                                     </div>
                                     <p className="text-slate-500 text-sm font-medium">예정된 상담</p>
                                     <h3 className="text-xl font-black text-slate-800 mt-1">{nextAppointment.date} {nextAppointment.time}</h3>
@@ -312,7 +312,7 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
                                     <p className="text-slate-500 text-sm font-medium">예정된 상담</p>
-                                    <Link href="/appointment" className="text-sm font-bold text-[#2E7D32] mt-2 block hover:underline">상담 예약하기 →</Link>
+                                    <Link href="/appointment" className="text-sm font-bold text-[#F697AB] mt-2 block hover:underline">상담 예약하기 →</Link>
                                 </>
                             )}
                         </div>
@@ -344,7 +344,7 @@ export default function DashboardPage() {
                                                     const diag = diagnoses.find(d => d.id === e.target.value);
                                                     if (diag) setSelectedDiagnosis(diag);
                                                 }}
-                                                className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#2E7D32]"
+                                                className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#F697AB]"
                                             >
                                                 {diagnoses.map((diag, index) => {
                                                     const dateStr = diag.createdAt?.toDate 
@@ -374,7 +374,7 @@ export default function DashboardPage() {
                                         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in zoom-in duration-700">
                                             <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="size-8 bg-[#2E7D32] rounded-xl flex items-center justify-center shadow-lg shadow-[#2E7D32]/20">
+                                                    <div className="size-8 bg-[#F697AB] rounded-xl flex items-center justify-center shadow-lg shadow-[#F697AB]/20">
                                                         <Activity size={18} className="text-white" />
                                                     </div>
                                                     <div>
@@ -384,7 +384,7 @@ export default function DashboardPage() {
                                                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Expert Visual Guidance</p>
                                                     </div>
                                                 </div>
-                                                <span className="px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-[10px] font-black rounded-full border border-[#2E7D32]/10 uppercase">
+                                                <span className="px-3 py-1 bg-[#FFF0F2] text-[#F697AB] text-[10px] font-black rounded-full border border-[#F697AB]/10 uppercase">
                                                     {selectedDiagnosis.status === 'completed' ? 'Personalized' : 'Pending'}
                                                 </span>
                                             </div>
@@ -430,13 +430,13 @@ export default function DashboardPage() {
                                                                 >
                                                                     <div className="relative">
                                                                         <div 
-                                                                            className="size-6 bg-[#2E7D32] border-2 border-white rounded-full shadow-lg group-hover/pin:scale-125 transition-transform animate-in fade-in zoom-in duration-500 flex items-center justify-center text-[10px] font-black text-white" 
+                                                                            className="size-6 bg-[#F697AB] border-2 border-white rounded-full shadow-lg group-hover/pin:scale-125 transition-transform animate-in fade-in zoom-in duration-500 flex items-center justify-center text-[10px] font-black text-white" 
                                                                             style={{ animationDelay: `${originalIdx * 100}ms` }}
                                                                         >
                                                                             {originalIdx + 1}
                                                                         </div>
                                                                         <div 
-                                                                            className={`absolute left-8 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm shadow-xl border border-[#E8F5E9] px-3 py-1.5 rounded-xl text-[11px] whitespace-nowrap font-black text-[#2E7D32] transition-all pointer-events-none ${
+                                                                            className={`absolute left-8 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm shadow-xl border border-[#FFF0F2] px-3 py-1.5 rounded-xl text-[11px] whitespace-nowrap font-black text-[#F697AB] transition-all pointer-events-none ${
                                                                                 activeTooltipIdx === originalIdx 
                                                                                     ? 'opacity-100 translate-x-0 z-20' 
                                                                                     : 'opacity-0 group-hover/pin:opacity-100 translate-x-2 group-hover/pin:translate-x-0'
@@ -457,7 +457,7 @@ export default function DashboardPage() {
                                                         <div className="space-y-2">
                                                             {selectedDiagnosis.markedAcupoints.map((marker, idx) => (
                                                                 <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                                                                    <div className="size-6 bg-[#E8F5E9] rounded-lg flex items-center justify-center text-[10px] font-black text-[#2E7D32]">
+                                                                    <div className="size-6 bg-[#FFF0F2] rounded-lg flex items-center justify-center text-[10px] font-black text-[#F697AB]">
                                                                         {idx + 1}
                                                                     </div>
                                                                     <span className="text-xs font-bold text-slate-700">{marker.label}</span>
@@ -471,8 +471,8 @@ export default function DashboardPage() {
                                                                 : '전문가의 침점 분석이 완료되면 이곳에 표시됩니다.'}
                                                         </div>
                                                     )}
-                                                    <div className="p-4 bg-[#2E7D32]/5 rounded-2xl border border-[#2E7D32]/10 mt-6">
-                                                        <p className="text-[10px] text-[#2E7D32] font-bold leading-relaxed">
+                                                    <div className="p-4 bg-[#F697AB]/5 rounded-2xl border border-[#F697AB]/10 mt-6">
+                                                        <p className="text-[10px] text-[#F697AB] font-bold leading-relaxed">
                                                             표시된 위치를 손가락이나 이침 패치로 지압해 주세요. 매일 3회씩 꾸준히 자극하면 건강 개선에 도움이 됩니다.
                                                         </p>
                                                     </div>
@@ -530,7 +530,7 @@ export default function DashboardPage() {
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] p-8 rounded-3xl shadow-lg text-white">
+                                                <div className="bg-gradient-to-br from-[#F697AB] to-[#C6566D] p-8 rounded-3xl shadow-lg text-white">
                                                     <h4 className="text-xs font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-2">
                                                         <Calendar size={14} /> 다음 상담 추천일
                                                     </h4>
@@ -539,7 +539,7 @@ export default function DashboardPage() {
                                                         href="https://map.naver.com/v5/entry/place/1460591745" 
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="mt-6 w-full py-3 bg-white text-[#1B5E20] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
+                                                        className="mt-6 w-full py-3 bg-white text-[#C6566D] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
                                                     >
                                                         예약 페이지로 이동
                                                     </Link>
@@ -574,20 +574,20 @@ export default function DashboardPage() {
                             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                                 <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                                     <h3 className="font-black text-slate-800 text-lg flex items-center gap-2">
-                                        <Calendar size={20} className="text-[#2E7D32]" />
+                                        <Calendar size={20} className="text-[#F697AB]" />
                                         최근 예약 현황
                                     </h3>
-                                    <Link href="/appointment" className="text-xs font-bold text-slate-400 hover:text-[#2E7D32] transition-colors">새 예약</Link>
+                                    <Link href="/appointment" className="text-xs font-bold text-slate-400 hover:text-[#F697AB] transition-colors">새 예약</Link>
                                 </div>
                                 <div className="divide-y divide-slate-100">
                                     {loadingAppointments ? (
-                                        <div className="p-10 text-center"><div className="w-6 h-6 border-2 border-[#2E7D32] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+                                        <div className="p-10 text-center"><div className="w-6 h-6 border-2 border-[#F697AB] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
                                     ) : appointments.length > 0 ? (
                                         appointments.map((appt) => (
                                             <div key={appt.id} className="p-5 hover:bg-slate-50 transition-colors">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-[#2E7D32]">
+                                                        <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-[#F697AB]">
                                                             {appt.type === 'video' ? <Video size={18} /> : appt.type === 'voice' ? <Mic size={18} /> : <MessageSquare size={18} />}
                                                         </div>
                                                         <div>
@@ -607,8 +607,8 @@ export default function DashboardPage() {
 
                             {/* Analysis Tip or Quick Report Preview */}
                             {selectedDiagnosis?.status === 'completed' ? (
-                                <div className="bg-[#1B5E20] rounded-3xl p-8 relative overflow-hidden group flex flex-col">
-                                    <span className="bg-[#FFD54F] text-[#1B5E20] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Expert Opinion</span>
+                                <div className="bg-[#C6566D] rounded-3xl p-8 relative overflow-hidden group flex flex-col">
+                                    <span className="bg-[#FFD54F] text-[#C6566D] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Expert Opinion</span>
                                     <h3 className="text-2xl font-black text-white leading-tight mb-4">
                                         추천 자극 포인트:<br />
                                         {selectedDiagnosis.acupoints?.substring(0, 30)}...
@@ -626,10 +626,10 @@ export default function DashboardPage() {
                             ) : (
                                 <div 
                                     onClick={() => alert('준비중입니다')}
-                                    className="bg-[#1B5E20] rounded-3xl p-8 relative overflow-hidden group cursor-pointer"
+                                    className="bg-[#C6566D] rounded-3xl p-8 relative overflow-hidden group cursor-pointer"
                                 >
                                     <div className="relative z-10 h-full flex flex-col">
-                                        <span className="bg-[#FFD54F] text-[#1B5E20] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Today's Tip</span>
+                                        <span className="bg-[#FFD54F] text-[#C6566D] text-[10px] font-black px-3 py-1 rounded-full w-fit mb-6 uppercase tracking-wider">Today's Tip</span>
                                         <h3 className="text-2xl font-black text-white leading-tight mb-4">
                                             귀의 신문혈을<br />자주 자극해 주세요
                                         </h3>
@@ -654,7 +654,7 @@ export default function DashboardPage() {
                             {/* 과거 진단 내역 리스트 섹션 */}
                             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 col-span-1 lg:col-span-2">
                                 <h3 className="font-black text-slate-800 text-lg flex items-center gap-2 mb-4">
-                                    <ClipboardList size={20} className="text-[#2E7D32]" />
+                                    <ClipboardList size={20} className="text-[#F697AB]" />
                                     이전 건강 진단 내역 목록
                                 </h3>
                                 {diagnoses.length > 0 ? (
@@ -671,7 +671,7 @@ export default function DashboardPage() {
                                                         setSelectedDiagnosis(diag);
                                                         setActiveTab('reports');
                                                     }}
-                                                    className="p-4 bg-slate-50 hover:bg-[#E8F5E9]/30 border border-slate-100 hover:border-[#2E7D32]/20 rounded-2xl cursor-pointer transition-all flex items-center justify-between group"
+                                                    className="p-4 bg-slate-50 hover:bg-[#FFF0F2]/30 border border-slate-100 hover:border-[#F697AB]/20 rounded-2xl cursor-pointer transition-all flex items-center justify-between group"
                                                 >
                                                     <div>
                                                         <p className="font-bold text-slate-800 text-sm">
@@ -697,14 +697,13 @@ export default function DashboardPage() {
                 </main>
             </div>
 
-            {/* Footer */}
             <footer className="bg-white border-t border-slate-200 py-8 px-6 mt-auto">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[11px] font-black text-slate-400 tracking-wider">© 2026 earbom wellness. All rights reserved.</p>
                     <div className="flex gap-6 text-[11px] font-black text-slate-400 uppercase tracking-tighter">
-                        <Link href="#" className="hover:text-[#2E7D32] transition-colors">이용약관</Link>
-                        <Link href="#" className="hover:text-[#2E7D32] transition-colors">개인정보처리방침</Link>
-                        <Link href="#" className="hover:text-[#2E7D32] transition-colors">고객센터</Link>
+                        <Link href="/terms" className="hover:text-[#F697AB] transition-colors">이용약관</Link>
+                        <Link href="/privacy" className="hover:text-[#F697AB] transition-colors">개인정보처리방침</Link>
+                        <Link href="/terms" className="hover:text-[#F697AB] transition-colors">취소 및 환불규정</Link>
                     </div>
                 </div>
             </footer>
@@ -713,14 +712,14 @@ export default function DashboardPage() {
             <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 py-2.5 px-6 z-50 flex items-center justify-around shadow-lg">
                 <button 
                     onClick={() => setActiveTab('overview')}
-                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'overview' ? 'text-[#2E7D32] font-black' : 'text-slate-400'}`}
+                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'overview' ? 'text-[#F697AB] font-black' : 'text-slate-400'}`}
                 >
                     <LayoutDashboard size={20} />
                     <span className="text-[10px] font-bold">홈</span>
                 </button>
                 <button 
                     onClick={() => setActiveTab('reports')}
-                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'reports' ? 'text-[#2E7D32] font-black' : 'text-slate-400'}`}
+                    className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'reports' ? 'text-[#F697AB] font-black' : 'text-slate-400'}`}
                 >
                     <ClipboardList size={20} />
                     <span className="text-[10px] font-bold">진단 리포트</span>
@@ -734,7 +733,7 @@ export default function DashboardPage() {
                 </button>
                 <Link 
                     href="/appointment" 
-                    className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#2E7D32] transition-all"
+                    className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#F697AB] transition-all"
                 >
                     <Calendar size={20} />
                     <span className="text-[10px] font-bold">상담 예약</span>

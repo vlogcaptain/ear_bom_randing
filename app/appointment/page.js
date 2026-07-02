@@ -34,7 +34,7 @@ export default function AppointmentPage() {
     if (loading || !user) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#f8f7f6]">
-                <div className="w-12 h-12 border-4 border-[#2E7D32] border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-[#F697AB] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -194,7 +194,7 @@ export default function AppointmentPage() {
                     key={i}
                     onClick={() => isSelectable && handleDateSelect(i)}
                     className={`aspect-square flex items-center justify-center text-sm font-bold rounded-full transition-all
-                        ${isSelected ? 'bg-[#2E7D32] text-white shadow-md' : isSelectable ? 'hover:bg-[#E8F5E9] text-slate-700' : 'text-slate-200 cursor-not-allowed'}`}
+                        ${isSelected ? 'bg-[#F697AB] text-white shadow-md' : isSelectable ? 'hover:bg-[#FFF0F2] text-slate-700' : 'text-slate-200 cursor-not-allowed'}`}
                 >
                     {i}
                 </button>
@@ -213,14 +213,14 @@ export default function AppointmentPage() {
             <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-green-100">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-[#2E7D32] rounded-xl flex items-center justify-center relative shadow-sm">
+                        <div className="w-10 h-10 bg-[#F697AB] rounded-xl flex items-center justify-center relative shadow-sm">
                             <Image src="/logo.png" alt="logo" width={52} height={52} className="object-contain invert brightness-0" />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-[#1B5E20]">earbom wellness</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-[#C6566D]">earbom wellness</span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        <button onClick={handleLogout} className="text-sm font-bold text-slate-500 hover:text-[#2E7D32] transition-colors">로그아웃</button>
-                        <div className="w-10 h-10 bg-[#E8F5E9] rounded-full flex items-center justify-center text-[#2E7D32] border border-[#C8E6C9]">
+                        <button onClick={handleLogout} className="text-sm font-bold text-slate-500 hover:text-[#F697AB] transition-colors">로그아웃</button>
+                        <div className="w-10 h-10 bg-[#FFF0F2] rounded-full flex items-center justify-center text-[#F697AB] border border-[#C8E6C9]">
                             <User size={20} />
                         </div>
                     </div>
@@ -230,7 +230,7 @@ export default function AppointmentPage() {
             <main className="flex-1 max-w-[1200px] mx-auto w-full p-6 md:p-8 pt-32 md:pt-40 space-y-10">
                 <div className="flex flex-col gap-4">
                     <nav className="flex items-center gap-2 text-sm">
-                        <Link href="/dashboard" className="text-[#2E7D32] font-semibold hover:underline flex items-center gap-1">
+                        <Link href="/dashboard" className="text-[#F697AB] font-semibold hover:underline flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">arrow_back</span> 대시보드
                         </Link>
                         <span className="text-slate-300">/</span>
@@ -249,11 +249,11 @@ export default function AppointmentPage() {
                             <div className="flex-1 space-y-4">
                                 <div>
                                     <div className="flex justify-center md:justify-start gap-2 mb-2">
-                                        {expert.tags.map(tag => <span key={tag} className="text-[11px] font-bold text-[#2E7D32] bg-[#E8F5E9] px-2 py-1 rounded-full">{tag}</span>)}
+                                        {expert.tags.map(tag => <span key={tag} className="text-[11px] font-bold text-[#F697AB] bg-[#FFF0F2] px-2 py-1 rounded-full">{tag}</span>)}
                                     </div>
                                     <h2 className="text-3xl font-black text-slate-900 leading-tight">
                                         {expert.name}<br />
-                                        <span className="text-lg font-bold text-[#2E7D32]">{expert.title}</span>
+                                        <span className="text-lg font-bold text-[#F697AB]">{expert.title}</span>
                                     </h2>
                                 </div>
                                 <p className="text-slate-500 leading-relaxed font-medium">{expert.description}</p>
@@ -274,13 +274,13 @@ export default function AppointmentPage() {
                             {/* Calendar */}
                             <div className="space-y-8">
                                 <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
-                                    <CalendarIcon className="text-[#2E7D32]" size={24} /> 1. 날짜 선택
+                                    <CalendarIcon className="text-[#F697AB]" size={24} /> 1. 날짜 선택
                                 </h3>
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between px-2">
-                                        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="hover:text-[#2E7D32] transition-colors"><ChevronLeft /></button>
+                                        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="hover:text-[#F697AB] transition-colors"><ChevronLeft /></button>
                                         <span className="font-black text-lg text-slate-800">{currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월</span>
-                                        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="hover:text-[#2E7D32] transition-colors"><ChevronRight /></button>
+                                        <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="hover:text-[#F697AB] transition-colors"><ChevronRight /></button>
                                     </div>
                                     <div className="grid grid-cols-7 text-center text-xs font-black text-slate-300 uppercase tracking-widest mb-4">
                                         <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
@@ -294,7 +294,7 @@ export default function AppointmentPage() {
                             {/* Time Slots */}
                             <div className="space-y-8 border-t md:border-t-0 md:border-l border-slate-100 pt-8 md:pt-0 md:pl-12">
                                 <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
-                                    <Clock className="text-[#2E7D32]" size={24} /> 2. 시간 선택
+                                    <Clock className="text-[#F697AB]" size={24} /> 2. 시간 선택
                                 </h3>
                                 {!selectedDate ? (
                                     <div className="h-full flex flex-col items-center justify-center text-center text-slate-300 py-20">
@@ -309,7 +309,7 @@ export default function AppointmentPage() {
                                                     key={time}
                                                     onClick={() => setSelectedTime(time)}
                                                     className={`py-4 rounded-2xl font-black text-sm transition-all border-2
-                                                        ${selectedTime === time ? 'bg-[#2E7D32] border-[#2E7D32] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-600 hover:border-[#2E7D32] hover:text-[#2E7D32]'}`}
+                                                        ${selectedTime === time ? 'bg-[#F697AB] border-[#F697AB] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-600 hover:border-[#F697AB] hover:text-[#F697AB]'}`}
                                                 >
                                                     {time}
                                                 </button>
@@ -325,7 +325,7 @@ export default function AppointmentPage() {
                         {/* Consultation Type */}
                         <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-green-50 space-y-8">
                             <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
-                                <Video className="text-[#2E7D32]" size={24} /> 3. 상담 방식
+                                <Video className="text-[#F697AB]" size={24} /> 3. 상담 방식
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {[
@@ -336,9 +336,9 @@ export default function AppointmentPage() {
                                         key={type.id}
                                         onClick={() => setConsultationType(type.id)}
                                         className={`flex flex-col items-center gap-4 p-8 rounded-[32px] transition-all border-2
-                                            ${consultationType === type.id ? 'bg-[#E8F5E9]/50 border-[#2E7D32] text-[#2E7D32] shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:border-[#2E7D32] hover:text-slate-600'}`}
+                                            ${consultationType === type.id ? 'bg-[#FFF0F2]/50 border-[#F697AB] text-[#F697AB] shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:border-[#F697AB] hover:text-slate-600'}`}
                                     >
-                                        <div className={`p-4 rounded-2xl ${consultationType === type.id ? 'bg-[#2E7D32] text-white' : 'bg-slate-50'}`}>
+                                        <div className={`p-4 rounded-2xl ${consultationType === type.id ? 'bg-[#F697AB] text-white' : 'bg-slate-50'}`}>
                                             {type.icon}
                                         </div>
                                         <span className="font-black text-sm">{type.label}</span>
@@ -350,10 +350,10 @@ export default function AppointmentPage() {
                             {consultationType === 'offline' && (
                                 <div className="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-200 animate-in fade-in slide-in-from-top-4 duration-300">
                                     <div className="flex items-start gap-3">
-                                        <MapPin className="text-[#2E7D32] mt-1 shrink-0" size={20} />
+                                        <MapPin className="text-[#F697AB] mt-1 shrink-0" size={20} />
                                         <div className="space-y-2">
                                             <p className="font-bold text-slate-900">방문 상담 장소 : 서울시 광진구 능동로 59길 27 1층</p>
-                                            <p className="text-sm font-bold text-[#2E7D32] bg-[#E8F5E9] px-3 py-1 rounded-full inline-block">매주 목요일 오전 11~12시 이침 무료 특강</p>
+                                            <p className="text-sm font-bold text-[#F697AB] bg-[#FFF0F2] px-3 py-1 rounded-full inline-block">매주 목요일 오전 11~12시 이침 무료 특강</p>
                                         </div>
                                     </div>
                                 </div>
@@ -363,13 +363,13 @@ export default function AppointmentPage() {
                         {/* Consultation Memo */}
                         <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-green-50 space-y-6">
                             <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
-                                <FileText className="text-[#2E7D32]" size={24} /> 4. 상담하고 싶은 내용 (원하는 상담 내용)
+                                <FileText className="text-[#F697AB]" size={24} /> 4. 상담하고 싶은 내용 (원하는 상담 내용)
                             </h3>
                             <textarea
                                 value={consultationMemo}
                                 onChange={(e) => setConsultationMemo(e.target.value)}
                                 placeholder="원하는 상담 주제, 증상 등 상담 지도사에게 전하고 싶은 내용을 자유롭게 작성해 주세요 (예: 최근 허리 통증 완화, 스트레스 불면증 해소 등)"
-                                className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-all font-medium text-sm resize-none"
+                                className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F697AB] focus:border-transparent transition-all font-medium text-sm resize-none"
                             />
                         </div>
                     </div>
@@ -381,7 +381,7 @@ export default function AppointmentPage() {
                                 <h3 className="text-2xl font-black text-slate-900 border-b border-slate-50 pb-6 mb-8 uppercase tracking-tighter">예약 확인</h3>
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4 group">
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#E8F5E9] group-hover:text-[#2E7D32] transition-colors">
+                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#FFF0F2] group-hover:text-[#F697AB] transition-colors">
                                             <CalendarIcon size={20} />
                                         </div>
                                         <div>
@@ -393,7 +393,7 @@ export default function AppointmentPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4 group">
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#E8F5E9] group-hover:text-[#2E7D32] transition-colors">
+                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#FFF0F2] group-hover:text-[#F697AB] transition-colors">
                                             {consultationType === 'offline' ? <MapPin size={20} /> : <Video size={20} />}
                                         </div>
                                         <div>
@@ -406,21 +406,21 @@ export default function AppointmentPage() {
                                 </div>
                             </div>
 
-                                <div className="bg-[#f8fcf8] px-5 py-6 rounded-[32px] border border-[#E8F5E9] space-y-4">
+                                <div className="bg-[#f8fcf8] px-5 py-6 rounded-[32px] border border-[#FFF0F2] space-y-4">
                                     <div className="flex justify-between items-center gap-2">
                                         <span className="text-slate-500 font-bold text-[13px] shrink-0">상담 비용</span>
                                         <span className="font-black text-slate-800 text-right text-[13px] whitespace-nowrap">
                                             {consultationType === 'offline' ? '상담+침 시술 30,000원' : '결제 금액이 없습니다'}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-end py-4 border-t border-[#E8F5E9] mt-4 gap-2">
+                                    <div className="flex justify-between items-end py-4 border-t border-[#FFF0F2] mt-4 gap-2">
                                         <span className="font-black text-slate-900 shrink-0 pb-1 text-sm">최종 결제 금액</span>
                                         <div className="text-right whitespace-nowrap">
                                             <div className="flex items-baseline justify-end">
-                                                <span className="text-3xl font-black text-[#2E7D32] tracking-tighter leading-none">
+                                                <span className="text-3xl font-black text-[#F697AB] tracking-tighter leading-none">
                                                     {consultationType === 'offline' ? '10,000' : '0'}
                                                 </span>
-                                                <span className="text-lg font-black text-[#2E7D32] ml-0.5">원</span>
+                                                <span className="text-lg font-black text-[#F697AB] ml-0.5">원</span>
                                             </div>
                                             {consultationType === 'offline' && (
                                                 <p className="text-[11px] font-bold text-orange-600 mt-1">(20,000원 현장 결제)</p>
@@ -434,18 +434,18 @@ export default function AppointmentPage() {
                                 <label className="flex items-start gap-3 text-xs text-slate-500 font-medium px-1 cursor-pointer group">
                                     <input 
                                         type="checkbox" 
-                                        className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#2E7D32] focus:ring-[#2E7D32] transition-all cursor-pointer"
+                                        className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#F697AB] focus:ring-[#F697AB] transition-all cursor-pointer"
                                         checked={agreementChecked}
                                         onChange={(e) => setAgreementChecked(e.target.checked)}
                                     />
                                     <span className="group-hover:text-slate-800 transition-colors leading-relaxed">
-                                        예약 전 <Link href="/terms" className="underline font-bold text-[#2E7D32]">취소 및 환불 규정</Link>을 확인하였으며, 이에 동의합니다.
+                                        예약 전 <Link href="/terms" className="underline font-bold text-[#F697AB]">취소 및 환불 규정</Link>을 확인하였으며, 이에 동의합니다.
                                     </span>
                                 </label>
                                 <button
                                     onClick={handleBooking}
                                     disabled={bookingLoading || !selectedDate || !selectedTime || !agreementChecked}
-                                    className="w-full bg-[#2E7D32] hover:bg-[#1B5E20] text-white font-black py-6 rounded-[24px] shadow-xl shadow-[#2E7D32]/20 transition-all transform active:scale-[0.98] text-lg disabled:opacity-50 disabled:grayscale disabled:transform-none"
+                                    className="w-full bg-[#F697AB] hover:bg-[#C6566D] text-white font-black py-6 rounded-[24px] shadow-xl shadow-[#F697AB]/20 transition-all transform active:scale-[0.98] text-lg disabled:opacity-50 disabled:grayscale disabled:transform-none"
                                 >
                                     {bookingLoading ? '예약 처리 중...' : (consultationType === 'offline' ? '예약 및 결제하기' : '예약하기')}
                                 </button>
