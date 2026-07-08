@@ -49,6 +49,7 @@ export default function AdminDashboardPage() {
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
+    const [showHidden, setShowHidden] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -173,7 +174,7 @@ export default function AdminDashboardPage() {
     };
 
     const filteredSurveys = surveys.filter(s => {
-        if (s.isHidden) return false;
+        if (s.isHidden && !showHidden) return false;
         const realName = getUserRealName(s.userId, s.userName);
         const matchesSearch = realName.toLowerCase().includes(searchTerm.toLowerCase());
         const status = s.status || 'pending';
@@ -202,7 +203,7 @@ export default function AdminDashboardPage() {
     };
 
     const filteredUploads = uploads.filter(u => {
-        if (u.isHidden) return false;
+        if (u.isHidden && !showHidden) return false;
         const name = u.userName || (u.userEmail ? u.userEmail.split('@')[0] : '사용자');
         const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               (u.userEmail && u.userEmail.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -403,6 +404,15 @@ export default function AdminDashboardPage() {
                                         className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
                                     />
                                 </div>
+                                <label className="flex items-center gap-1.5 text-[11px] font-black text-slate-500 cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-all select-none">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={showHidden} 
+                                        onChange={(e) => setShowHidden(e.target.checked)}
+                                        className="rounded border-slate-300 text-[#F697AB] focus:ring-[#F697AB]/20"
+                                    />
+                                    <span>숨김 의뢰 포함</span>
+                                </label>
                                 <button 
                                     onClick={fetchDashboardData}
                                     className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
@@ -435,7 +445,7 @@ export default function AdminDashboardPage() {
                                         </tr>
                                     ) : filteredSurveys.length > 0 ? (
                                         filteredSurveys.map((survey) => (
-                                            <tr key={survey.id} className="hover:bg-slate-50 transition-colors group">
+                                            <tr key={survey.id} className={`hover:bg-slate-50 transition-colors group ${survey.isHidden ? 'opacity-60 bg-slate-50/80 border-dashed border-slate-200' : ''}`}>
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-700 font-black text-xs border border-green-100 uppercase">
@@ -486,23 +496,43 @@ export default function AdminDashboardPage() {
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <button 
-                                                            onClick={async () => {
-                                                                if (confirm('이 의뢰를 목록에서 숨기시겠습니까?')) {
-                                                                    try {
-                                                                        await updateDoc(doc(db, 'surveys', survey.id), { isHidden: true });
-                                                                        alert('숨김 처리되었습니다.');
-                                                                        fetchDashboardData();
-                                                                    } catch (err) {
-                                                                        console.error(err);
-                                                                        alert('숨김 처리에 실패했습니다.');
+                                                        {survey.isHidden ? (
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    if (confirm('이 의뢰의 숨김 처리를 해제하시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'surveys', survey.id), { isHidden: false });
+                                                                            alert('숨김 해제되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 해제에 실패했습니다.');
+                                                                        }
                                                                     }
-                                                                }
-                                                            }}
-                                                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl text-xs font-black transition-all"
-                                                        >
-                                                            숨기기
-                                                        </button>
+                                                                }}
+                                                                className="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-xs font-black transition-all border border-green-200"
+                                                            >
+                                                                숨김 해제
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    if (confirm('이 의뢰를 목록에서 숨기시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'surveys', survey.id), { isHidden: true });
+                                                                            alert('숨김 처리되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 처리에 실패했습니다.');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl text-xs font-black transition-all"
+                                                            >
+                                                                숨기기
+                                                            </button>
+                                                        )}
                                                         <button 
                                                             onClick={() => router.push(`/admin/diagnose?id=${survey.id}`)}
                                                             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-black hover:bg-black transition-all shadow-sm"
@@ -638,6 +668,15 @@ export default function AdminDashboardPage() {
                                         className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
                                     />
                                 </div>
+                                <label className="flex items-center gap-1.5 text-[11px] font-black text-slate-500 cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-all select-none">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={showHidden} 
+                                        onChange={(e) => setShowHidden(e.target.checked)}
+                                        className="rounded border-slate-300 text-[#F697AB] focus:ring-[#F697AB]/20"
+                                    />
+                                    <span>숨김 의뢰 포함</span>
+                                </label>
                                 <button 
                                     onClick={fetchDashboardData}
                                     className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
@@ -660,7 +699,7 @@ export default function AdminDashboardPage() {
                                         <div 
                                             key={upload.id} 
                                             onClick={() => openUploadDetail(upload)}
-                                            className="border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer bg-white flex flex-col group"
+                                            className={`border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer bg-white flex flex-col group ${upload.isHidden ? 'opacity-60 bg-slate-50/80 border-dashed border-slate-300 shadow-none' : ''}`}
                                         >
                                             <div className="relative aspect-square w-full bg-slate-100 overflow-hidden">
                                                 {upload.fileUrl ? (
@@ -686,24 +725,45 @@ export default function AdminDashboardPage() {
                                                         <h4 className="font-bold text-slate-800 text-sm truncate flex-1">
                                                             {upload.userName || (upload.userEmail ? upload.userEmail.split('@')[0] : '사용자')}
                                                         </h4>
-                                                        <button
-                                                            onClick={async (e) => {
-                                                                e.stopPropagation();
-                                                                if (confirm('이 의뢰를 관리자 목록에서 숨기시겠습니까?')) {
-                                                                    try {
-                                                                        await updateDoc(doc(db, 'uploads', upload.id), { isHidden: true });
-                                                                        alert('숨김 처리되었습니다.');
-                                                                        fetchDashboardData();
-                                                                    } catch (err) {
-                                                                        console.error(err);
-                                                                        alert('숨김 처리에 실패했습니다.');
+                                                        {upload.isHidden ? (
+                                                            <button
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    if (confirm('이 의뢰의 숨김 처리를 해제하시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'uploads', upload.id), { isHidden: false });
+                                                                            alert('숨김 해제되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 해제에 실패했습니다.');
+                                                                        }
                                                                     }
-                                                                }
-                                                            }}
-                                                            className="text-[10px] text-slate-400 hover:text-red-500 font-bold bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-colors shrink-0"
-                                                        >
-                                                            숨기기
-                                                        </button>
+                                                                }}
+                                                                className="text-[10px] text-green-600 hover:text-green-800 font-bold bg-green-50 hover:bg-green-100 px-2.5 py-1.5 rounded-lg transition-colors shrink-0 border border-green-200"
+                                                            >
+                                                                숨김 해제
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    if (confirm('이 의뢰를 관리자 목록에서 숨기시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'uploads', upload.id), { isHidden: true });
+                                                                            alert('숨김 처리되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 처리에 실패했습니다.');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="text-[10px] text-slate-400 hover:text-red-500 font-bold bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-colors shrink-0"
+                                                            >
+                                                                숨기기
+                                                            </button>
+                                                        )}
                                                     </div>
                                                     <p className="text-xs text-slate-400 mt-1 truncate">
                                                         {upload.userEmail || ''}
