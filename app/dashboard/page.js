@@ -534,11 +534,9 @@ export default function DashboardPage() {
                                                     <h4 className="text-xs font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-2">
                                                         <Calendar size={14} /> 다음 상담 추천일
                                                     </h4>
-                                                    <p className="text-2xl font-black">{selectedDiagnosis.nextDate ? new Date(selectedDiagnosis.nextDate).toLocaleDateString() : '분석 대기'}</p>
+                                                    <p className="text-2xl font-black">{selectedDiagnosis.nextDate ? new Date(selectedDiagnosis.nextDate).toLocaleDateString() : '예약 대기'}</p>
                                                     <Link 
-                                                        href="https://map.naver.com/v5/entry/place/1460591745" 
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                        href="/appointment" 
                                                         className="mt-6 w-full py-3 bg-white text-[#C6566D] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
                                                     >
                                                         예약 페이지로 이동

@@ -173,6 +173,7 @@ export default function AdminDashboardPage() {
     };
 
     const filteredSurveys = surveys.filter(s => {
+        if (s.isHidden) return false;
         const realName = getUserRealName(s.userId, s.userName);
         const matchesSearch = realName.toLowerCase().includes(searchTerm.toLowerCase());
         const status = s.status || 'pending';
@@ -201,6 +202,7 @@ export default function AdminDashboardPage() {
     };
 
     const filteredUploads = uploads.filter(u => {
+        if (u.isHidden) return false;
         const name = u.userName || (u.userEmail ? u.userEmail.split('@')[0] : '사용자');
         const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               (u.userEmail && u.userEmail.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -483,13 +485,32 @@ export default function AdminDashboardPage() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-5 text-right">
-                                                    <button 
-                                                        onClick={() => router.push(`/admin/diagnose?id=${survey.id}`)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-black hover:bg-black transition-all shadow-sm"
-                                                    >
-                                                        분석하기
-                                                        <ChevronRight size={14} />
-                                                    </button>
+                                                    <div className="flex justify-end gap-2">
+                                                        <button 
+                                                            onClick={async () => {
+                                                                if (confirm('이 의뢰를 목록에서 숨기시겠습니까?')) {
+                                                                    try {
+                                                                        await updateDoc(doc(db, 'surveys', survey.id), { isHidden: true });
+                                                                        alert('숨김 처리되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('숨김 처리에 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl text-xs font-black transition-all"
+                                                        >
+                                                            숨기기
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => router.push(`/admin/diagnose?id=${survey.id}`)}
+                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-black hover:bg-black transition-all shadow-sm"
+                                                        >
+                                                            분석하기
+                                                            <ChevronRight size={14} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -661,9 +682,29 @@ export default function AdminDashboardPage() {
                                             </div>
                                             <div className="p-4 flex-1 flex flex-col justify-between">
                                                 <div>
-                                                    <h4 className="font-bold text-slate-800 text-sm">
-                                                        {upload.userName || (upload.userEmail ? upload.userEmail.split('@')[0] : '사용자')}
-                                                    </h4>
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <h4 className="font-bold text-slate-800 text-sm truncate flex-1">
+                                                            {upload.userName || (upload.userEmail ? upload.userEmail.split('@')[0] : '사용자')}
+                                                        </h4>
+                                                        <button
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation();
+                                                                if (confirm('이 의뢰를 관리자 목록에서 숨기시겠습니까?')) {
+                                                                    try {
+                                                                        await updateDoc(doc(db, 'uploads', upload.id), { isHidden: true });
+                                                                        alert('숨김 처리되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('숨김 처리에 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="text-[10px] text-slate-400 hover:text-red-500 font-bold bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-colors shrink-0"
+                                                        >
+                                                            숨기기
+                                                        </button>
+                                                    </div>
                                                     <p className="text-xs text-slate-400 mt-1 truncate">
                                                         {upload.userEmail || ''}
                                                     </p>
@@ -954,7 +995,7 @@ export default function AdminDashboardPage() {
                         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Left Side: Photo */}
                             <div className="flex flex-col gap-4">
-                                <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+                                <div className="relative h-[250px] md:h-[350px] w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                                     {selectedUpload.fileUrl ? (
                                         <img 
                                             src={selectedUpload.fileUrl} 
