@@ -17,10 +17,11 @@ import {
     MessageCircle,
     X,
     Video as VideoIcon,
-    Menu
+    Menu,
+    Camera
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
-import { collection, query, getDocs, orderBy, limit, where } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Image from 'next/image';
 
@@ -30,7 +31,7 @@ export default function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all'); // all, pending, completed
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('diagnose'); // diagnose, members, logs
+    const [activeTab, setActiveTab] = useState('diagnose'); // diagnose, appUploads, members, logs, appointments
     const [users, setUsers] = useState([]);
     const [stats, setStats] = useState({ today: 0, pending: 0, completed: 0, totalUsers: 0 });
     const [selectedUserNotes, setSelectedUserNotes] = useState([]);
@@ -40,6 +41,14 @@ export default function AdminDashboardPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(false);
+
+    // App Uploads states
+    const [uploads, setUploads] = useState([]);
+    const [loadingUploads, setLoadingUploads] = useState(false);
+    const [selectedUpload, setSelectedUpload] = useState(null);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
+    const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -103,6 +112,17 @@ export default function AdminDashboardPage() {
             }));
             setAppointments(appData);
             setLoadingAppointments(false);
+
+            // 앱 사진 업로드 가져오기
+            setLoadingUploads(true);
+            const uploadsQ = query(collection(db, 'uploads'), orderBy('uploadedAt', 'desc'), limit(100));
+            const uploadsSnapshot = await getDocs(uploadsQ);
+            const uploadsData = uploadsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setUploads(uploadsData);
+            setLoadingUploads(false);
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
         } finally {
@@ -171,6 +191,66 @@ export default function AdminDashboardPage() {
                a.expertName?.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
+    // App Uploads products mapping
+    const PRODUCTS = {
+        'magnesium': { name: '수면 유도 마그네슘', link: 'https://example.com/products/magnesium' },
+        'ear_set_a': { name: '이침 세트 A (두통/어깨)', link: 'https://example.com/products/ear-set-a' },
+        'ear_set_b': { name: '이침 세트 B (소화/수면)', link: 'https://example.com/products/ear-set-b' },
+        'vitamin_b': { name: '활력 비타민 B 컴플렉스', link: 'https://example.com/products/vitamin-b' },
+        'massage_tool': { name: '귀 지압 마사지봉', link: 'https://example.com/products/massage-tool' }
+    };
+
+    const filteredUploads = uploads.filter(u => {
+        const name = u.userName || (u.userEmail ? u.userEmail.split('@')[0] : '사용자');
+        const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                              (u.userEmail && u.userEmail.toLowerCase().includes(searchTerm.toLowerCase()));
+        const status = u.status || 'pending';
+        if (filterStatus === 'all') return matchesSearch;
+        return matchesSearch && status === filterStatus;
+    });
+
+    const openUploadDetail = (upload) => {
+        setSelectedUpload(upload);
+        setFeedbackText(upload.feedback || '');
+        setIsUploadModalOpen(true);
+    };
+
+    const handleAddProductLink = (productKey) => {
+        const product = PRODUCTS[productKey];
+        if (!product) return;
+        const linkText = `\n[추천 제품: ${product.name} - 구매하기: ${product.link}]`;
+        setFeedbackText(prev => prev + linkText);
+    };
+
+    const handleUploadFeedbackSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedUpload) return;
+        setSubmittingFeedback(true);
+        try {
+            const uploadRef = doc(db, 'uploads', selectedUpload.id);
+            await updateDoc(uploadRef, {
+                feedback: feedbackText,
+                status: 'completed',
+                reviewedAt: serverTimestamp()
+            });
+            
+            // Local state update
+            setUploads(prev => prev.map(u => u.id === selectedUpload.id ? {
+                ...u,
+                feedback: feedbackText,
+                status: 'completed'
+            } : u));
+            
+            setIsUploadModalOpen(false);
+            alert('피드백이 성공적으로 저장되었습니다.');
+        } catch (error) {
+            console.error("Error saving feedback:", error);
+            alert('피드백 저장에 실패했습니다: ' + error.message);
+        } finally {
+            setSubmittingFeedback(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
             {/* Admin Header */}
@@ -198,6 +278,12 @@ export default function AdminDashboardPage() {
                             className={`${activeTab === 'diagnose' ? 'text-white' : 'hover:text-white'} transition-colors`}
                         >
                             진단 대기함
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('appUploads')}
+                            className={`${activeTab === 'appUploads' ? 'text-white' : 'hover:text-white'} transition-colors`}
+                        >
+                            앱 사진 진단
                         </button>
                         <button 
                             onClick={() => setActiveTab('appointments')}
@@ -238,6 +324,12 @@ export default function AdminDashboardPage() {
                             className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'diagnose' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
                         >
                             진단 대기함
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('appUploads'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'appUploads' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            앱 사진 진단
                         </button>
                         <button 
                             onClick={() => { setActiveTab('appointments'); setIsMobileMenuOpen(false); }}
@@ -499,6 +591,101 @@ export default function AdminDashboardPage() {
                             </table>
                         </div>
                     </div>
+                ) : activeTab === 'appUploads' ? (
+                    <>
+                        {/* List Control Bar */}
+                        <div className="bg-white p-4 rounded-t-3xl border-x border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-200">
+                                {['all', 'pending', 'completed'].map((st) => (
+                                    <button
+                                        key={st}
+                                        onClick={() => setFilterStatus(st)}
+                                        className={`px-4 py-2 rounded-lg text-xs font-black uppercase transition-all ${filterStatus === st ? 'bg-white text-slate-800 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                    >
+                                        {st === 'all' ? '전체' : st === 'pending' ? '대기중' : '진단완료'}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <div className="relative flex-1 md:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <input 
+                                        type="text"
+                                        placeholder="이름/이메일 검색..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                                    />
+                                </div>
+                                <button 
+                                    onClick={fetchDashboardData}
+                                    className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+                                >
+                                    <RefreshCcw size={18} className={loadingUploads ? 'animate-spin' : ''} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Uploads Grid */}
+                        <div className="bg-white border-x border-b border-slate-200 rounded-b-3xl shadow-sm overflow-hidden p-6">
+                            {loadingUploads ? (
+                                <div className="py-20 text-center">
+                                    <div className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                    <p className="text-slate-400 font-bold text-sm">앱 업로드 데이터를 불러오는 중입니다...</p>
+                                </div>
+                            ) : filteredUploads.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {filteredUploads.map((upload) => (
+                                        <div 
+                                            key={upload.id} 
+                                            onClick={() => openUploadDetail(upload)}
+                                            className="border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer bg-white flex flex-col group"
+                                        >
+                                            <div className="relative aspect-square w-full bg-slate-100 overflow-hidden">
+                                                {upload.fileUrl ? (
+                                                    <img 
+                                                        src={upload.fileUrl} 
+                                                        alt="Ear Photo" 
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-3xl">👂</div>
+                                                )}
+                                                <span className={`absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-black uppercase ${
+                                                    (upload.status || 'pending') === 'pending' 
+                                                        ? 'bg-orange-500 text-white' 
+                                                        : 'bg-green-600 text-white'
+                                                }`}>
+                                                    {(upload.status || 'pending') === 'pending' ? '대기중' : '완료'}
+                                                </span>
+                                            </div>
+                                            <div className="p-4 flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <h4 className="font-bold text-slate-800 text-sm">
+                                                        {upload.userName || (upload.userEmail ? upload.userEmail.split('@')[0] : '사용자')}
+                                                    </h4>
+                                                    <p className="text-xs text-slate-400 mt-1 truncate">
+                                                        {upload.userEmail || ''}
+                                                    </p>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 font-bold mt-3">
+                                                    {upload.uploadedAt ? (
+                                                        upload.uploadedAt.toDate 
+                                                            ? upload.uploadedAt.toDate().toLocaleString('ko-KR') 
+                                                            : new Date(upload.uploadedAt).toLocaleString('ko-KR')
+                                                    ) : ''}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-20 text-center text-slate-300 font-bold text-sm">
+                                    표시할 진단 의뢰가 없습니다.
+                                </div>
+                            )}
+                        </div>
+                    </>
                 ) : activeTab === 'members' ? (
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -739,6 +926,172 @@ export default function AdminDashboardPage() {
                                 <VideoIcon size={18} />
                                 실시간 상담 시작하기
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Upload Detail Modal */}
+            {isUploadModalOpen && selectedUpload && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsUploadModalOpen(false)}></div>
+                    <div className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                            <div>
+                                <h3 className="font-black text-slate-800 text-lg">
+                                    {selectedUpload.userName || '사용자'}님의 귀 사진 진단
+                                </h3>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">App Ear photo diagnosis</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsUploadModalOpen(false)}
+                                className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Left Side: Photo */}
+                            <div className="flex flex-col gap-4">
+                                <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+                                    {selectedUpload.fileUrl ? (
+                                        <img 
+                                            src={selectedUpload.fileUrl} 
+                                            alt="Ear Detail" 
+                                            className="w-full h-full object-contain"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-400 text-4xl">👂</div>
+                                    )}
+                                </div>
+                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                    <h4 className="font-black text-xs text-slate-400 uppercase tracking-wider mb-3">📋 의뢰 정보</h4>
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-400 font-bold">이름</span>
+                                            <span className="font-extrabold text-slate-800">{selectedUpload.userName || '사용자'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-400 font-bold">이메일</span>
+                                            <span className="font-extrabold text-slate-800">{selectedUpload.userEmail || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-400 font-bold">요청 일시</span>
+                                            <span className="font-extrabold text-slate-800">
+                                                {selectedUpload.uploadedAt ? (
+                                                    selectedUpload.uploadedAt.toDate 
+                                                        ? selectedUpload.uploadedAt.toDate().toLocaleString('ko-KR') 
+                                                        : new Date(selectedUpload.uploadedAt).toLocaleString('ko-KR')
+                                                ) : '-'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Right Side: Quiz Answers & Feedback Form */}
+                            <div className="flex flex-col gap-6">
+                                {/* Quiz Answers */}
+                                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
+                                    <h4 className="font-black text-xs text-slate-400 uppercase tracking-wider mb-4">📝 자가 진단 응답</h4>
+                                    {selectedUpload.quizAnswers ? (
+                                        <div className="grid grid-cols-2 gap-4 text-xs">
+                                            {Object.entries(selectedUpload.quizAnswers).map(([qKey, aVal]) => {
+                                                const questionLabels = {
+                                                    1: '불편 부위',
+                                                    2: '통증 강도',
+                                                    3: '피로도',
+                                                    4: '소화 상태',
+                                                    5: '수면 품질',
+                                                    6: '스트레스'
+                                                };
+                                                const answerLabels = {
+                                                    head: '머리/두통',
+                                                    neck_shoulder: '목/어깨',
+                                                    back: '허리/등',
+                                                    digestive: '소화기관',
+                                                    none: '없음',
+                                                    very_good: '매우 좋음',
+                                                    good: '좋음',
+                                                    normal: '보통',
+                                                    bad: '안좋음',
+                                                    very_bad: '매우 안좋음',
+                                                    tired: '피곤함',
+                                                    very_tired: '매우 피곤함',
+                                                    very_low: '매우 낮음',
+                                                    low: '낮음',
+                                                    high: '높음',
+                                                    very_high: '매우 높음'
+                                                };
+                                                return (
+                                                    <div key={qKey} className="flex flex-col gap-1">
+                                                        <span className="text-slate-400 font-bold">{questionLabels[qKey] || `질문 ${qKey}`}</span>
+                                                        <span className="font-extrabold text-slate-800 bg-white border border-slate-200/60 px-2 py-1.5 rounded-lg text-center">
+                                                            {answerLabels[aVal] || aVal}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-slate-400">설문 답변 없음</p>
+                                    )}
+                                </div>
+                                
+                                {/* Feedback Form */}
+                                <form onSubmit={handleUploadFeedbackSubmit} className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-black text-slate-600">💬 전문가 피드백</label>
+                                        <textarea
+                                            value={feedbackText}
+                                            onChange={(e) => setFeedbackText(e.target.value)}
+                                            rows={6}
+                                            required
+                                            placeholder="사용자의 귀 분석 결과를 토대로 증상 완화를 위한 혈자리 자극 조언이나 기타 피드백을 자세히 기입해주세요..."
+                                            className="w-full border border-slate-200 rounded-2xl p-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-black text-slate-600">🛍️ 추천 제품 링크 추가</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {Object.entries(PRODUCTS).map(([key, p]) => (
+                                                <button
+                                                    key={key}
+                                                    type="button"
+                                                    onClick={() => handleAddProductLink(key)}
+                                                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-black rounded-lg transition-colors border border-slate-200"
+                                                >
+                                                    +{p.name} 🔗
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex gap-4 mt-4">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setIsUploadModalOpen(false)}
+                                            className="flex-1 py-3 border border-slate-200 rounded-xl text-slate-500 text-sm font-black hover:bg-slate-50 transition-colors"
+                                        >
+                                            취소
+                                        </button>
+                                        <button 
+                                            type="submit"
+                                            disabled={submittingFeedback}
+                                            className="flex-1 py-3 bg-[#2E7D32] hover:bg-[#1B5E20] text-white rounded-xl text-sm font-black transition-all flex items-center justify-center gap-2"
+                                        >
+                                            {submittingFeedback ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" size={16} />
+                                                    저장 중...
+                                                </>
+                                            ) : '피드백 저장'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -12,14 +12,14 @@ export default function SurveyComplete() {
                 {/* 1. Success Message */}
                 <div className="text-center space-y-4">
                     <div className="flex justify-center">
-                        <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center border border-green-100 animate-bounce">
-                            <CheckCircle2 size={48} className="text-[#2E7D32]" />
+                        <div className="w-20 h-20 bg-[#FFF0F2] rounded-full flex items-center justify-center border border-pink-100 animate-bounce">
+                            <CheckCircle2 size={48} className="text-[#F697AB]" />
                         </div>
                     </div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">분석 요청이 완료되었습니다</h1>
                     <p className="text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
                         귀 사진과 답변이 정상적으로 접수되었습니다.<br />
-                        <span className="text-[#2E7D32] font-bold">1일 이내</span>에 대표 전문가의 분석이 완료되는 즉시 입력하신 번호로 알림(문자/이메일)을 보내 드립니다.
+                        <span className="text-[#F697AB] font-bold">1일 이내</span>에 대표 전문가의 분석이 완료되는 즉시 입력하신 번호로 알림 문자를 발송해 드립니다.
                     </p>
                 </div>
 
@@ -39,7 +39,7 @@ export default function SurveyComplete() {
                         </div>
                         <div className="flex-1 text-center md:text-left space-y-3">
                             <div>
-                                <span className="inline-block text-xs font-bold text-[#2E7D32] bg-green-50 px-2.5 py-1 rounded-full border border-green-100 mb-1.5">
+                                <span className="inline-block text-xs font-bold text-[#F697AB] bg-[#FFF0F2] px-2.5 py-1 rounded-full border border-pink-100 mb-1.5">
                                     earbom wellness 대표 전문가
                                 </span>
                                 <h4 className="text-xl font-extrabold text-slate-800">백정숙 수석지도사</h4>
@@ -50,7 +50,7 @@ export default function SurveyComplete() {
                                 <span>#이침전문가</span>
                             </p>
                             <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                                수천 년간 이어져 온 전통 이침 요법의 지혜를 전문가의 분석력과 결합하여, 무너진 건강 밸런스를 되찾아 드립니다.
+                                건강은 아플 때만 지키는 것이 아니라, 평생 함께 관리하는 것입니다. 귀를 통해 몸이 보내는 신호를 읽고 건강관리의 방향을 제시하는 귀 분석 전문가입니다.
                             </p>
                         </div>
                     </div>
@@ -58,6 +58,14 @@ export default function SurveyComplete() {
 
                 {/* 3. Action Buttons & Links */}
                 <div className="grid gap-4">
+                    <Link
+                        href="/appointment"
+                        className="w-full bg-[#F697AB] hover:bg-[#C6566D] text-white py-5 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-pink-900/10 transition-all group"
+                    >
+                        <span>대면 상담 및 무료 특강 신청하기</span>
+                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
+
                     <Link
                         href="https://blog.naver.com/js100216"
                         target="_blank"
@@ -73,7 +81,7 @@ export default function SurveyComplete() {
 
                     <Link
                         href="/dashboard"
-                        className="w-full bg-[#1B5E20] hover:bg-[#1B5E20]/90 text-white py-5 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-green-900/10 transition-all group"
+                        className="w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 py-4 px-6 rounded-2xl transition-all font-bold text-slate-700 group"
                     >
                         <span>내가 작성했던 진단 리포트 다시보기</span>
                         <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

@@ -238,7 +238,7 @@ export default function Home() {
                         <div className="z-10">
                             <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-primary text-sm font-semibold mb-6 shadow-sm">
                                 <span className="material-symbols-outlined text-sm">verified</span>
-                                Ear smart 건강 진단 서비스
+                                Ear 전문가 분석 서비스
                             </div>
                             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-primary-dark mb-6">
                                 당신의 귀로<br />건강을 읽다
@@ -365,7 +365,7 @@ export default function Home() {
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
-                                { step: "01", icon: "person_edit", title: "정보 입력", desc: "정확한 분석을 위해 성별과 나이대를 선택해주세요." },
+                                { step: "01", icon: "person_edit", title: "현재 상태 설문 참여", desc: "정확한 분석을 위해 현재 건강 상태 설문에 답변해 주세요." },
                                 { step: "02", icon: "add_a_photo", title: "귀 사진 촬영", desc: <>밝은 곳에서 <span className="font-bold text-gray-900 text-lg">양쪽</span> 귀의 선명한 사진을 찍어주세요.</> },
                                 { step: "03", icon: "analytics", title: "이침 전문가 정밀 분석", desc: "이침 전문가의 혈자리 분석을 바탕으로 맞춤형 결과 리포트를 제공합니다." },
                             ].map((item, idx) => (
@@ -434,31 +434,14 @@ export default function Home() {
                                             <span key={idx} className="text-primary text-sm font-semibold bg-[#FFF0F2] px-3 py-1.5 rounded-full border border-green-100">{tag}</span>
                                         ))}
                                     </div>
-                                    <p className="text-gray-500 text-lg leading-relaxed mb-10">
-                                        "수천 년간 이어져 온 전통 이침 요법의 지혜를 전문가의 분석력과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다. 데이터에 근거한 정밀한 분석과 따뜻한 인술의 조화를 통해 현대인들의 무너진 건강 밸런스를 되찾아 드리는 것이 저의 철학입니다."
+                                    <p className="text-gray-500 text-base leading-relaxed mb-10 whitespace-pre-line">
+                                        {`건강은 아플 때만 지키는 것이 아니라, 평생 함께 관리하는 것입니다.
+건강에 대한 불안과 걱정이 생길 때 가장 먼저 떠오르는 사람이 되고 싶습니다.
+귀를 통해 몸이 보내는 신호를 읽고 건강관리의 방향을 제시하는 귀 분석 전문가입니다.
+언제든 편하게 소통하며 실질적인 도움을 드리겠습니다.
+당신의 건강 여정에 가장 가까운 평생 건강주치의 같은 사람이 되겠습니다.`}
                                     </p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="space-y-4">
-                                            <h4 className="font-bold text-lg text-primary-dark border-b border-green-100 pb-2 flex items-center gap-2">
-                                                <span className="material-symbols-outlined text-primary">work</span>
-                                                경력
-                                            </h4>
-                                            <ul className="space-y-2">
-                                                {[
-                                                    "(現) 국제이침협회 수석지도사",
-                                                    "(現) 서울시립대학교 평생교육원 강사",
-                                                    "(現) 국립금오공과대학교 평생교육원 강사",
-                                                    "(現) 서울 성동문화재단 강사",
-                                                    "(前) 서울 광진문화원 강사",
-                                                ].map((item, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-gray-600 text-sm">
-                                                        <span className="text-primary mt-1">•</span>
-                                                        <span>{item}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-
                                         <div className="space-y-4">
                                             <h4 className="font-bold text-lg text-primary-dark border-b border-green-100 pb-2 flex items-center gap-2">
                                                 <span className="material-symbols-outlined text-primary">verified</span>
@@ -466,6 +449,7 @@ export default function Home() {
                                             </h4>
                                             <ul className="space-y-2">
                                                 {[
+                                                    "Certified Ear Acupuncture Specialist ; ACCAIM(미국통합의학인증위원회)",
                                                     "국제이침협회 귀상담사 수석지도사",
                                                     "국제이침협회 귀상담사 지도사",
                                                     "국제이침협회 귀상담사 1급",
@@ -480,28 +464,29 @@ export default function Home() {
                                             </ul>
                                         </div>
 
-                                        <div className="md:col-span-2 space-y-4">
+                                        <div className="space-y-4">
                                             <h4 className="font-bold text-lg text-primary-dark border-b border-green-100 pb-2 flex items-center gap-2">
                                                 <span className="material-symbols-outlined text-primary">school</span>
                                                 출강이력
                                             </h4>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                            <ul className="space-y-2">
                                                 {[
-                                                    "국제이침협회 서울교육장 취미반",
-                                                    "국제이침협회 서울교육장 자격증반",
+                                                    "국제이침협회 서울교육장 자격증반 20기 진행",
                                                     "서울시립대학교 평생교육원",
                                                     "서울 성동문화재단 건강강좌",
                                                     "서울 광진문화원 생활문화강좌",
+                                                    "MBN매일아침215회 역노화건강법 출연",
                                                     "MG새마을금고 문화대학 건강특강",
                                                     "NH농협 여성대학 건강특강",
-                                                    "서울 성동근로자복지센터 건강특강 외 다수",
+                                                    "서울근로자복지센터 건강특강",
+                                                    "서울 강동고등학교 직원연수 건강특강 외 다수",
                                                 ].map((item, idx) => (
-                                                    <div key={idx} className="flex items-center gap-2 text-gray-600 text-sm">
-                                                        <span className="text-primary">•</span>
+                                                    <li key={idx} className="flex items-start gap-2 text-gray-600 text-sm">
+                                                        <span className="text-primary mt-1">•</span>
                                                         <span>{item}</span>
-                                                    </div>
+                                                    </li>
                                                 ))}
-                                            </div>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
