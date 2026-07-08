@@ -128,6 +128,8 @@ export default function AdminDashboardPage() {
             console.error("Error fetching dashboard data:", error);
         } finally {
             setLoading(false);
+            setLoadingUploads(false);
+            setLoadingAppointments(false);
         }
     };
 
@@ -560,15 +562,26 @@ export default function AdminDashboardPage() {
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-black text-slate-800">예약 신청 내역 ({filteredAppointments.length}건)</h3>
-                            <div className="relative w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                                <input 
-                                    type="text"
-                                    placeholder="예약자명 검색..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none"
-                                />
+                            <div className="flex gap-2 items-center">
+                                <div className="relative w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <input 
+                                        type="text"
+                                        placeholder="예약자명 검색..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none"
+                                    />
+                                </div>
+                                <label className="flex items-center gap-1.5 text-[11px] font-black text-slate-500 cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-all select-none">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={showHidden} 
+                                        onChange={(e) => setShowHidden(e.target.checked)}
+                                        className="rounded border-slate-300 text-[#F697AB] focus:ring-[#F697AB]/20"
+                                    />
+                                    <span>숨김 의뢰 포함</span>
+                                </label>
                             </div>
                         </div>
                         <div className="overflow-x-auto">
@@ -580,19 +593,20 @@ export default function AdminDashboardPage() {
                                     <th className="px-6 py-4">희망 일정</th>
                                     <th className="px-6 py-4">상담하고 싶은 내용</th>
                                     <th className="px-6 py-4">신청일</th>
+                                    <th className="px-6 py-4 text-right">관리</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {loadingAppointments ? (
                                     <tr>
-                                        <td colSpan="5" className="py-20 text-center">
+                                        <td colSpan="6" className="py-20 text-center">
                                             <Loader2 className="animate-spin mx-auto mb-2 text-green-600" />
                                             <p className="text-slate-400 text-sm">예약 목록을 로딩 중...</p>
                                         </td>
                                     </tr>
                                 ) : filteredAppointments.length > 0 ? (
                                     filteredAppointments.map((appt) => (
-                                        <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <tr key={appt.id} className={`hover:bg-slate-50/50 transition-colors ${appt.isHidden ? 'opacity-60 bg-slate-50/80 border-dashed border-slate-200' : ''}`}>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 font-bold text-xs uppercase">
@@ -629,11 +643,50 @@ export default function AdminDashboardPage() {
                                                     {appt.createdAt?.toDate ? appt.createdAt.toDate().toLocaleDateString() : '-'}
                                                 </p>
                                             </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {appt.isHidden ? (
+                                                    <button 
+                                                        onClick={async () => {
+                                                            if (confirm('이 예약의 숨김 처리를 해제하시겠습니까?')) {
+                                                                try {
+                                                                    await updateDoc(doc(db, 'appointments', appt.id), { isHidden: false });
+                                                                    alert('숨김 해제되었습니다.');
+                                                                    fetchDashboardData();
+                                                                } catch (err) {
+                                                                    console.error(err);
+                                                                    alert('숨김 해제에 실패했습니다.');
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-[10px] font-black transition-all border border-green-200"
+                                                    >
+                                                        숨김 해제
+                                                    </button>
+                                                ) : (
+                                                    <button 
+                                                        onClick={async () => {
+                                                            if (confirm('이 예약을 목록에서 숨기시겠습니까?')) {
+                                                                    try {
+                                                                        await updateDoc(doc(db, 'appointments', appt.id), { isHidden: true });
+                                                                        alert('숨김 처리되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('숨김 처리에 실패했습니다.');
+                                                                    }
+                                                            }
+                                                        }}
+                                                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-[10px] font-black transition-all"
+                                                    >
+                                                        숨기기
+                                                    </button>
+                                                )}
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="py-20 text-center text-slate-300 font-bold text-sm">
+                                        <td colSpan="6" className="py-20 text-center text-slate-300 font-bold text-sm">
                                             상담 예약 정보가 없습니다.
                                         </td>
                                     </tr>
@@ -883,7 +936,18 @@ export default function AdminDashboardPage() {
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-black text-slate-800">진단 분석 로그 (최근 완료순)</h3>
-                            <p className="text-xs font-bold text-slate-400">총 {surveys.filter(s => s.status === 'completed').length}건의 이력이 있습니다.</p>
+                            <div className="flex gap-4 items-center">
+                                <label className="flex items-center gap-1.5 text-[11px] font-black text-slate-500 cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-all select-none">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={showHidden} 
+                                        onChange={(e) => setShowHidden(e.target.checked)}
+                                        className="rounded border-slate-300 text-[#F697AB] focus:ring-[#F697AB]/20"
+                                    />
+                                    <span>숨김 의뢰 포함</span>
+                                </label>
+                                <p className="text-xs font-bold text-slate-400">총 {surveys.filter(s => s.status === 'completed').length}건의 이력이 있습니다.</p>
+                            </div>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left min-w-[800px] md:min-w-0">
@@ -908,6 +972,7 @@ export default function AdminDashboardPage() {
                                     surveys
                                         .filter(s => s.status === 'completed')
                                         .filter(s => {
+                                            if (s.isHidden && !showHidden) return false;
                                             const realName = getUserRealName(s.userId, s.userName);
                                             return realName.toLowerCase().includes(searchTerm.toLowerCase());
                                         })
@@ -917,7 +982,7 @@ export default function AdminDashboardPage() {
                                             return dateB - dateA;
                                         })
                                         .map((log) => (
-                                            <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                                            <tr key={log.id} className={`hover:bg-slate-50 transition-colors ${log.isHidden ? 'opacity-60 bg-slate-50/80 border-dashed border-slate-200' : ''}`}>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black text-[10px] uppercase">
@@ -947,13 +1012,52 @@ export default function AdminDashboardPage() {
                                                     </p>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button 
-                                                        onClick={() => router.push(`/admin/diagnose?id=${log.id}`)}
-                                                        className="p-2 text-slate-400 hover:text-black transition-colors"
-                                                        title="진단 결과 다시보기"
-                                                    >
-                                                        <ChevronRight size={18} />
-                                                    </button>
+                                                    <div className="flex justify-end items-center gap-2">
+                                                        {log.isHidden ? (
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    if (confirm('이 의뢰의 숨김 처리를 해제하시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'surveys', log.id), { isHidden: false });
+                                                                            alert('숨김 해제되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 해제에 실패했습니다.');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-[10px] font-black transition-all border border-green-200"
+                                                            >
+                                                                숨김 해제
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    if (confirm('이 의뢰를 목록에서 숨기시겠습니까?')) {
+                                                                        try {
+                                                                            await updateDoc(doc(db, 'surveys', log.id), { isHidden: true });
+                                                                            alert('숨김 처리되었습니다.');
+                                                                            fetchDashboardData();
+                                                                        } catch (err) {
+                                                                            console.error(err);
+                                                                            alert('숨김 처리에 실패했습니다.');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-[10px] font-black transition-all"
+                                                            >
+                                                                숨기기
+                                                            </button>
+                                                        )}
+                                                        <button 
+                                                            onClick={() => router.push(`/admin/diagnose?id=${log.id}`)}
+                                                            className="p-2 text-slate-400 hover:text-black transition-colors"
+                                                            title="진단 결과 다시보기"
+                                                        >
+                                                            <ChevronRight size={18} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
