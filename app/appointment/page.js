@@ -183,7 +183,7 @@ export default function AppointmentPage() {
 
             // 관리자 대상 SMS 알림 전송 (비동기, 예약 성공 자체를 방해하지 않음)
             try {
-                const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-4491-0315';
+                const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-5266-0150';
                 const apptDateStr = selectedDate.toISOString().split('T')[0];
                 await fetch('/api/sms/send', {
                     method: 'POST',
