@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { User, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, Mic, MessageSquare, MapPin, FileText } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 
 export default function AppointmentPage() {
@@ -21,6 +21,7 @@ export default function AppointmentPage() {
     const [consultationMemo, setConsultationMemo] = useState('');
     const [bookingLoading, setBookingLoading] = useState(false);
     const [agreementChecked, setAgreementChecked] = useState(false);
+    const [bookedSlots, setBookedSlots] = useState([]);
 
     // Calendar States
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -30,6 +31,34 @@ export default function AppointmentPage() {
             router.push('/login');
         }
     }, [user, loading, router]);
+
+    useEffect(() => {
+        const fetchBookedSlots = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'appointments'));
+                const slots = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status !== 'cancelled' && data.date && data.time) {
+                        slots.push({ date: data.date, time: data.time });
+                    }
+                });
+                setBookedSlots(slots);
+            } catch (error) {
+                console.error("Error fetching appointments: ", error);
+            }
+        };
+        fetchBookedSlots();
+    }, []);
+
+    const isTimeSlotBooked = (time) => {
+        if (!selectedDate) return false;
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        return bookedSlots.some(slot => slot.date === dateStr && slot.time === time);
+    };
 
     if (loading || !user) {
         return (
@@ -257,15 +286,6 @@ export default function AppointmentPage() {
                                     </h2>
                                 </div>
                                 <p className="text-slate-500 leading-relaxed font-medium">{expert.description}</p>
-                                <div className="bg-orange-50/50 p-4 rounded-2xl border border-orange-100 flex items-start gap-3">
-                                    <span className="material-symbols-outlined text-orange-500 mt-0.5">info</span>
-                                    <p className="text-sm text-orange-800 font-bold leading-relaxed text-left">
-                                        "외부강의 일정으로 방문 상담은 아래의 시간에 가능합니다"<br />
-                                        <span className="text-xs font-medium text-orange-700 mt-1 block">
-                                            월 13:30~19:00 / 화 17:30~20:00 / 수 13:00~17:00 / 금 16:00~20:00
-                                        </span>
-                                    </p>
-                                </div>
                             </div>
                         </div>
 
@@ -304,16 +324,24 @@ export default function AppointmentPage() {
                                 ) : (
                                     <div className="grid grid-cols-2 gap-3">
                                         {generateTimeSlots(selectedDate).length > 0 ? (
-                                            generateTimeSlots(selectedDate).map(time => (
-                                                <button
-                                                    key={time}
-                                                    onClick={() => setSelectedTime(time)}
-                                                    className={`py-4 rounded-2xl font-black text-sm transition-all border-2
-                                                        ${selectedTime === time ? 'bg-[#F697AB] border-[#F697AB] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-600 hover:border-[#F697AB] hover:text-[#F697AB]'}`}
-                                                >
-                                                    {time}
-                                                </button>
-                                            ))
+                                            generateTimeSlots(selectedDate).map(time => {
+                                                const isBooked = isTimeSlotBooked(time);
+                                                return (
+                                                    <button
+                                                        key={time}
+                                                        disabled={isBooked}
+                                                        onClick={() => !isBooked && setSelectedTime(time)}
+                                                        className={`py-4 rounded-2xl font-black text-sm transition-all border-2
+                                                            ${isBooked 
+                                                                ? 'bg-slate-100 border-slate-100 text-slate-300 cursor-not-allowed' 
+                                                                : selectedTime === time 
+                                                                    ? 'bg-[#F697AB] border-[#F697AB] text-white shadow-lg' 
+                                                                    : 'bg-white border-slate-100 text-slate-600 hover:border-[#F697AB] hover:text-[#F697AB]'}`}
+                                                    >
+                                                        {time} {isBooked && "(예약 완료)"}
+                                                    </button>
+                                                );
+                                            })
                                         ) : (
                                             <p className="col-span-2 text-center text-slate-400 py-10 font-bold">해당 요일은 상담이 없습니다.</p>
                                         )}
