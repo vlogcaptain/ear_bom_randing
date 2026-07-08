@@ -180,6 +180,23 @@ export default function AppointmentPage() {
                 paymentStatus: consultationType === 'offline' ? 'paid' : 'free',
                 createdAt: serverTimestamp()
             });
+
+            // 관리자 대상 SMS 알림 전송 (비동기, 예약 성공 자체를 방해하지 않음)
+            try {
+                const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-4491-0315';
+                const apptDateStr = selectedDate.toISOString().split('T')[0];
+                await fetch('/api/sms/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: adminPhone,
+                        message: `[이어봄 알림]\n새로운 1:1 상담 예약이 신청되었습니다.\n\n- 신청자: ${user.displayName || '사용자'}님\n- 일정: ${apptDateStr} (${selectedTime})\n- 방식: ${consultationType === 'offline' ? '대면(방문)' : '비대면(화상)'}\n\n관리자 대시보드에서 확인해 주세요.`
+                    })
+                });
+            } catch (smsErr) {
+                console.error("Failed to send admin notification SMS:", smsErr);
+            }
+
             alert('예약이 성공적으로 완료되었습니다.');
             router.push('/dashboard');
         } catch (error) {

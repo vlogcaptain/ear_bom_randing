@@ -82,19 +82,23 @@ function DiagnoseContent() {
                 const data = docSnap.data();
                 
                 let realName = '';
+                let userPhone = '';
+                let userEmail = '';
                 if (data.userId) {
                     try {
                         const userSnap = await getDoc(doc(db, 'users', data.userId));
                         if (userSnap.exists()) {
                             const uData = userSnap.data();
                             realName = uData.name || uData.displayName || '';
+                            userPhone = uData.phoneNumber || uData.phone || '';
+                            userEmail = uData.email || '';
                         }
                     } catch (userErr) {
                         console.error("Error fetching user profile for survey:", userErr);
                     }
                 }
                 
-                setSurvey({ ...data, realName });
+                setSurvey({ ...data, realName, userPhone, userEmail });
                 // 기존 데이터가 있으면 채워넣기 (수정 모드 대비)
                 if (data.status === 'completed') {
                     setForm({
@@ -137,6 +141,23 @@ function DiagnoseContent() {
                 markedAcupoints: markedAcupoints || [],
                 diagnosedAt: serverTimestamp()
             });
+
+            // 사용자 대상 진단 완료 SMS 알림 전송 (비동기)
+            if (survey?.userPhone) {
+                try {
+                    await fetch('/api/sms/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: survey.userPhone,
+                            message: `[이어봄 알림]\n${survey.realName || '고객'}님, 이침 전문가 진단 분석이 완료되었습니다.\n\n지금 바로 이어봄 대시보드에 로그인하셔서 확인해 주세요.\n\n- 확인 경로: 이어봄 로그인 -> 대시보드`
+                        })
+                    });
+                } catch (smsErr) {
+                    console.error("Failed to send user notification SMS:", smsErr);
+                }
+            }
+
             alert('진단이 성공적으로 완료되었습니다.');
             router.push('/admin');
         } catch (error) {
