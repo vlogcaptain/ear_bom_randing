@@ -45,31 +45,31 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         }
     }, []);
 
-    useEffect(() => {
-        const initRecaptcha = () => {
-            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current && auth) {
-                try {
-                    const container = document.getElementById('recaptcha-container');
-                    if (container) {
-                        console.log('Initializing reCAPTCHA (size: normal for debugging)...');
-                        const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                            'size': 'normal',
-                            'callback': (response) => {
-                                console.log('reCAPTCHA solved, token obtained');
-                            },
-                            'expired-callback': () => {
-                                console.log('reCAPTCHA expired, resetting...');
-                            }
-                        });
-                        recaptchaVerifierRef.current = verifier;
-                        console.log('reCAPTCHA initialized successfully');
-                    }
-                } catch (err) {
-                    console.error('reCAPTCHA initialization failed:', err);
+    const initRecaptcha = () => {
+        if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current && auth) {
+            try {
+                const container = document.getElementById('recaptcha-container');
+                if (container) {
+                    console.log('Initializing reCAPTCHA (size: normal)...');
+                    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                        'size': 'normal',
+                        'callback': (response) => {
+                            console.log('reCAPTCHA solved, token obtained');
+                        },
+                        'expired-callback': () => {
+                            console.log('reCAPTCHA expired, resetting...');
+                        }
+                    });
+                    recaptchaVerifierRef.current = verifier;
+                    console.log('reCAPTCHA initialized successfully');
                 }
+            } catch (err) {
+                console.error('reCAPTCHA initialization failed:', err);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         if (mounted && authMode === 'phone') {
             initRecaptcha();
         }
@@ -140,6 +140,9 @@ export default function LoginForm({ onSuccess, onTitleChange, onSwitchToSignup }
         setLoading(true);
         setError('');
         try {
+            if (!recaptchaVerifierRef.current) {
+                initRecaptcha();
+            }
             if (!recaptchaVerifierRef.current) {
                 throw new Error('reCAPTCHA가 초기화되지 않았습니다. 잠시 후 다시 시도해 주세요.');
             }
