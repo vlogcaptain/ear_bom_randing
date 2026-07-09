@@ -6,8 +6,8 @@ export const metadata = {
     title: "earbom wellness - 귀 하나로 읽는 당신의 건강",
     description: "동양의학의 지름길, 전문가 분석 기반 스마트 건강 진단 서비스",
     icons: {
-        icon: "/icon.png?v=2",
-        apple: "/apple-icon.png?v=2",
+        icon: "/icon.png?v=3",
+        apple: "/apple-icon.png?v=3",
     }
 };
 
