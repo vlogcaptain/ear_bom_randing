@@ -39,6 +39,7 @@ export default function Footer() {
                         <ul className="space-y-4 text-gray-500 text-sm">
                             <li><Link className="hover:text-[#F697AB]" href="/#concept">이침 원리 소개</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/gallery">갤러리</Link></li>
+                            <li><a className="hover:text-[#F697AB]" href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a></li>
                             <li><Link className="hover:text-[#F697AB]" href="/appointment">상담예약</Link></li>
                         </ul>
                     </div>

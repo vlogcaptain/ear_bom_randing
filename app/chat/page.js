@@ -243,6 +243,7 @@ export default function ChatPage() {
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/#how-it-works">사용방법</Link>
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/#features">주요기능</Link>
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/gallery">갤러리</Link>
+                        <a className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a>
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/dashboard">대시보드</Link>
                         <Link className="hover:text-[#2E7D32] w-max whitespace-nowrap" href="/appointment">상담예약</Link>
                         <Link className="text-[#2E7D32] font-semibold w-max whitespace-nowrap" href="/chat">실시간 상담</Link>

@@ -150,6 +150,7 @@ export default function Home() {
                         <Link className="hover:text-primary transition-colors" href="#features">주요기능</Link>
                         <Link className="hover:text-primary transition-colors" href="#course">강좌 수강</Link>
                         <Link className="hover:text-primary transition-colors" href="/gallery">갤러리</Link>
+                        <a className="hover:text-primary transition-colors" href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a>
                         <Link className="hover:text-primary transition-colors" href="/dashboard">대시보드</Link>
                         <Link className="hover:text-primary transition-colors" href="/appointment">상담예약</Link>
                         <button 
@@ -204,6 +205,7 @@ export default function Home() {
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#features">주요기능</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="#course">강좌 수강</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/gallery">갤러리</Link>
+                            <a onClick={() => setIsMobileMenuOpen(false)} href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard">대시보드</Link>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/appointment">상담예약</Link>
                             <button 
