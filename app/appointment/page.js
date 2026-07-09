@@ -402,7 +402,6 @@ export default function AppointmentPage() {
                                         <MapPin className="text-[#F697AB] mt-1 shrink-0" size={20} />
                                         <div className="space-y-2">
                                             <p className="font-bold text-slate-900">방문 상담 장소 : 서울시 광진구 능동로 59길 27 1층</p>
-                                            <p className="text-sm font-bold text-[#F697AB] bg-[#FFF0F2] px-3 py-1 rounded-full inline-block">매주 목요일 오전 11~12시 이침 무료 특강</p>
                                         </div>
                                     </div>
                                 </div>
