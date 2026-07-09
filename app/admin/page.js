@@ -18,10 +18,11 @@ import {
     X,
     Video as VideoIcon,
     Menu,
-    Camera
+    Camera,
+    Trash2
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
-import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Image from 'next/image';
 
@@ -536,6 +537,24 @@ export default function AdminDashboardPage() {
                                                             </button>
                                                         )}
                                                         <button 
+                                                            onClick={async () => {
+                                                                if (confirm(`'${getUserRealName(survey.userId, survey.userName)}' 님의 진단 의뢰를 영구 삭제하시겠습니까? 데이터베이스에서 완전히 삭제되며 되돌릴 수 없습니다.`)) {
+                                                                    try {
+                                                                        await deleteDoc(doc(db, 'surveys', survey.id));
+                                                                        alert('영구 삭제되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('삭제 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                                                            title="영구 삭제"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                        <button 
                                                             onClick={() => router.push(`/admin/diagnose?id=${survey.id}`)}
                                                             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-black hover:bg-black transition-all shadow-sm"
                                                         >
@@ -713,6 +732,25 @@ export default function AdminDashboardPage() {
                                                             숨기기
                                                         </button>
                                                     )}
+                                                    <button 
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            if (confirm(`'${getUserRealName(appt.userId, appt.userName)}' 님의 예약을 영구 삭제하시겠습니까? 데이터베이스에서 완전히 삭제되며 되돌릴 수 없습니다.`)) {
+                                                                    try {
+                                                                        await deleteDoc(doc(db, 'appointments', appt.id));
+                                                                        alert('예약이 영구 삭제되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('삭제 실패했습니다.');
+                                                                    }
+                                                            }
+                                                        }}
+                                                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all"
+                                                        title="영구 삭제"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -850,6 +888,25 @@ export default function AdminDashboardPage() {
                                                                 숨기기
                                                             </button>
                                                         )}
+                                                        <button 
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation();
+                                                                if (confirm(`'${upload.userName || '사용자'}' 님의 앱 사진 의뢰를 영구 삭제하시겠습니까? 데이터베이스에서 완전히 삭제되며 되돌릴 수 없습니다.`)) {
+                                                                    try {
+                                                                        await deleteDoc(doc(db, 'uploads', upload.id));
+                                                                        alert('영구 삭제되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('삭제 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all shrink-0 ml-1.5"
+                                                            title="영구 삭제"
+                                                        >
+                                                            <Trash2 size={15} />
+                                                        </button>
                                                     </div>
                                                     <p className="text-xs text-slate-400 mt-1 truncate">
                                                         {upload.userEmail || ''}
@@ -949,6 +1006,24 @@ export default function AdminDashboardPage() {
                                                     </button>
                                                     <button className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
                                                         <ExternalLink size={16} />
+                                                    </button>
+                                                    <button 
+                                                        onClick={async () => {
+                                                            if (confirm(`'${user.name || user.displayName || '이름 없음'}' 회원을 영구 삭제하시겠습니까?\n회원의 프로필 계정이 삭제됩니다. (기존 진단/예약 이력은 별도로 완전히 삭제하셔야 무결성이 유지됩니다.)`)) {
+                                                                try {
+                                                                    await deleteDoc(doc(db, 'users', user.id));
+                                                                    alert('회원 프로필이 영구 삭제되었습니다.');
+                                                                    fetchDashboardData();
+                                                                } catch (err) {
+                                                                    console.error(err);
+                                                                    alert('삭제 실패했습니다.');
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                                                        title="회원 영구 삭제"
+                                                    >
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -1083,6 +1158,24 @@ export default function AdminDashboardPage() {
                                                                 숨기기
                                                             </button>
                                                         )}
+                                                        <button 
+                                                            onClick={async () => {
+                                                                if (confirm(`'${getUserRealName(log.userId, log.userName)}' 님의 완료된 진단 기록을 영구 삭제하시겠습니까? 데이터베이스에서 완전히 삭제되며 되돌릴 수 없습니다.`)) {
+                                                                    try {
+                                                                        await deleteDoc(doc(db, 'surveys', log.id));
+                                                                        alert('영구 삭제되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('삭제 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all"
+                                                            title="영구 삭제"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
                                                         <button 
                                                             onClick={() => router.push(`/admin/diagnose?id=${log.id}`)}
                                                             className="p-2 text-slate-400 hover:text-black transition-colors"
