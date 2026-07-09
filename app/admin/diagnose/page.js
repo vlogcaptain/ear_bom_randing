@@ -178,7 +178,7 @@ function DiagnoseContent() {
     );
 
     return (
-        <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+        <div className="min-h-screen md:h-screen bg-slate-50 flex flex-col md:overflow-hidden">
             {/* Minimal Header */}
             <header className="bg-white border-b border-slate-200 h-14 flex items-center justify-between px-6 shrink-0">
                 <div className="flex items-center gap-4">
@@ -235,7 +235,7 @@ function DiagnoseContent() {
                 </div>
             )}
 
-            <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
+            <div className="flex flex-col md:flex-row flex-1 overflow-y-visible md:overflow-hidden">
                 {/* Left Side: Image Viewer */}
                 <div className="w-full md:w-1/2 h-[400px] md:h-full bg-slate-900 relative flex items-center justify-center p-4 md:p-8 shrink-0">
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
@@ -314,7 +314,7 @@ function DiagnoseContent() {
                 </div>
 
                 {/* Right Side: Inputs */}
-                <div className="w-full md:w-1/2 bg-white overflow-y-auto p-6 md:p-10 custom-scrollbar">
+                <div className="w-full md:w-1/2 bg-white md:overflow-y-auto p-6 md:p-10 custom-scrollbar">
                     <div className="max-w-2xl mx-auto space-y-10">
                         
                         {/* Survey Summary Section */}
