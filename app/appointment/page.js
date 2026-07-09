@@ -167,16 +167,21 @@ export default function AppointmentPage() {
                 }
             }
 
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
             // 결제 성공(혹은 무료 상담) 시 DB 저장 진행
             await addDoc(collection(db, 'appointments'), {
                 userId: user.uid,
                 userName: user.displayName || '사용자',
                 expertName: expert.name,
-                date: selectedDate.toISOString().split('T')[0],
+                date: dateStr,
                 time: selectedTime,
                 type: consultationType,
                 memo: consultationMemo || '',
-                status: 'confirmed',
+                status: 'pending',
                 paymentStatus: consultationType === 'offline' ? 'paid' : 'free',
                 createdAt: serverTimestamp()
             });
@@ -184,13 +189,12 @@ export default function AppointmentPage() {
             // 관리자 대상 SMS 알림 전송 (비동기, 예약 성공 자체를 방해하지 않음)
             try {
                 const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-5266-0150';
-                const apptDateStr = selectedDate.toISOString().split('T')[0];
                 await fetch('/api/sms/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         to: adminPhone,
-                        message: `[이어봄 알림]\n새로운 1:1 상담 예약이 신청되었습니다.\n\n- 신청자: ${user.displayName || '사용자'}님\n- 일정: ${apptDateStr} (${selectedTime})\n- 방식: ${consultationType === 'offline' ? '대면(방문)' : '비대면(화상)'}\n\n관리자 대시보드에서 확인해 주세요.`
+                        message: `[이어봄 알림]\n새로운 1:1 상담 예약이 대기 중입니다.\n\n- 신청자: ${user.displayName || '사용자'}님\n- 일정: ${dateStr} (${selectedTime})\n- 방식: ${consultationType === 'offline' ? '대면(방문)' : '비대면(화상)'}\n\n관리자 대시보드에서 승인을 진행해 주세요.`
                     })
                 });
             } catch (smsErr) {

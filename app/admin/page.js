@@ -592,6 +592,7 @@ export default function AdminDashboardPage() {
                                     <th className="px-6 py-4">상담 방식</th>
                                     <th className="px-6 py-4">희망 일정</th>
                                     <th className="px-6 py-4">상담하고 싶은 내용</th>
+                                    <th className="px-6 py-4">예약 상태</th>
                                     <th className="px-6 py-4">신청일</th>
                                     <th className="px-6 py-4 text-right">관리</th>
                                 </tr>
@@ -599,7 +600,7 @@ export default function AdminDashboardPage() {
                             <tbody className="divide-y divide-slate-50">
                                 {loadingAppointments ? (
                                     <tr>
-                                        <td colSpan="6" className="py-20 text-center">
+                                        <td colSpan="7" className="py-20 text-center">
                                             <Loader2 className="animate-spin mx-auto mb-2 text-green-600" />
                                             <p className="text-slate-400 text-sm">예약 목록을 로딩 중...</p>
                                         </td>
@@ -639,33 +640,64 @@ export default function AdminDashboardPage() {
                                                 </p>
                                             </td>
                                             <td className="px-6 py-4">
+                                                {appt.status === 'confirmed' ? (
+                                                    <span className="px-2 py-1 bg-green-50 text-green-700 rounded-md text-[10px] font-black uppercase border border-green-100">
+                                                        예약 확정
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-md text-[10px] font-black uppercase border border-amber-100">
+                                                        승인 대기
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4">
                                                 <p className="text-[10px] text-slate-400 font-medium">
                                                     {appt.createdAt?.toDate ? appt.createdAt.toDate().toLocaleDateString() : '-'}
                                                 </p>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                {appt.isHidden ? (
-                                                    <button 
-                                                        onClick={async () => {
-                                                            if (confirm('이 예약의 숨김 처리를 해제하시겠습니까?')) {
-                                                                try {
-                                                                    await updateDoc(doc(db, 'appointments', appt.id), { isHidden: false });
-                                                                    alert('숨김 해제되었습니다.');
-                                                                    fetchDashboardData();
-                                                                } catch (err) {
-                                                                    console.error(err);
-                                                                    alert('숨김 해제에 실패했습니다.');
+                                                <div className="flex justify-end items-center gap-2">
+                                                    {(!appt.isHidden && appt.status !== 'confirmed') && (
+                                                        <button 
+                                                            onClick={async () => {
+                                                                if (confirm('이 예약을 확정 및 승인하시겠습니까?')) {
+                                                                    try {
+                                                                        await updateDoc(doc(db, 'appointments', appt.id), { status: 'confirmed' });
+                                                                        alert('예약이 정상적으로 승인 및 확정되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('예약 승인에 실패했습니다.');
+                                                                    }
                                                                 }
-                                                            }
-                                                        }}
-                                                        className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-[10px] font-black transition-all border border-green-200"
-                                                    >
-                                                        숨김 해제
-                                                    </button>
-                                                ) : (
-                                                    <button 
-                                                        onClick={async () => {
-                                                            if (confirm('이 예약을 목록에서 숨기시겠습니까?')) {
+                                                            }}
+                                                            className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black transition-all shadow-sm"
+                                                        >
+                                                            예약 승인
+                                                        </button>
+                                                    )}
+                                                    {appt.isHidden ? (
+                                                        <button 
+                                                            onClick={async () => {
+                                                                if (confirm('이 예약의 숨김 처리를 해제하시겠습니까?')) {
+                                                                    try {
+                                                                        await updateDoc(doc(db, 'appointments', appt.id), { isHidden: false });
+                                                                        alert('숨김 해제되었습니다.');
+                                                                        fetchDashboardData();
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        alert('숨김 해제에 실패했습니다.');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-[10px] font-black transition-all border border-green-200"
+                                                        >
+                                                            숨김 해제
+                                                        </button>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={async () => {
+                                                                if (confirm('이 예약을 목록에서 숨기시겠습니까?')) {
                                                                     try {
                                                                         await updateDoc(doc(db, 'appointments', appt.id), { isHidden: true });
                                                                         alert('숨김 처리되었습니다.');
@@ -674,19 +706,20 @@ export default function AdminDashboardPage() {
                                                                         console.error(err);
                                                                         alert('숨김 처리에 실패했습니다.');
                                                                     }
-                                                            }
-                                                        }}
-                                                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-[10px] font-black transition-all"
-                                                    >
-                                                        숨기기
-                                                    </button>
-                                                )}
+                                                                }
+                                                            }}
+                                                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-[10px] font-black transition-all"
+                                                        >
+                                                            숨기기
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="py-20 text-center text-slate-300 font-bold text-sm">
+                                        <td colSpan="7" className="py-20 text-center text-slate-300 font-bold text-sm">
                                             상담 예약 정보가 없습니다.
                                         </td>
                                     </tr>
