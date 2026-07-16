@@ -12,7 +12,13 @@ function LoginContent() {
     const [title, setTitle] = useState('로그인');
     const from = searchParams.get('from') || '/survey';
 
-    if (loading) {
+    useEffect(() => {
+        if (!loading && user) {
+            router.push(from);
+        }
+    }, [user, loading, router, from]);
+
+    if (loading || user) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="w-12 h-12 border-4 border-[#2E7D32] border-t-transparent rounded-full animate-spin"></div>

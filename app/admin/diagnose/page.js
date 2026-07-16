@@ -33,6 +33,9 @@ function DiagnoseContent() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [zoom, setZoom] = useState(1);
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [showConfirm, setShowConfirm] = useState(false);
     const [isMarkingModalOpen, setIsMarkingModalOpen] = useState(false);
     const [markedAcupoints, setMarkedAcupoints] = useState([]);
@@ -71,6 +74,54 @@ function DiagnoseContent() {
         });
         return () => unsubscribe();
     }, [id, router]);
+
+    // 드래그(Pan) 핸들러
+    const handleDragStart = (clientX, clientY) => {
+        if (zoom <= 1) return;
+        setIsDragging(true);
+        setDragStart({ x: clientX - offset.x, y: clientY - offset.y });
+    };
+
+    const handleDragMove = (clientX, clientY) => {
+        if (!isDragging || zoom <= 1) return;
+        const newX = clientX - dragStart.x;
+        const newY = clientY - dragStart.y;
+        setOffset({ x: newX, y: newY });
+    };
+
+    const handleDragEnd = () => {
+        setIsDragging(false);
+    };
+
+    // 마우스 이벤트 매핑
+    const onMouseDown = (e) => {
+        handleDragStart(e.clientX, e.clientY);
+    };
+
+    const onMouseMove = (e) => {
+        handleDragMove(e.clientX, e.clientY);
+    };
+
+    const onMouseUpOrLeave = () => {
+        handleDragEnd();
+    };
+
+    // 터치 이벤트 매핑 (모바일 호환성)
+    const onTouchStart = (e) => {
+        if (e.touches.length === 1) {
+            handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    };
+
+    const onTouchMove = (e) => {
+        if (e.touches.length === 1) {
+            handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    };
+
+    const onTouchEnd = () => {
+        handleDragEnd();
+    };
 
     const fetchSurvey = async () => {
         if (!id) return;
@@ -237,7 +288,16 @@ function DiagnoseContent() {
 
             <div className="flex flex-col md:flex-row flex-1 overflow-y-visible md:overflow-hidden">
                 {/* Left Side: Image Viewer */}
-                <div className="w-full md:w-1/2 h-[400px] md:h-full bg-slate-900 relative flex items-center justify-center p-4 md:p-8 shrink-0">
+                <div 
+                    onMouseDown={onMouseDown}
+                    onMouseMove={onMouseMove}
+                    onMouseUp={onMouseUpOrLeave}
+                    onMouseLeave={onMouseUpOrLeave}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    className={`w-full md:w-1/2 h-[400px] md:h-full bg-slate-900 relative flex items-center justify-center p-4 md:p-8 shrink-0 overflow-hidden select-none ${zoom > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+                >
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
                         <div className="bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-[10px] font-black text-white uppercase tracking-widest mb-2">
                             User Submitted Photo
@@ -267,13 +327,23 @@ function DiagnoseContent() {
                                 <ZoomIn size={18} />
                             </button>
                             <button 
-                                onClick={() => setZoom(prev => Math.max(prev - 0.2, 0.5))}
+                                onClick={() => {
+                                    setZoom(prev => {
+                                        const next = Math.max(prev - 0.2, 0.5);
+                                        if (next <= 1) setOffset({ x: 0, y: 0 });
+                                        return next;
+                                    });
+                                }}
                                 className={`w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all ${zoom <= 0.5 ? 'opacity-30 cursor-not-allowed' : ''}`}
                                 disabled={zoom <= 0.5}
                             >
                                 <ZoomOut size={18} />
                             </button>
-                            <button onClick={() => setZoom(1)} className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all">
+                            <button 
+                                onClick={() => { setZoom(1); setOffset({ x: 0, y: 0 }); }} 
+                                className="w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-xl flex items-center justify-center transition-all"
+                                title="줌/위치 초기화"
+                            >
                                 <RotateCcw size={18} />
                             </button>
                             <button 
@@ -286,7 +356,10 @@ function DiagnoseContent() {
                         </div>
                     </div>
 
-                    <div className="relative w-full h-full flex items-center justify-center transition-transform duration-300 ease-out" style={{ transform: `scale(${zoom})` }}>
+                    <div 
+                        className={`relative w-full h-full flex items-center justify-center ${isDragging ? 'transition-none' : 'transition-transform duration-300 ease-out'}`} 
+                        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }}
+                    >
                         {(survey?.leftEarUrl || survey?.rightEarUrl || survey?.earPhotoUrl) ? (
                             <div className="relative">
                                 <img 
