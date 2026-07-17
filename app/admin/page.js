@@ -25,6 +25,7 @@ import { db, auth } from '@/lib/firebase';
 import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Image from 'next/image';
+import EditAppointmentModal from '@/components/EditAppointmentModal';
 
 export default function AdminDashboardPage() {
     const router = useRouter();
@@ -42,6 +43,8 @@ export default function AdminDashboardPage() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [loadingAppointments, setLoadingAppointments] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedAppointmentForEdit, setSelectedAppointmentForEdit] = useState(null);
 
     // App Uploads states
     const [uploads, setUploads] = useState([]);
@@ -676,24 +679,84 @@ export default function AdminDashboardPage() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end items-center gap-2">
-                                                    {(!appt.isHidden && appt.status !== 'confirmed') && (
-                                                        <button 
-                                                            onClick={async () => {
-                                                                if (confirm('이 예약을 확정 및 승인하시겠습니까?')) {
-                                                                    try {
-                                                                        await updateDoc(doc(db, 'appointments', appt.id), { status: 'confirmed' });
-                                                                        alert('예약이 정상적으로 승인 및 확정되었습니다.');
-                                                                        fetchDashboardData();
-                                                                    } catch (err) {
-                                                                        console.error(err);
-                                                                        alert('예약 승인에 실패했습니다.');
+                                                    {(!appt.isHidden) && (
+                                                        <>
+                                                            {appt.status !== 'confirmed' && (
+                                                                <button 
+                                                                    onClick={async () => {
+                                                                        if (confirm('이 예약을 확정 및 승인하시겠습니까?')) {
+                                                                            try {
+                                                                                await updateDoc(doc(db, 'appointments', appt.id), { status: 'confirmed' });
+                                                                                
+                                                                                // 예약 승인 시에도 사용자에게 자동 승인 확정 SMS 발송 연동
+                                                                                const recipientPhone = (getUserContact(appt.userId).phone || appt.phone || '').replace(/[^0-9]/g, '');
+                                                                                if (recipientPhone) {
+                                                                                    try {
+                                                                                        const cleanName = getUserRealName(appt.userId, appt.userName) || '고객';
+                                                                                        const smsMessage = `[이어봄 wellness] ${cleanName}님, 신청하신 예약이 확정되었습니다.\n일시: ${appt.date} ${appt.time}\n장소: 서울시 광진구 능동로 59길 27 1층`;
+                                                                                        await fetch('/api/sms/send', {
+                                                                                            method: 'POST',
+                                                                                            headers: { 'Content-Type': 'application/json' },
+                                                                                            body: JSON.stringify({
+                                                                                                receiver: recipientPhone,
+                                                                                                message: smsMessage
+                                                                                            })
+                                                                                        });
+                                                                                    } catch (smsErr) {
+                                                                                        console.error("Failed to send confirmation SMS on direct approval:", smsErr);
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                                alert('예약이 정상적으로 승인 및 확정되었습니다.');
+                                                                                fetchDashboardData();
+                                                                            } catch (err) {
+                                                                                console.error(err);
+                                                                                alert('예약 승인에 실패했습니다.');
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                    className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black transition-all shadow-sm"
+                                                                >
+                                                                    예약 승인
+                                                                </button>
+                                                            )}
+                                                            <button 
+                                                                onClick={() => {
+                                                                    setSelectedAppointmentForEdit({
+                                                                        id: appt.id,
+                                                                        date: appt.date,
+                                                                        time: appt.time,
+                                                                        userId: appt.userId,
+                                                                        userName: appt.userName,
+                                                                        realName: getUserRealName(appt.userId, appt.userName),
+                                                                        userPhone: getUserContact(appt.userId).phone || appt.phone || ''
+                                                                    });
+                                                                    setIsEditModalOpen(true);
+                                                                }}
+                                                                className="px-2.5 py-1.5 bg-slate-800 hover:bg-black text-white rounded-lg text-[10px] font-black transition-all shadow-sm"
+                                                            >
+                                                                일정 변경
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => {
+                                                                    const userPhone = getUserContact(appt.userId).phone || appt.phone || '';
+                                                                    const cleanPhone = userPhone.replace(/[^0-9]/g, '');
+                                                                    const text = `안녕하세요 이어봄입니다. 신청하신 예약 일정의 조율을 위해 연락드렸습니다.`;
+                                                                    if (navigator.clipboard) {
+                                                                        navigator.clipboard.writeText(text)
+                                                                            .then(() => alert('일정 조율 안내문이 클립보드에 복사되었습니다. 카카오톡 등에 바로 붙여넣어 쓰실 수 있습니다.'))
+                                                                            .catch(err => console.error(err));
                                                                     }
-                                                                }
-                                                            }}
-                                                            className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black transition-all shadow-sm"
-                                                        >
-                                                            예약 승인
-                                                        </button>
+                                                                    if (cleanPhone) {
+                                                                        window.open(`sms:${cleanPhone}?body=${encodeURIComponent(text)}`, '_self');
+                                                                    }
+                                                                }}
+                                                                className="px-2 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-black transition-all border border-amber-200"
+                                                                title="안내문 복사 및 문자 전송 조율"
+                                                            >
+                                                                조율 문자
+                                                            </button>
+                                                        </>
                                                     )}
                                                     {appt.isHidden ? (
                                                         <button 
@@ -1427,6 +1490,17 @@ export default function AdminDashboardPage() {
                     </div>
                 </div>
             )}
+
+            {/* Edit Appointment Modal */}
+            <EditAppointmentModal 
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedAppointmentForEdit(null);
+                }}
+                appointment={selectedAppointmentForEdit}
+                onSuccess={fetchDashboardData}
+            />
         </div>
     );
 }
