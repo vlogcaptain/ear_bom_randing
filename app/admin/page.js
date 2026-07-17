@@ -35,7 +35,7 @@ export default function AdminDashboardPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('diagnose'); // diagnose, appUploads, members, logs, appointments
     const [users, setUsers] = useState([]);
-    const [stats, setStats] = useState({ today: 0, pending: 0, completed: 0, totalUsers: 0 });
+    const [stats, setStats] = useState({ today: 0, pending: 0, completed: 0, totalUsers: 0, todayAppointments: 0, pendingAppointments: 0 });
     const [selectedUserNotes, setSelectedUserNotes] = useState([]);
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
     const [noteLoading, setNoteLoading] = useState(false);
@@ -94,19 +94,6 @@ export default function AdminDashboardPage() {
             }));
             setUsers(userData);
 
-            // 통계 계산
-            const today = new Date().toDateString();
-            const todayCount = surveyData.filter(s => s.createdAt?.toDate().toDateString() === today).length;
-            const pendingCount = surveyData.filter(s => (s.status || 'pending') === 'pending').length;
-            const completedCount = surveyData.filter(s => s.status === 'completed').length;
-            
-            setStats({
-                today: todayCount,
-                pending: pendingCount,
-                completed: completedCount,
-                totalUsers: userData.length
-            });
-
             // 상담 예약 가져오기
             setLoadingAppointments(true);
             const appQ = query(collection(db, 'appointments'), orderBy('createdAt', 'desc'));
@@ -117,6 +104,24 @@ export default function AdminDashboardPage() {
             }));
             setAppointments(appData);
             setLoadingAppointments(false);
+
+            // 통계 계산
+            const today = new Date().toDateString();
+            const todayCount = surveyData.filter(s => s.createdAt?.toDate ? s.createdAt.toDate().toDateString() === today : false).length;
+            const pendingCount = surveyData.filter(s => (s.status || 'pending') === 'pending').length;
+            const completedCount = surveyData.filter(s => s.status === 'completed').length;
+
+            const todayApptCount = appData.filter(a => a.createdAt?.toDate ? a.createdAt.toDate().toDateString() === today : false).length;
+            const pendingApptCount = appData.filter(a => (a.status || 'pending') === 'pending').length;
+            
+            setStats({
+                today: todayCount,
+                pending: pendingCount,
+                completed: completedCount,
+                totalUsers: userData.length,
+                todayAppointments: todayApptCount,
+                pendingAppointments: pendingApptCount
+            });
 
             // 앱 사진 업로드 가져오기
             setLoadingUploads(true);
@@ -365,21 +370,43 @@ export default function AdminDashboardPage() {
             <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
                 {/* Stats Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="text-slate-400 text-xs font-black uppercase mb-2">오늘 들어온 요청</div>
-                        <div className="text-3xl font-black text-slate-800">{stats.today}건</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[125px]">
+                        <div>
+                            <div className="text-slate-400 text-xs font-black uppercase mb-2">오늘 들어온 요청</div>
+                            <div className="text-3xl font-black text-slate-800">{stats.today + stats.todayAppointments}건</div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between text-[10px] font-bold text-slate-500">
+                            <span>진단요청: {stats.today}건</span>
+                            <span>예약신청: {stats.todayAppointments}건</span>
+                        </div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="text-orange-500 text-xs font-black uppercase mb-2">미처리 진단</div>
-                        <div className="text-3xl font-black text-slate-800">{stats.pending}건</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[125px]">
+                        <div>
+                            <div className="text-orange-500 text-xs font-black uppercase mb-2">미처리 요청 대기</div>
+                            <div className="text-3xl font-black text-slate-800">{stats.pending + stats.pendingAppointments}건</div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between text-[10px] font-bold text-slate-500">
+                            <span className="text-orange-500">진단대기: {stats.pending}건</span>
+                            <span className="text-blue-600">예약대기: {stats.pendingAppointments}건</span>
+                        </div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="text-green-600 text-xs font-black uppercase mb-2">진단 완료 (누적)</div>
-                        <div className="text-3xl font-black text-slate-800">{stats.completed}건</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[125px]">
+                        <div>
+                            <div className="text-green-600 text-xs font-black uppercase mb-2">진단 완료 (누적)</div>
+                            <div className="text-3xl font-black text-slate-800">{stats.completed}건</div>
+                        </div>
+                        <div className="text-[10px] font-bold text-slate-400 mt-2 pt-2 border-t border-slate-50 border-dashed">
+                            전체 사용자 누적 피드백 완료
+                        </div>
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="text-slate-400 text-xs font-black uppercase mb-2">총 회원수</div>
-                        <div className="text-3xl font-black text-slate-800">{stats.totalUsers}명</div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[125px]">
+                        <div>
+                            <div className="text-slate-400 text-xs font-black uppercase mb-2">총 회원수</div>
+                            <div className="text-3xl font-black text-slate-800">{stats.totalUsers}명</div>
+                        </div>
+                        <div className="text-[10px] font-bold text-slate-400 mt-2 pt-2 border-t border-slate-50 border-dashed">
+                            가입 회원 통합 관리 데이터
+                        </div>
                     </div>
                 </div>
 
