@@ -504,11 +504,11 @@ export default function Home() {
                             <span className="text-[#F697AB] font-bold text-sm tracking-wider uppercase bg-[#FFF0F2] px-4 py-2 rounded-full border border-pink-100 mb-4 inline-block">
                                 EarBom Wellness Education System
                             </span>
-                            <h2 className="text-3xl md:text-5xl font-black text-[#1B5E20] mb-4">
-                                귀로 배우는 이어봄 웰니스 강좌
+                            <h2 className="text-3xl md:text-5xl font-black text-[#1B5E20] mb-4 leading-tight">
+                                귀로 배우는<br />이어봄 웰니스 강좌
                             </h2>
-                            <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
-                                단순한 귀혈점 암기가 아닌, 인체를 이해하고 나/가족의 건강을 스스로 디자인하는 웰니스 체계입니다.
+                            <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                                단순한 귀혈점 암기가 아닌, 인체를 이해하고 나와<br className="hidden sm:inline" /> 가족의 건강을 스스로 디자인하는 웰니스 체계입니다.
                             </p>
                         </div>
 
@@ -529,13 +529,13 @@ export default function Home() {
                                     <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">
                                         원데이 클래스
                                     </h3>
-                                    <p className="text-[#F697AB] font-bold text-base mb-6">
-                                        "귀를 보면 건강이 보인다 — 내 몸의 신호를 알아보는 특별한 체험"
+                                    <p className="text-[#F697AB] font-bold text-base mb-6 leading-relaxed">
+                                        "귀를 보면 건강이 보인다 —<br className="sm:hidden" /> 내 몸의 신호를 알아보는 특별한 체험"
                                     </p>
 
                                     <div className="flex items-baseline gap-2 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                         <span className="text-3xl md:text-4xl font-black text-slate-900">60,000</span>
-                                        <span className="text-slate-500 font-bold text-sm">원 / 1회 체험 (실습포함)</span>
+                                        <span className="text-slate-500 font-bold text-sm whitespace-nowrap">원 / 1회 체험 (실습포함)</span>
                                     </div>
 
                                     {/* 3-Part Syllabus */}
@@ -598,13 +598,13 @@ export default function Home() {
                                     <h3 className="text-2xl md:text-3xl font-black text-white mb-2">
                                         이어봄 웰니스 5주 입문과정
                                     </h3>
-                                    <p className="text-green-300 font-bold text-base mb-6">
-                                        "Hear Your Body — 외우는 강의가 아닌, 인체를 이해하는 강의"
+                                    <p className="text-green-300 font-bold text-base mb-6 leading-relaxed">
+                                        "Hear Your Body —<br className="sm:hidden" /> 외우는 강의가 아닌, 인체를 이해하는 강의"
                                     </p>
 
                                     <div className="flex items-baseline gap-2 mb-8 bg-green-900/60 p-4 rounded-2xl border border-green-700/60">
                                         <span className="text-3xl md:text-4xl font-black text-white">400,000</span>
-                                        <span className="text-green-300 font-bold text-sm">원 / 5주 마스터 코스</span>
+                                        <span className="text-green-300 font-bold text-sm whitespace-nowrap">원 / 5주 마스터 코스</span>
                                     </div>
 
                                     {/* 5-Week Syllabus List */}
@@ -635,14 +635,16 @@ export default function Home() {
                                     {/* 5-Step System Banner */}
                                     <div className="bg-green-900/80 p-4 rounded-2xl border border-green-700 mb-8">
                                         <div className="text-[11px] font-bold text-green-300 mb-2">earbom wellness 5-Step System</div>
-                                        <div className="flex justify-between items-center text-[11px] font-extrabold text-white text-center">
+                                        <div className="flex flex-wrap justify-between items-center text-[10px] sm:text-[11px] font-extrabold text-white text-center gap-y-1">
                                             <span>1.Ear Scan</span>
-                                            <span className="text-green-500">➔</span>
+                                            <span className="text-green-400">➔</span>
                                             <span>2.Body Insight</span>
-                                            <span className="text-green-500">➔</span>
+                                            <span className="text-green-400">➔</span>
                                             <span>3.Ear Point</span>
-                                            <span className="text-green-500">➔</span>
+                                            <span className="text-green-400">➔</span>
                                             <span>4.Ear Therapy</span>
+                                            <span className="text-green-400">➔</span>
+                                            <span>5.Wellness Life</span>
                                         </div>
                                     </div>
                                 </div>
@@ -663,12 +665,17 @@ export default function Home() {
                                 <div className="w-12 h-12 bg-[#FFF0F2] rounded-2xl flex items-center justify-center shrink-0">
                                     <span className="material-symbols-outlined text-[#F697AB]">workspace_premium</span>
                                 </div>
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-base">국제이침협회 정식 커리큘럼 & 민간자격 등록기관</h4>
-                                    <p className="text-xs text-slate-500 mt-1">민간자격등록번호: 2023-000664 (문체부 주무) | 수강 후 자격증 연계 가능</p>
+                                <div className="space-y-1">
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                        <h4 className="font-black text-slate-900 text-base">국제이침협회 정식 커리큘럼 & 민간자격 등록기관</h4>
+                                        <span className="bg-[#FFF0F2] text-[#C6566D] font-extrabold text-xs px-2.5 py-0.5 rounded-full border border-pink-100">
+                                            8주 자격증 과정 800,000원 / 개별상담
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500">민간자격등록번호: 2023-000664 (문체부 주무) | 수강 후 자격증 연계 가능 (개별 상담 문의)</p>
                                 </div>
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 shrink-0">
                                 <Link href="/terms" className="text-xs font-bold text-slate-400 hover:text-slate-600 underline">
                                     강좌 취소 및 환불 규정
                                 </Link>
