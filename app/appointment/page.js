@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -10,7 +10,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 
-export default function AppointmentPage() {
+function AppointmentContent() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
 
@@ -472,5 +472,17 @@ export default function AppointmentPage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function AppointmentPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-pale">
+                <div className="text-center font-bold text-slate-500">예약 페이지를 불러오는 중입니다...</div>
+            </div>
+        }>
+            <AppointmentContent />
+        </Suspense>
     );
 }
