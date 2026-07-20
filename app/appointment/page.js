@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { User, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, Mic, MessageSquare, MapPin, FileText } from 'lucide-react';
 import { db } from '@/lib/firebase';
@@ -15,10 +15,22 @@ export default function AppointmentPage() {
     const { user, loading, logout } = useAuth();
 
     // Booking States
+    const searchParams = useSearchParams();
+    const typeParam = searchParams ? searchParams.get('type') : null;
+
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState('');
     const [consultationType, setConsultationType] = useState('video');
     const [consultationMemo, setConsultationMemo] = useState('');
+
+    useEffect(() => {
+        if (typeParam) {
+            if (typeParam === 'oneday') setConsultationType('oneday');
+            else if (typeParam === '5weeks') setConsultationType('5weeks');
+            else if (typeParam === 'offline') setConsultationType('offline');
+            else if (typeParam === 'video') setConsultationType('video');
+        }
+    }, [typeParam]);
     const [bookingLoading, setBookingLoading] = useState(false);
     const [agreementChecked, setAgreementChecked] = useState(false);
     const [bookedSlots, setBookedSlots] = useState([]);
@@ -188,13 +200,19 @@ export default function AppointmentPage() {
 
             // 관리자 대상 SMS 알림 전송 (비동기, 예약 성공 자체를 방해하지 않음)
             try {
+                const typeLabelMap = {
+                    offline: '대면(방문)',
+                    video: '비대면(화상)',
+                    oneday: '원데이 클래스 (60,000원)',
+                    '5weeks': '5주 입문과정 (400,000원)'
+                };
                 const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-5266-0150';
                 await fetch('/api/sms/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         to: adminPhone,
-                        message: `[이어봄 알림]\n새로운 1:1 상담 예약이 대기 중입니다.\n\n- 신청자: ${user.displayName || '사용자'}님\n- 일정: ${dateStr} (${selectedTime})\n- 방식: ${consultationType === 'offline' ? '대면(방문)' : '비대면(화상)'}\n\n관리자 대시보드에서 승인을 진행해 주세요.`
+                        message: `[이어봄 알림]\n새로운 예약/신청이 대기 중입니다.\n\n- 신청자: ${user.displayName || '사용자'}님\n- 일정: ${dateStr} (${selectedTime})\n- 구분: ${typeLabelMap[consultationType] || consultationType}\n\n관리자 대시보드에서 승인을 진행해 주세요.`
                     })
                 });
             } catch (smsErr) {
@@ -374,23 +392,28 @@ export default function AppointmentPage() {
                         {/* Consultation Type */}
                         <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-green-50 space-y-8">
                             <h3 className="text-xl font-black flex items-center gap-2 text-slate-800">
-                                <Video className="text-[#F697AB]" size={24} /> 3. 상담 방식
+                                <Video className="text-[#F697AB]" size={24} /> 3. 상담 및 강좌 종류 선택
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {[
-                                    { id: 'offline', label: '대면 상담 (방문)', icon: <MapPin /> },
-                                    { id: 'video', label: '비대면 상담', icon: <Video /> }
+                                    { id: 'video', label: '1:1 비대면 상담', sub: '온라인 화상 1:1 웰니스 케어', icon: <Video /> },
+                                    { id: 'offline', label: '1:1 대면 방문 상담', sub: '서울 광진구 센터 직접 방문', icon: <MapPin /> },
+                                    { id: 'oneday', label: '원데이 클래스 (60,000원)', sub: '2시간 실습 체험 / 재료비 포함', icon: <FileText /> },
+                                    { id: '5weeks', label: '5주 입문과정 (400,000원)', sub: '주 3시간 × 5주 마스터 코스', icon: <FileText /> }
                                 ].map(type => (
                                     <button
                                         key={type.id}
                                         onClick={() => setConsultationType(type.id)}
-                                        className={`flex flex-col items-center gap-4 p-8 rounded-[32px] transition-all border-2
-                                            ${consultationType === type.id ? 'bg-[#FFF0F2]/50 border-[#F697AB] text-[#F697AB] shadow-sm' : 'bg-white border-slate-100 text-slate-400 hover:border-[#F697AB] hover:text-slate-600'}`}
+                                        className={`flex flex-col items-start text-left gap-3 p-6 rounded-[28px] transition-all border-2
+                                            ${consultationType === type.id ? 'bg-[#FFF0F2]/60 border-[#F697AB] text-[#1B5E20] shadow-sm' : 'bg-white border-slate-100 text-slate-500 hover:border-[#F697AB] hover:text-slate-700'}`}
                                     >
-                                        <div className={`p-4 rounded-2xl ${consultationType === type.id ? 'bg-[#F697AB] text-white' : 'bg-slate-50'}`}>
-                                            {type.icon}
+                                        <div className="flex items-center gap-3 w-full">
+                                            <div className={`p-3 rounded-2xl shrink-0 ${consultationType === type.id ? 'bg-[#F697AB] text-white' : 'bg-slate-100 text-slate-500'}`}>
+                                                {type.icon}
+                                            </div>
+                                            <span className="font-extrabold text-sm">{type.label}</span>
                                         </div>
-                                        <span className="font-black text-sm">{type.label}</span>
+                                        <p className="text-xs text-slate-400 font-medium pl-1">{type.sub}</p>
                                     </button>
                                 ))}
                             </div>

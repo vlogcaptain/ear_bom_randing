@@ -500,106 +500,178 @@ export default function Home() {
                 {/* Course Information Section */}
                 <section className="py-24 bg-pale" id="course">
                     <div className="max-w-7xl mx-auto px-6">
-                        <div className="bg-white rounded-[40px] shadow-xl border border-green-100 p-8 md:p-16">
-                            <div className="flex flex-col lg:flex-row gap-12">
-                                <div className="lg:w-1/2">
-                                    <div className="inline-flex items-center gap-2 bg-[#FFF0F2] px-4 py-2 rounded-full text-primary text-sm font-semibold mb-6">
-                                        <span className="material-symbols-outlined text-sm">workspace_premium</span>
-                                        민간자격등록번호: 2023-000664 (문체부 주무)
-                                    </div>
-                                    <h2 className="text-3xl md:text-4xl font-extrabold text-primary-dark mb-8 leading-tight">
-                                        국제이침협회 <br className="hidden md:block" />
-                                        <span className="text-[#F697AB]">귀 상담사 1급</span> 자격증반
-                                    </h2>
-                                    
-                                    <div className="space-y-8">
-                                        {[
-                                            {
-                                                icon: "target",
-                                                title: "목표",
-                                                content: "건강의 근본적인 문제 해결을 위한 이혈이침요법과 실전 기술 학습"
-                                            },
-                                            {
-                                                icon: "calendar_today",
-                                                title: "일정",
-                                                content: "오프라인 강의(8주 과정)"
-                                            },
-                                            {
-                                                icon: "groups",
-                                                title: "대상",
-                                                content: (
-                                                    <ul className="space-y-2">
-                                                        <li className="flex gap-2">
-                                                            <span className="text-primary">•</span>
-                                                            <span>건강 관리 및 상담에 관심 있는 일반인 및 초보자</span>
-                                                        </li>
-                                                        <li className="flex gap-2">
-                                                            <span className="text-primary">•</span>
-                                                            <span>건강지도강사를 통한 제 2의 직업, 상담을 통한 수익연계를 위한 건강 매니저로 성장하고자 하는 분</span>
-                                                        </li>
-                                                    </ul>
-                                                )
-                                            }
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="flex gap-4">
-                                                <div className="w-12 h-12 bg-[#FFF0F2] rounded-xl flex items-center justify-center shrink-0">
-                                                    <span className="material-symbols-outlined text-primary">{item.icon}</span>
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-lg mb-1">{item.title}</h4>
-                                                    <div className="text-gray-600 leading-relaxed">{item.content}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    
-                                    <div className="mt-12 flex flex-col sm:flex-row gap-4">
-                                        <Link 
-                                            href="/appointment"
-                                            className="inline-flex items-center justify-center gap-2 bg-[#F697AB] text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#C6566D] transition-all shadow-lg text-center"
-                                        >
-                                            강좌 수강 문의하기
-                                            <span className="material-symbols-outlined">arrow_forward</span>
-                                        </Link>
-                                        <Link 
-                                            href="#reviews"
-                                            className="inline-flex items-center justify-center gap-2 bg-white text-[#F697AB] border-2 border-[#F697AB] px-8 py-4 rounded-2xl text-lg font-bold hover:bg-[#FFF0F2] transition-all text-center"
-                                        >
-                                            강좌 후기 확인하기
-                                            <span className="material-symbols-outlined">visibility</span>
-                                        </Link>
-                                    </div>
+                        <div className="text-center mb-16">
+                            <span className="text-[#F697AB] font-bold text-sm tracking-wider uppercase bg-[#FFF0F2] px-4 py-2 rounded-full border border-pink-100 mb-4 inline-block">
+                                EarBom Wellness Education System
+                            </span>
+                            <h2 className="text-3xl md:text-5xl font-black text-[#1B5E20] mb-4">
+                                귀로 배우는 이어봄 웰니스 강좌
+                            </h2>
+                            <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
+                                단순한 귀혈점 암기가 아닌, 인체를 이해하고 나/가족의 건강을 스스로 디자인하는 웰니스 체계입니다.
+                            </p>
+                        </div>
+
+                        {/* Two-Track Course Cards */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                            {/* Card 1: One-Day Class */}
+                            <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-lg border border-pink-100 flex flex-col justify-between hover:shadow-2xl transition-all relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 bg-[#F697AB] text-white text-xs font-black px-6 py-2 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                                    체험형 클래스
                                 </div>
-                                
-                                <div className="lg:w-1/2">
-                                    <div className="bg-[#FFF0F2]/50 rounded-3xl p-8 md:p-10 border border-green-100 flex flex-col h-full gap-6">
-                                        <h3 className="text-2xl font-bold text-center text-gray-800 shrink-0">
-                                            국제이현협회의 <span className="text-primary">귀상담사 교육</span>은?
-                                        </h3>
-                                        <div className="flex flex-col gap-6 flex-1">
-                                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-green-50 flex-1 flex items-center">
-                                                <p className="text-lg leading-relaxed text-gray-700 w-full">
-                                                    <u>스트레스 완화, 통증 관리 등</u>, 귀의 120개 이상의 혈자리 활용하여 <strong className="text-gray-900">효과적인 건강 진단 및 관리 가능</strong>
-                                                </p>
-                                            </div>
-                                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-green-50 flex-1 flex items-center">
-                                                <p className="text-lg leading-relaxed text-gray-700 w-full">
-                                                    비침습적 방법으로 <strong className="text-gray-900">누구나 실습 가능하며(접근성)</strong>, <u>약물 사용 없이</u> 자연 치유와 건강 증진할 수 있는 <strong className="text-gray-900">안정성</strong>
-                                                </p>
-                                            </div>
+
+                                <div>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="bg-[#FFF0F2] text-[#C6566D] font-bold text-xs px-3 py-1.5 rounded-full border border-pink-100">
+                                            교육시간 2시간 (실습재료 포함)
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+                                        원데이 클래스
+                                    </h3>
+                                    <p className="text-[#F697AB] font-bold text-base mb-6">
+                                        "귀를 보면 건강이 보인다 — 내 몸의 신호를 알아보는 특별한 체험"
+                                    </p>
+
+                                    <div className="flex items-baseline gap-2 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                        <span className="text-3xl md:text-4xl font-black text-slate-900">60,000</span>
+                                        <span className="text-slate-500 font-bold text-sm">원 / 1회 체험 (실습포함)</span>
+                                    </div>
+
+                                    {/* 3-Part Syllabus */}
+                                    <div className="space-y-4 mb-8">
+                                        <h4 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                                            <span className="w-2 h-2 bg-[#F697AB] rounded-full"></span>
+                                            원데이 클래스 교육 과정 (3부)
+                                        </h4>
+                                        <div className="space-y-2.5">
+                                            {[
+                                                { step: "1부", title: "귀, 건강의 지도가 되다", desc: "귀와 인체 관계 이해, 이혈테라피 원리 학습" },
+                                                { step: "2부", title: "내 몸 건강 신호 알아보기", desc: "귀의 변화 관찰, 스트레스/순환 체크 포인트" },
+                                                { step: "3부", title: "직접 체험하는 귀 건강관리", desc: "귀 자극법 배우기, 스티커 활용 및 셀프케어" }
+                                            ].map((item, idx) => (
+                                                <div key={idx} className="bg-[#FFF0F2]/40 p-3.5 rounded-xl border border-pink-100/60 flex items-start gap-3">
+                                                    <span className="font-black text-xs text-[#C6566D] bg-white px-2 py-1 rounded-md shadow-2xs border border-pink-100 shrink-0">{item.step}</span>
+                                                    <div>
+                                                        <div className="font-bold text-sm text-slate-800">{item.title}</div>
+                                                        <div className="text-xs text-slate-500 mt-0.5">{item.desc}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="space-y-4 shrink-0">
-                                            <div className="text-center text-sm text-gray-400">
-                                                * 본 교육은 국제이침협회의 정식 커리큘럼을 따릅니다.
-                                            </div>
-                                            <div className="text-center border-t border-green-100 pt-4">
-                                                <Link href="/terms" className="text-xs text-gray-400 hover:text-primary transition-all underline">
-                                                    강좌 취소 및 환불 규정 안내
-                                                </Link>
-                                            </div>
+                                    </div>
+
+                                    {/* Recommended For */}
+                                    <div className="space-y-2 mb-8">
+                                        <div className="text-xs font-bold text-slate-400">추천 대상</div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {["건강관리 첫걸음 희망자", "가족 건강케어 관심자", "이혈테라피 입문자"].map((tag, tIdx) => (
+                                                <span key={tIdx} className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                                    ✔ {tag}
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
+
+                                <Link 
+                                    href="/appointment?type=oneday"
+                                    className="w-full py-4 bg-[#F697AB] hover:bg-[#C6566D] text-white rounded-2xl font-black text-base transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.01]"
+                                >
+                                    원데이 클래스 수강 신청하기
+                                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                </Link>
+                            </div>
+
+                            {/* Card 2: 5-Week Course */}
+                            <div className="bg-[#1B5E20] text-white rounded-[40px] p-8 md:p-12 shadow-lg border border-green-800 flex flex-col justify-between hover:shadow-2xl transition-all relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 bg-[#A5D6A7] text-[#1B5E20] text-xs font-black px-6 py-2 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                                    프리미엄 5주 코스
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="bg-green-800/80 text-green-200 font-bold text-xs px-3 py-1.5 rounded-full border border-green-700">
+                                            주 3시간 (실습포함) × 5주 과정
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl md:text-3xl font-black text-white mb-2">
+                                        이어봄 웰니스 5주 입문과정
+                                    </h3>
+                                    <p className="text-green-300 font-bold text-base mb-6">
+                                        "Hear Your Body — 외우는 강의가 아닌, 인체를 이해하는 강의"
+                                    </p>
+
+                                    <div className="flex items-baseline gap-2 mb-8 bg-green-900/60 p-4 rounded-2xl border border-green-700/60">
+                                        <span className="text-3xl md:text-4xl font-black text-white">400,000</span>
+                                        <span className="text-green-300 font-bold text-sm">원 / 5주 마스터 코스</span>
+                                    </div>
+
+                                    {/* 5-Week Syllabus List */}
+                                    <div className="space-y-4 mb-8">
+                                        <h4 className="font-extrabold text-green-200 text-sm flex items-center gap-2">
+                                            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                            5주 주차별 전문 커리큘럼
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {[
+                                                { wk: "1주", topic: "움직임이 편해야 건강하다", detail: "목·허리·무릎 통증 완화 이혈테라피" },
+                                                { wk: "2주", topic: "건강의 시작은 소화력", detail: "위장·간해독·혈당관리 & 소화 개선" },
+                                                { wk: "3주", topic: "숨 쉬는 힘이 면역력이다", detail: "폐·비염·알레르기 완화 & 면역 케어" },
+                                                { wk: "4주", topic: "좋은 잠이 최고의 보약", detail: "자율신경·불면·두통 & 수면 케어" },
+                                                { wk: "5주", topic: "호르몬 균형이 건강을 만든다", detail: "갱년기·생리통·만성피로 & 밸런스 관리" }
+                                            ].map((wkItem, idx) => (
+                                                <div key={idx} className="bg-green-900/40 p-3 rounded-xl border border-green-800/80 flex items-center justify-between text-xs">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <span className="font-black text-[11px] text-green-900 bg-green-300 px-2 py-0.5 rounded-md shrink-0">{wkItem.wk}</span>
+                                                        <span className="font-bold text-white">{wkItem.topic}</span>
+                                                    </div>
+                                                    <span className="text-green-300 font-medium text-[11px] hidden sm:inline">{wkItem.detail}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* 5-Step System Banner */}
+                                    <div className="bg-green-900/80 p-4 rounded-2xl border border-green-700 mb-8">
+                                        <div className="text-[11px] font-bold text-green-300 mb-2">earbom wellness 5-Step System</div>
+                                        <div className="flex justify-between items-center text-[11px] font-extrabold text-white text-center">
+                                            <span>1.Ear Scan</span>
+                                            <span className="text-green-500">➔</span>
+                                            <span>2.Body Insight</span>
+                                            <span className="text-green-500">➔</span>
+                                            <span>3.Ear Point</span>
+                                            <span className="text-green-500">➔</span>
+                                            <span>4.Ear Therapy</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Link 
+                                    href="/appointment?type=5weeks"
+                                    className="w-full py-4 bg-[#F697AB] hover:bg-[#C6566D] text-white rounded-2xl font-black text-base transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.01]"
+                                >
+                                    5주 입문과정 수강 신청하기
+                                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Certificate Info Banner */}
+                        <div className="bg-white rounded-3xl p-6 md:p-8 border border-green-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-[#FFF0F2] rounded-2xl flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-[#F697AB]">workspace_premium</span>
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-base">국제이침협회 정식 커리큘럼 & 민간자격 등록기관</h4>
+                                    <p className="text-xs text-slate-500 mt-1">민간자격등록번호: 2023-000664 (문체부 주무) | 수강 후 자격증 연계 가능</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <Link href="/terms" className="text-xs font-bold text-slate-400 hover:text-slate-600 underline">
+                                    강좌 취소 및 환불 규정
+                                </Link>
                             </div>
                         </div>
                     </div>
