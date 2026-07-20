@@ -523,7 +523,7 @@ export default function Home() {
                                 <div>
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className="bg-[#FFF0F2] text-[#C6566D] font-bold text-xs px-3 py-1.5 rounded-full border border-pink-100">
-                                            교육시간 2시간 (실습재료 포함)
+                                            교육시간 3시간 (실습재료 포함)
                                         </span>
                                     </div>
                                     <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">

@@ -124,67 +124,19 @@ export default function AppointmentPage() {
     };
 
     const handleBooking = async () => {
-
         if (!selectedDate || !selectedTime) {
-            alert('상담 날짜와 시간을 선택해 주세요.');
+            alert('상담 및 강좌 수강 날짜와 시간을 선택해 주세요.');
             return;
         }
 
         setBookingLoading(true);
         try {
-            // 방문 상담(offline)인 경우 결제 로직 진행
-            if (consultationType === 'offline') {
-                if (!window.PortOne) {
-                    alert('결제 모듈이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.');
-                    setBookingLoading(false);
-                    return;
-                }
-
-                const paymentId = `payment-${crypto.randomUUID()}`;
-                const amount = 10000; // UI상 표시된 최종 결제 금액
-
-                const paymentResponse = await window.PortOne.requestPayment({
-                    storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID,
-                    channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY,
-                    paymentId: paymentId,
-                    orderName: `${expert.name} 전문가 상담 예약`,
-                    totalAmount: amount,
-                    currency: "CURRENCY_KRW",
-                    payMethod: "CARD",
-                    customer: {
-                        fullName: user.displayName || "사용자",
-                        email: user.email || "",
-                    },
-                });
-
-                // 결제 실패 처리
-                if (paymentResponse.code !== undefined) {
-                    alert(`결제 실패: ${paymentResponse.message}`);
-                    setBookingLoading(false);
-                    return;
-                }
-
-                // 서버 사이드 결제 검증
-                const verifyRes = await fetch("/api/payment/verify", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ paymentId: paymentResponse.paymentId }),
-                });
-
-                const verifyData = await verifyRes.json();
-                if (!verifyData.success) {
-                    alert(`결제 검증 실패: ${verifyData.message}`);
-                    setBookingLoading(false);
-                    return;
-                }
-            }
-
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
             const day = String(selectedDate.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
 
-            // 결제 성공(혹은 무료 상담) 시 DB 저장 진행
+            // 예약/신청 데이터 DB 저장 진행 (온라인 결제 심사 중이므로 pending 상태로 접수)
             await addDoc(collection(db, 'appointments'), {
                 userId: user.uid,
                 userName: user.displayName || '사용자',
@@ -194,7 +146,7 @@ export default function AppointmentPage() {
                 type: consultationType,
                 memo: consultationMemo || '',
                 status: 'pending',
-                paymentStatus: consultationType === 'offline' ? 'paid' : 'free',
+                paymentStatus: 'pending_confirmation',
                 createdAt: serverTimestamp()
             });
 
@@ -398,7 +350,7 @@ export default function AppointmentPage() {
                                 {[
                                     { id: 'video', label: '1:1 비대면 상담', sub: '온라인 화상 1:1 웰니스 케어', icon: <Video /> },
                                     { id: 'offline', label: '1:1 대면 방문 상담', sub: '서울 광진구 센터 직접 방문', icon: <MapPin /> },
-                                    { id: 'oneday', label: '원데이 클래스 (60,000원)', sub: '2시간 실습 체험 / 재료비 포함', icon: <FileText /> },
+                                    { id: 'oneday', label: '원데이 클래스 (60,000원)', sub: '3시간 실습 체험 / 재료비 포함', icon: <FileText /> },
                                     { id: '5weeks', label: '5주 입문과정 (400,000원)', sub: '주 3시간 × 5주 마스터 코스', icon: <FileText /> }
                                 ].map(type => (
                                     <button
@@ -477,26 +429,18 @@ export default function AppointmentPage() {
                                 </div>
                             </div>
 
-                                <div className="bg-[#f8fcf8] px-5 py-6 rounded-[32px] border border-[#FFF0F2] space-y-4">
-                                    <div className="flex justify-between items-center gap-2">
-                                        <span className="text-slate-500 font-bold text-[13px] shrink-0">상담 비용</span>
-                                        <span className="font-black text-slate-800 text-right text-[13px] whitespace-nowrap">
-                                            {consultationType === 'offline' ? '상담+침 시술 30,000원' : '결제 금액이 없습니다'}
-                                        </span>
+                                {/* Online Payment Pending Notice Banner */}
+                                <div className="bg-[#FFF0F2]/60 px-5 py-6 rounded-[28px] border border-pink-200/80 space-y-3">
+                                    <div className="flex items-center gap-2 text-[#C6566D] font-extrabold text-xs uppercase tracking-wider">
+                                        <span className="w-2 h-2 bg-[#F697AB] rounded-full animate-ping"></span>
+                                        온라인 결제 심사 및 준비 진행 중
                                     </div>
-                                    <div className="flex justify-between items-end py-4 border-t border-[#FFF0F2] mt-4 gap-2">
-                                        <span className="font-black text-slate-900 shrink-0 pb-1 text-sm">최종 결제 금액</span>
-                                        <div className="text-right whitespace-nowrap">
-                                            <div className="flex items-baseline justify-end">
-                                                <span className="text-3xl font-black text-[#F697AB] tracking-tighter leading-none">
-                                                    {consultationType === 'offline' ? '10,000' : '0'}
-                                                </span>
-                                                <span className="text-lg font-black text-[#F697AB] ml-0.5">원</span>
-                                            </div>
-                                            {consultationType === 'offline' && (
-                                                <p className="text-[11px] font-bold text-orange-600 mt-1">(20,000원 현장 결제)</p>
-                                            )}
-                                        </div>
+                                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                                        현재 전자 결제 PG 심사가 진행 중입니다. 일정을 선택 후 <strong className="text-slate-900 font-bold">[예약 및 수강 신청 완료]</strong>를 누르시면, 담당 매니저가 일정을 승인하고 개별 안내를 드립니다.
+                                    </p>
+                                    <div className="pt-2 border-t border-pink-100 flex justify-between items-center text-[11px] font-bold text-slate-500">
+                                        <span>구분: {typeLabelMap[consultationType] || consultationType}</span>
+                                        <span className="text-[#C6566D]">현장/개별 안내</span>
                                     </div>
                                 </div>
 
@@ -518,7 +462,7 @@ export default function AppointmentPage() {
                                     disabled={bookingLoading || !selectedDate || !selectedTime || !agreementChecked}
                                     className="w-full bg-[#F697AB] hover:bg-[#C6566D] text-white font-black py-6 rounded-[24px] shadow-xl shadow-[#F697AB]/20 transition-all transform active:scale-[0.98] text-lg disabled:opacity-50 disabled:grayscale disabled:transform-none"
                                 >
-                                    {bookingLoading ? '예약 처리 중...' : (consultationType === 'offline' ? '예약 및 결제하기' : '예약하기')}
+                                    {bookingLoading ? '신청 처리 중...' : '예약 및 수강 신청 완료'}
                                 </button>
                             </div>
                         </div>
