@@ -10,6 +10,13 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 
+const typeLabelMap = {
+    offline: '대면 상담 (방문)',
+    video: '비대면 상담',
+    oneday: '원데이 클래스 (60,000원)',
+    '5weeks': '5주 입문과정 (400,000원)'
+};
+
 function AppointmentContent() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
@@ -152,12 +159,6 @@ function AppointmentContent() {
 
             // 관리자 대상 SMS 알림 전송 (비동기, 예약 성공 자체를 방해하지 않음)
             try {
-                const typeLabelMap = {
-                    offline: '대면(방문)',
-                    video: '비대면(화상)',
-                    oneday: '원데이 클래스 (60,000원)',
-                    '5weeks': '5주 입문과정 (400,000원)'
-                };
                 const adminPhone = process.env.NEXT_PUBLIC_ADMIN_PHONE || '010-5266-0150';
                 await fetch('/api/sms/send', {
                     method: 'POST',
