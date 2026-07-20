@@ -28,9 +28,9 @@ export default function Footer() {
                         
                         {/* 사업자 정보 섹션 */}
                         <div className="text-xs text-gray-400 space-y-1">
-                            <p>상호명: 이노홈 홀딩스 | 대표자: 김도형</p>
-                            <p>사업자등록번호: 794-09-01034 | 통신판매업신고번호: 제2026-서울 송파-1203호</p>
-                            <p>주소: 서울특별시 송파구 충민로 66, 패션관 9056호 (문정동, 가든파이브라이프)</p>
+                            <p>상호명: 이어봄 웰니스 | 대표자: 백정숙</p>
+                            <p>사업자등록번호: 821-31-01754 | 통신판매업신고번호: 제2026-서울성동-1064호</p>
+                            <p>주소: 서울특별시 성동구 행당로 82, 105동 1402호 (행당동, 행당한진타운)</p>
                             <p>고객센터: 010-5266-0150 | 이메일: js100216@naver.com</p>
                         </div>
                     </div>
@@ -53,7 +53,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-pink-100 text-xs text-gray-400 gap-4">
-                    <p>© 2026 earbom wellness (이노홈 홀딩스). All rights reserved.</p>
+                    <p>© 2026 earbom wellness (이어봄 웰니스). All rights reserved.</p>
                     <div className="flex gap-6 items-center">
                         <a className="hover:text-[#F697AB]" href="#">Instagram</a>
                         <a className="hover:text-[#F697AB]" href="#">Facebook</a>
