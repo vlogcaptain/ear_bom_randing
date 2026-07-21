@@ -172,7 +172,7 @@ function AppointmentContent() {
                 console.error("Failed to send admin notification SMS:", smsErr);
             }
 
-            alert('예약이 성공적으로 완료되었습니다.');
+            alert('수강 및 상담 신청이 성공적으로 접수되었습니다.\n\n[무통장 입금 계좌 안내]\n신한은행 907-04-259313 백정숙(이어봄웰니스)\n\n입금 완료해 주신 신청자분께는 담당 매니저가 입금 확인 후 개별 연락(SMS/전화)을 드립니다.');
             router.push('/dashboard');
         } catch (error) {
             console.error("Booking error:", error);
@@ -430,18 +430,48 @@ function AppointmentContent() {
                                 </div>
                             </div>
 
-                                {/* Online Payment Pending Notice Banner */}
-                                <div className="bg-[#FFF0F2]/60 px-5 py-6 rounded-[28px] border border-pink-200/80 space-y-3">
-                                    <div className="flex items-center gap-2 text-[#C6566D] font-extrabold text-xs uppercase tracking-wider">
-                                        <span className="w-2 h-2 bg-[#F697AB] rounded-full animate-ping"></span>
-                                        온라인 결제 심사 및 준비 진행 중
+                                {/* Bank Account & Payment Notice Banner */}
+                                <div className="bg-[#FFF0F2]/70 px-5 py-6 rounded-[28px] border border-pink-200/90 space-y-4">
+                                    <div className="flex items-center justify-between text-[#C6566D] font-extrabold text-xs">
+                                        <span className="flex items-center gap-1.5 uppercase tracking-wider">
+                                            <span className="w-2 h-2 bg-[#F697AB] rounded-full animate-ping"></span>
+                                            수강료 / 상담비 입금 계좌 안내
+                                        </span>
+                                        <span className="text-[11px] bg-white px-2 py-0.5 rounded-full border border-pink-200 text-[#C6566D]">무통장 입금</span>
                                     </div>
-                                    <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                                        현재 전자 결제 PG 심사가 진행 중입니다. 일정을 선택 후 <strong className="text-slate-900 font-bold">[예약 및 수강 신청 완료]</strong>를 누르시면, 담당 매니저가 일정을 승인하고 개별 안내를 드립니다.
-                                    </p>
-                                    <div className="pt-2 border-t border-pink-100 flex justify-between items-center text-[11px] font-bold text-slate-500">
-                                        <span>구분: {typeLabelMap[consultationType] || consultationType}</span>
-                                        <span className="text-[#C6566D]">현장/개별 안내</span>
+                                    
+                                    <div className="bg-white p-3.5 rounded-2xl border border-pink-100 space-y-2">
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="font-extrabold text-slate-800">신한은행</span>
+                                            <button 
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText('90704259313');
+                                                    alert('계좌번호(신한은행 907-04-259313)가 클립보드에 복사되었습니다.');
+                                                }}
+                                                className="text-[11px] font-bold text-[#C6566D] bg-[#FFF0F2] hover:bg-[#F697AB] hover:text-white px-2.5 py-1 rounded-lg transition-all border border-pink-200 cursor-pointer"
+                                            >
+                                                계좌 복사
+                                            </button>
+                                        </div>
+                                        <p className="font-black text-slate-900 text-sm tracking-tight">907-04-259313</p>
+                                        <p className="text-[11px] font-bold text-slate-500">예금주: 백정숙 (이어봄웰니스)</p>
+                                    </div>
+
+                                    <div className="space-y-2 text-xs text-slate-600 font-medium leading-relaxed">
+                                        <p className="flex items-start gap-1">
+                                            <span className="text-[#C6566D] font-bold">🔔</span>
+                                            <span>신청 완료 후 수강료를 입금해 주시면, <strong>담당 매니저가 확인 후 개별 연락(SMS/전화)</strong>을 드립니다.</span>
+                                        </p>
+                                        {consultationType === '5weeks' && (
+                                            <p className="text-[11px] font-bold text-[#C6566D] bg-white/90 p-2.5 rounded-xl border border-pink-200">
+                                                🎁 원데이 클래스 수강생 특전 5만원 할인이 적용되는 과정입니다.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="pt-2 border-t border-pink-200/60 flex justify-between items-center text-[11px] font-bold text-slate-500">
+                                        <span>신청 구분: {typeLabelMap[consultationType] || consultationType}</span>
+                                        <span className="text-[#C6566D]">입금 확인 후 승인</span>
                                     </div>
                                 </div>
 

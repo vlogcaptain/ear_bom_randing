@@ -529,9 +529,19 @@ export default function Home() {
                                     <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">
                                         원데이 클래스
                                     </h3>
-                                    <p className="text-[#F697AB] font-bold text-base mb-6 leading-relaxed">
+                                    <p className="text-[#F697AB] font-bold text-base mb-4 leading-relaxed">
                                         "귀를 보면 건강이 보인다 —<br className="sm:hidden" /> 내 몸의 신호를 알아보는 특별한 체험"
                                     </p>
+
+                                    {/* Schedule & Location Notice */}
+                                    <div className="bg-[#FFF0F2]/80 p-4 rounded-2xl border border-pink-200/70 mb-6 space-y-1.5 text-xs text-[#C6566D]">
+                                        <div className="font-extrabold flex items-center gap-1.5 text-xs md:text-sm text-[#9C3349]">
+                                            <span>🗓️</span> 차기 일정: 2026.09.07 (월) 14:00 ~ 17:00
+                                        </div>
+                                        <div className="font-semibold flex items-center gap-1.5 text-slate-600">
+                                            <span>📍</span> 장소: 논현역 부근 예정 (소수 정예 진행 / 추후 상세 공지)
+                                        </div>
+                                    </div>
 
                                     <div className="flex items-baseline gap-2 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                         <span className="text-3xl md:text-4xl font-black text-slate-900">60,000</span>
@@ -598,9 +608,20 @@ export default function Home() {
                                     <h3 className="text-2xl md:text-3xl font-black text-white mb-2">
                                         이어봄 웰니스 5주 입문과정
                                     </h3>
-                                    <p className="text-green-300 font-bold text-base mb-6 leading-relaxed">
+                                    <p className="text-green-300 font-bold text-base mb-4 leading-relaxed">
                                         "Hear Your Body —<br className="sm:hidden" /> 외우는 강의가 아닌, 인체를 이해하는 강의"
                                     </p>
+
+                                    {/* Schedule Notice & Discount 特典 Banner */}
+                                    <div className="bg-green-900/80 p-4 rounded-2xl border border-green-700/80 mb-6 space-y-2 text-xs">
+                                        <div className="font-extrabold flex items-center gap-1.5 text-xs md:text-sm text-green-200">
+                                            <span>🗓️</span> 일정: 2026.09.21 ~ 10.19 (5주 과정) / 주 1회 (월) 14:00~17:00
+                                        </div>
+                                        <div className="bg-[#FFF0F2] text-[#C6566D] font-black p-2.5 rounded-xl border border-pink-200 flex items-center gap-2 text-xs shadow-xs">
+                                            <span className="text-base">🎁</span>
+                                            <span>원데이 클래스 수강생 특전 ➔ 입문과정 등록 시 5만원 할인 혜택!</span>
+                                        </div>
+                                    </div>
 
                                     <div className="flex items-baseline gap-2 mb-8 bg-green-900/60 p-4 rounded-2xl border border-green-700/60">
                                         <span className="text-3xl md:text-4xl font-black text-white">400,000</span>
