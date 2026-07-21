@@ -131,17 +131,31 @@ function AppointmentContent() {
     };
 
     const handleBooking = async () => {
-        if (!selectedDate || !selectedTime) {
-            alert('상담 및 강좌 수강 날짜와 시간을 선택해 주세요.');
+        const isCourseType = consultationType === 'oneday' || consultationType === '5weeks';
+
+        if (!isCourseType && (!selectedDate || !selectedTime)) {
+            alert('상담 날짜와 시간을 선택해 주세요.');
             return;
         }
 
         setBookingLoading(true);
         try {
-            const year = selectedDate.getFullYear();
-            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-            const day = String(selectedDate.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
+            let dateStr = '';
+            let timeStr = '';
+
+            if (consultationType === 'oneday') {
+                dateStr = '2026-09-07';
+                timeStr = '14:00~17:00';
+            } else if (consultationType === '5weeks') {
+                dateStr = '2026-09-21';
+                timeStr = '14:00~17:00 (5주과정)';
+            } else if (selectedDate) {
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                dateStr = `${year}-${month}-${day}`;
+                timeStr = selectedTime;
+            }
 
             // 예약/신청 데이터 DB 저장 진행 (온라인 결제 심사 중이므로 pending 상태로 접수)
             await addDoc(collection(db, 'appointments'), {
@@ -149,7 +163,7 @@ function AppointmentContent() {
                 userName: user.displayName || '사용자',
                 expertName: expert.name,
                 date: dateStr,
-                time: selectedTime,
+                time: timeStr,
                 type: consultationType,
                 memo: consultationMemo || '',
                 status: 'pending',
@@ -430,14 +444,11 @@ function AppointmentContent() {
                                 </div>
                             </div>
 
-                                {/* Bank Account & Payment Notice Banner */}
+                                {/* Bank Account Notice Banner */}
                                 <div className="bg-[#FFF0F2]/70 px-5 py-6 rounded-[28px] border border-pink-200/90 space-y-4">
-                                    <div className="flex items-center justify-between text-[#C6566D] font-extrabold text-xs">
-                                        <span className="flex items-center gap-1.5 uppercase tracking-wider">
-                                            <span className="w-2 h-2 bg-[#F697AB] rounded-full animate-ping"></span>
-                                            수강료 / 상담비 입금 계좌 안내
-                                        </span>
-                                        <span className="text-[11px] bg-white px-2 py-0.5 rounded-full border border-pink-200 text-[#C6566D]">무통장 입금</span>
+                                    <div className="flex items-center gap-1.5 text-[#C6566D] font-extrabold text-xs uppercase tracking-wider">
+                                        <span className="w-2 h-2 bg-[#F697AB] rounded-full animate-ping"></span>
+                                        수강료 / 상담비 입금 계좌 안내
                                     </div>
                                     
                                     <div className="bg-white p-3.5 rounded-2xl border border-pink-100 space-y-2">
@@ -490,7 +501,7 @@ function AppointmentContent() {
                                 </label>
                                 <button
                                     onClick={handleBooking}
-                                    disabled={bookingLoading || !selectedDate || !selectedTime || !agreementChecked}
+                                    disabled={bookingLoading || ((consultationType === 'video' || consultationType === 'offline') && (!selectedDate || !selectedTime)) || !agreementChecked}
                                     className="w-full bg-[#F697AB] hover:bg-[#C6566D] text-white font-black py-6 rounded-[24px] shadow-xl shadow-[#F697AB]/20 transition-all transform active:scale-[0.98] text-lg disabled:opacity-50 disabled:grayscale disabled:transform-none"
                                 >
                                     {bookingLoading ? '신청 처리 중...' : '예약 및 수강 신청 완료'}
