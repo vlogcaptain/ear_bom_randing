@@ -40,8 +40,12 @@ export default function UserSignupForm({ onSwitchToLogin }) {
 
     useEffect(() => {
         const initRecaptcha = () => {
-            if (typeof window !== 'undefined' && authMode === 'phone' && !recaptchaVerifierRef.current && auth) {
+            if (typeof window !== 'undefined' && authMode === 'phone' && auth) {
                 try {
+                    if (window.recaptchaVerifier) {
+                        recaptchaVerifierRef.current = window.recaptchaVerifier;
+                        return;
+                    }
                     const container = document.getElementById('recaptcha-container-signup');
                     if (container) {
                         const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
@@ -50,6 +54,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
                                 console.log('reCAPTCHA solved');
                             }
                         });
+                        window.recaptchaVerifier = verifier;
                         recaptchaVerifierRef.current = verifier;
                     }
                 } catch (err) {
@@ -63,12 +68,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
         }
 
         return () => {
-            if (recaptchaVerifierRef.current) {
-                try {
-                    recaptchaVerifierRef.current.clear();
-                    recaptchaVerifierRef.current = null;
-                } catch (e) { }
-            }
+            // Do not aggressively clear to prevent DOM destruction on re-render
         };
     }, [authMode, mounted]);
 
@@ -130,7 +130,12 @@ export default function UserSignupForm({ onSwitchToLogin }) {
     };
 
     const handleSendCode = async (e) => {
-        e.preventDefault();
+        if (e) {
+            try {
+                e.preventDefault();
+                e.stopPropagation();
+            } catch (eventErr) {}
+        }
         if (!formData.name) {
             setError('이름을 입력해 주세요.');
             return;
@@ -143,22 +148,52 @@ export default function UserSignupForm({ onSwitchToLogin }) {
         setLoading(true);
         setError('');
         try {
-            if (!recaptchaVerifierRef.current) {
-                throw new Error('reCAPTCHA 초기화 실패. 잠시 후 다시 시도해 주세요.');
+            let verifier = recaptchaVerifierRef.current || (typeof window !== 'undefined' ? window.recaptchaVerifier : null);
+            if (!verifier && typeof window !== 'undefined' && auth) {
+                const container = document.getElementById('recaptcha-container-signup');
+                if (container) {
+                    verifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
+                        'size': 'invisible',
+                        'callback': () => {
+                            console.log('reCAPTCHA solved dynamically');
+                        }
+                    });
+                    window.recaptchaVerifier = verifier;
+                    recaptchaVerifierRef.current = verifier;
+                }
             }
+
+            if (!verifier) {
+                throw new Error('보안 인증 모듈(reCAPTCHA) 초기화 실패. 페이지 새로고침 후 다시 시도해 주세요.');
+            }
+
             const formattedPhone = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+82${formData.phoneNumber.replace(/^0/, '')}`;
-            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current);
+            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, verifier);
             setConfirmationResult(confirmation);
         } catch (err) {
             console.error('Phone Auth Error:', err);
             setError(`인증번호 전송 실패: ${err.message || '번호를 확인해 주세요.'}`);
+            if (typeof window !== 'undefined') {
+                try {
+                    if (window.recaptchaVerifier) {
+                        window.recaptchaVerifier.clear();
+                        window.recaptchaVerifier = null;
+                        recaptchaVerifierRef.current = null;
+                    }
+                } catch (e) {}
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const handleVerifyAndSignup = async (e) => {
-        e.preventDefault();
+        if (e) {
+            try {
+                e.preventDefault();
+                e.stopPropagation();
+            } catch (eventErr) {}
+        }
         setLoading(true);
         setError('');
         try {
@@ -302,7 +337,7 @@ export default function UserSignupForm({ onSwitchToLogin }) {
             ) : (
                 <div className="space-y-5">
                     {!confirmationResult ? (
-                        <form onSubmit={handleSendCode} className="space-y-5">
+                        <div className="space-y-5">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700 ml-1">이름</label>
                                 <div className="relative">
@@ -335,15 +370,16 @@ export default function UserSignupForm({ onSwitchToLogin }) {
                                 </div>
                             </div>
                             <button
-                                type="submit"
+                                type="button"
+                                onClick={handleSendCode}
                                 disabled={loading}
-                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4"
+                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4 cursor-pointer"
                             >
                                 {loading ? '전송 중...' : '인증번호 받기'}
                             </button>
-                        </form>
+                        </div>
                     ) : (
-                        <form onSubmit={handleVerifyAndSignup} className="space-y-5">
+                        <div className="space-y-5">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700 ml-1">인증번호</label>
                                 <div className="relative">
@@ -365,13 +401,14 @@ export default function UserSignupForm({ onSwitchToLogin }) {
                                 </div>
                             </div>
                             <button
-                                type="submit"
+                                type="button"
+                                onClick={handleVerifyAndSignup}
                                 disabled={loading}
-                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4"
+                                className="w-full bg-[#2E7D32] text-white py-5 rounded-2xl font-black text-lg hover:bg-[#1B5E20] transition-all shadow-lg shadow-[#2E7D32]/20 disabled:opacity-50 mt-4 cursor-pointer"
                             >
                                 {loading ? '가입 처리 중...' : '인증 및 가입 완료'}
                             </button>
-                        </form>
+                        </div>
                     )}
                 </div>
             )}
