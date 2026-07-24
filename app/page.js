@@ -91,6 +91,22 @@ export default function Home() {
         }
     };
 
+    const handleHashClick = (e, hash) => {
+        e.preventDefault();
+        const element = document.querySelector(hash);
+        if (element) {
+            const headerOffset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+        setIsMobileMenuOpen(false);
+    };
+
     // Body scroll lock when mobile menu is open
     useEffect(() => {
         if (isMobileMenuOpen) {
@@ -145,10 +161,10 @@ export default function Home() {
                         <span className="text-2xl font-extrabold tracking-tight text-[#C6566D]">earbom wellness</span>
                     </div>
                     <nav className="hidden md:flex items-center gap-8 font-medium text-gray-500">
-                        <Link className="hover:text-primary transition-colors" href="#concept">이침 원리</Link>
-                        <Link className="hover:text-primary transition-colors" href="#how-it-works">사용방법</Link>
-                        <Link className="hover:text-primary transition-colors" href="#features">주요기능</Link>
-                        <Link className="hover:text-primary transition-colors" href="#course">강좌 수강</Link>
+                        <a className="hover:text-primary transition-colors cursor-pointer" onClick={(e) => handleHashClick(e, '#concept')}>이침 원리</a>
+                        <a className="hover:text-primary transition-colors cursor-pointer" onClick={(e) => handleHashClick(e, '#how-it-works')}>사용방법</a>
+                        <a className="hover:text-primary transition-colors cursor-pointer" onClick={(e) => handleHashClick(e, '#features')}>주요기능</a>
+                        <a className="hover:text-primary transition-colors cursor-pointer" onClick={(e) => handleHashClick(e, '#course')}>강좌 수강</a>
                         <Link className="hover:text-primary transition-colors" href="/gallery">갤러리</Link>
                         <a className="hover:text-primary transition-colors" href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a>
                         <Link className="hover:text-primary transition-colors" href="/dashboard">대시보드</Link>
@@ -200,10 +216,10 @@ export default function Home() {
                             </button>
                         </div>
                         <nav className="flex flex-col p-8 gap-10 text-2xl font-black text-gray-900 overflow-y-auto">
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="#concept">이침 원리</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="#how-it-works">사용방법</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="#features">주요기능</Link>
-                            <Link onClick={() => setIsMobileMenuOpen(false)} href="#course">강좌 수강</Link>
+                            <a onClick={(e) => handleHashClick(e, '#concept')} className="cursor-pointer">이침 원리</a>
+                            <a onClick={(e) => handleHashClick(e, '#how-it-works')} className="cursor-pointer">사용방법</a>
+                            <a onClick={(e) => handleHashClick(e, '#features')} className="cursor-pointer">주요기능</a>
+                            <a onClick={(e) => handleHashClick(e, '#course')} className="cursor-pointer">강좌 수강</a>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/gallery">갤러리</Link>
                             <a onClick={() => setIsMobileMenuOpen(false)} href="https://blog.naver.com/js_ear" target="_blank" rel="noopener noreferrer">블로그</a>
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/dashboard">대시보드</Link>
@@ -453,9 +469,9 @@ export default function Home() {
                                                 {[
                                                     "Certified Ear Acupuncture Specialist ; ACCAIM(미국통합의학인증위원회)",
                                                     "[영국 자격증] 이혈요법 전문과정 (Introduction to auricular therapy diploma) - 영국 공인 전문 교육원 (Centre of Excellence, UK)",
-                                                    "국제이침협회 귀상담사 수석지도사",
-                                                    "국제이침협회 귀상담사 지도사",
-                                                    "국제이침협회 귀상담사 1급",
+                                                    "국제이현협회 귀상담사 수석지도사",
+                                                    "국제이현협회 귀상담사 지도사",
+                                                    "국제이현협회 귀상담사 1급",
                                                     "사회복지사 2급",
                                                     "치매예방활동가",
                                                 ].map((item, idx) => (
@@ -689,7 +705,7 @@ export default function Home() {
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                                        <h4 className="font-black text-slate-900 text-base">국제이침협회 정식 커리큘럼 & 민간자격 등록기관</h4>
+                                        <h4 className="font-black text-slate-900 text-base">국제이현협회 정식 커리큘럼 & 민간자격 등록기관</h4>
                                         <span className="bg-[#FFF0F2] text-[#C6566D] font-extrabold text-xs px-2.5 py-0.5 rounded-full border border-pink-100">
                                             8주 자격증 과정 800,000원 / 개별상담
                                         </span>
