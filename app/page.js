@@ -452,6 +452,7 @@ export default function Home() {
                                             <ul className="space-y-2">
                                                 {[
                                                     "Certified Ear Acupuncture Specialist ; ACCAIM(미국통합의학인증위원회)",
+                                                    "[영국 자격증] 이혈요법 전문과정 (Introduction to auricular therapy diploma) - 영국 공인 전문 교육원 (Centre of Excellence, UK)",
                                                     "국제이침협회 귀상담사 수석지도사",
                                                     "국제이침협회 귀상담사 지도사",
                                                     "국제이침협회 귀상담사 1급",
@@ -473,7 +474,7 @@ export default function Home() {
                                             </h4>
                                             <ul className="space-y-2">
                                                 {[
-                                                    "국제이침협회 서울교육장 자격증반 20기 진행",
+                                                    "국제이현협회(서울) 자격증과정 20기 진행",
                                                     "서울시립대학교 평생교육원",
                                                     "서울 성동문화재단 건강강좌",
                                                     "서울 광진문화원 생활문화강좌",
