@@ -22,7 +22,7 @@ import {
     Trash2
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
-import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Image from 'next/image';
 import EditAppointmentModal from '@/components/EditAppointmentModal';
@@ -54,6 +54,12 @@ export default function AdminDashboardPage() {
     const [feedbackText, setFeedbackText] = useState('');
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
     const [showHidden, setShowHidden] = useState(false);
+
+    // Schedule management states
+    const [blockedSlots, setBlockedSlots] = useState({});
+    const [selectedScheduleDate, setSelectedScheduleDate] = useState(new Date());
+    const [scheduleMonth, setScheduleMonth] = useState(new Date());
+    const [scheduleLoading, setScheduleLoading] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -133,12 +139,95 @@ export default function AdminDashboardPage() {
             }));
             setUploads(uploadsData);
             setLoadingUploads(false);
+
+            // 차단된 슬롯 데이터 로드
+            await fetchBlockedSlots();
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
         } finally {
             setLoading(false);
             setLoadingUploads(false);
             setLoadingAppointments(false);
+        }
+    };
+
+    const fetchBlockedSlots = async () => {
+        try {
+            const blockedQ = query(collection(db, 'blocked_slots'));
+            const snapshot = await getDocs(blockedQ);
+            const data = {};
+            snapshot.docs.forEach(doc => {
+                data[doc.id] = doc.data();
+            });
+            setBlockedSlots(data);
+        } catch (err) {
+            console.error("Error fetching blocked slots:", err);
+        }
+    };
+
+    const getBaseTimeSlots = (date) => {
+        if (!date) return [];
+        const dayOfWeek = date.getDay(); // 0: 일, 1: 월, 2: 화, 3: 수, 4: 목, 5: 금, 6: 토
+        if (dayOfWeek === 1) { // 월요일
+            return ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'];
+        }
+        if (dayOfWeek === 2) { // 화요일
+            return ['17:30', '18:00', '18:30', '19:00', '19:30', '20:00'];
+        }
+        if (dayOfWeek === 3) { // 수요일
+            return ['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'];
+        }
+        if (dayOfWeek === 5) { // 금요일
+            return ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'];
+        }
+        return [];
+    };
+
+    const handleToggleAllDayBlocked = async (dateStr) => {
+        const ref = doc(db, 'blocked_slots', dateStr);
+        const current = blockedSlots[dateStr] || { isAllDayBlocked: false, blockedTimes: [] };
+        const updated = {
+            date: dateStr,
+            isAllDayBlocked: !current.isAllDayBlocked,
+            blockedTimes: current.blockedTimes || [],
+            updatedAt: serverTimestamp()
+        };
+        try {
+            await setDoc(ref, updated);
+            setBlockedSlots(prev => ({
+                ...prev,
+                [dateStr]: updated
+            }));
+        } catch (err) {
+            console.error("Error toggling all day blocked:", err);
+            alert("설정 저장에 실패했습니다.");
+        }
+    };
+
+    const handleToggleBlockedTime = async (dateStr, timeSlot) => {
+        const ref = doc(db, 'blocked_slots', dateStr);
+        const current = blockedSlots[dateStr] || { isAllDayBlocked: false, blockedTimes: [] };
+        let updatedTimes = [...(current.blockedTimes || [])];
+        if (updatedTimes.includes(timeSlot)) {
+            updatedTimes = updatedTimes.filter(t => t !== timeSlot);
+        } else {
+            updatedTimes.push(timeSlot);
+        }
+        const updated = {
+            date: dateStr,
+            isAllDayBlocked: current.isAllDayBlocked,
+            blockedTimes: updatedTimes,
+            updatedAt: serverTimestamp()
+        };
+        try {
+            await setDoc(ref, updated);
+            setBlockedSlots(prev => ({
+                ...prev,
+                [dateStr]: updated
+            }));
+        } catch (err) {
+            console.error("Error toggling blocked time:", err);
+            alert("설정 저장에 실패했습니다.");
         }
     };
 
@@ -317,6 +406,12 @@ export default function AdminDashboardPage() {
                         >
                             분석 로그
                         </button>
+                        <button 
+                            onClick={() => setActiveTab('schedule')}
+                            className={`${activeTab === 'schedule' ? 'text-white' : 'hover:text-white'} transition-colors`}
+                        >
+                            상담 일정 관리
+                        </button>
                     </nav>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
@@ -362,6 +457,12 @@ export default function AdminDashboardPage() {
                             className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'logs' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
                         >
                             분석 로그
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('schedule'); setIsMobileMenuOpen(false); }}
+                            className={`w-full text-left p-4 rounded-xl font-bold text-sm ${activeTab === 'schedule' ? 'bg-green-600 text-white' : 'text-slate-400'}`}
+                        >
+                            상담 일정 관리
                         </button>
                     </div>
                 )}
@@ -1130,7 +1231,7 @@ export default function AdminDashboardPage() {
                         </table>
                         </div>
                     </div>
-                ) : (
+                ) : activeTab === 'logs' ? (
                     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-black text-slate-800">진단 분석 로그 (최근 완료순)</h3>
@@ -1288,7 +1389,223 @@ export default function AdminDashboardPage() {
                         </table>
                         </div>
                     </div>
-                )}
+                ) : activeTab === 'schedule' ? (
+                    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h3 className="font-black text-slate-800 text-lg">상담 일정 관리</h3>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">Consultation Schedule Control</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={fetchDashboardData}
+                                    className="p-2 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors"
+                                    title="새로고침"
+                                >
+                                    <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            {/* 미니 캘린더 영역 (5 cols) */}
+                            <div className="lg:col-span-5 space-y-4">
+                                <div className="flex items-center justify-between px-2">
+                                    <h4 className="font-black text-sm text-slate-700">
+                                        {scheduleMonth.getFullYear()}년 {scheduleMonth.getMonth() + 1}월
+                                    </h4>
+                                    <div className="flex gap-1">
+                                        <button 
+                                            onClick={() => setScheduleMonth(new Date(scheduleMonth.getFullYear(), scheduleMonth.getMonth() - 1, 1))}
+                                            className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 border border-slate-200 bg-white"
+                                        >
+                                            &lt;
+                                        </button>
+                                        <button 
+                                            onClick={() => setScheduleMonth(new Date())}
+                                            className="px-2 py-1 text-xs font-bold hover:bg-slate-100 rounded-lg text-slate-500 border border-slate-200 bg-white"
+                                        >
+                                            오늘
+                                        </button>
+                                        <button 
+                                            onClick={() => setScheduleMonth(new Date(scheduleMonth.getFullYear(), scheduleMonth.getMonth() + 1, 1))}
+                                            className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 border border-slate-200 bg-white"
+                                        >
+                                            &gt;
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Calendar grid */}
+                                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/30">
+                                    <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
+                                        {['일', '월', '화', '수', '목', '금', '토'].map(d => (
+                                            <div key={d} className="py-1">{d}</div>
+                                        ))}
+                                    </div>
+                                    <div className="grid grid-cols-7 gap-1">
+                                        {(() => {
+                                            const year = scheduleMonth.getFullYear();
+                                            const month = scheduleMonth.getMonth();
+                                            const firstDay = new Date(year, month, 1).getDay();
+                                            const totalDays = new Date(year, month + 1, 0).getDate();
+                                            const cells = [];
+
+                                            // 빈칸 채우기
+                                            for (let i = 0; i < firstDay; i++) {
+                                                cells.push(<div key={`empty-${i}`} className="aspect-square"></div>);
+                                            }
+
+                                            // 일자 채우기
+                                            for (let day = 1; day <= totalDays; day++) {
+                                                const currentD = new Date(year, month, day);
+                                                const m = String(month + 1).padStart(2, '0');
+                                                const d = String(day).padStart(2, '0');
+                                                const dateStr = `${year}-${m}-${d}`;
+                                                
+                                                const blockData = blockedSlots[dateStr] || { isAllDayBlocked: false, blockedTimes: [] };
+                                                const isAllBlocked = blockData.isAllDayBlocked;
+                                                const blockedCount = blockData.blockedTimes?.length || 0;
+                                                const baseSlotsCount = getBaseTimeSlots(currentD).length;
+                                                const isSelected = selectedScheduleDate && selectedScheduleDate.toDateString() === currentD.toDateString();
+
+                                                let bgClass = "bg-white hover:bg-slate-100 text-slate-700";
+                                                let borderClass = "border border-slate-150";
+                                                
+                                                if (isSelected) {
+                                                    bgClass = "bg-[#2E7D32] text-white shadow-md shadow-green-700/10";
+                                                    borderClass = "border border-[#1B5E20]";
+                                                } else if (isAllBlocked) {
+                                                    bgClass = "bg-red-50 text-red-500 hover:bg-red-100/70";
+                                                    borderClass = "border border-red-200";
+                                                } else if (blockedCount > 0) {
+                                                    bgClass = "bg-orange-50 text-orange-600 hover:bg-orange-100/70";
+                                                    borderClass = "border border-orange-200 border-dashed";
+                                                } else if (baseSlotsCount > 0) {
+                                                    bgClass = "bg-green-50/40 text-green-700 hover:bg-green-50";
+                                                    borderClass = "border border-green-200/50";
+                                                }
+
+                                                cells.push(
+                                                    <button
+                                                        key={`day-${day}`}
+                                                        onClick={() => setSelectedScheduleDate(currentD)}
+                                                        className={`aspect-square rounded-xl flex flex-col items-center justify-center p-1 text-xs font-bold transition-all relative ${bgClass} ${borderClass}`}
+                                                    >
+                                                        <span>{day}</span>
+                                                        {isAllBlocked ? (
+                                                            <span className="text-[8px] font-black text-red-500 mt-0.5">휴무</span>
+                                                        ) : blockedCount > 0 ? (
+                                                            <span className="text-[8px] font-black text-orange-500 mt-0.5">-{blockedCount}</span>
+                                                        ) : baseSlotsCount > 0 ? (
+                                                            <span className="w-1 h-1 bg-green-500 rounded-full mt-0.5"></span>
+                                                        ) : null}
+                                                    </button>
+                                                );
+                                            }
+
+                                            return cells;
+                                        })()}
+                                    </div>
+                                </div>
+                                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-slate-500 font-medium">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-green-50 border border-green-200 rounded"></div>
+                                        <span>기본 상담 가능 요일 (월, 화, 수, 금)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-red-50 border border-red-200 rounded"></div>
+                                        <span>하루 전체 마감(휴무) 처리된 날짜</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-orange-50 border border-orange-200 border-dashed rounded"></div>
+                                        <span>일부 시간 슬롯이 비활성화(마감)된 날짜</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 시간 슬롯 제어 패널 (7 cols) */}
+                            <div className="lg:col-span-7 space-y-6">
+                                {selectedScheduleDate ? (
+                                    (() => {
+                                        const year = selectedScheduleDate.getFullYear();
+                                        const month = String(selectedScheduleDate.getMonth() + 1).padStart(2, '0');
+                                        const day = String(selectedScheduleDate.getDate()).padStart(2, '0');
+                                        const dateStr = `${year}-${month}-${day}`;
+                                        
+                                        const blockData = blockedSlots[dateStr] || { isAllDayBlocked: false, blockedTimes: [] };
+                                        const isAllBlocked = blockData.isAllDayBlocked;
+                                        const blockedTimesList = blockData.blockedTimes || [];
+                                        const baseTimes = getBaseTimeSlots(selectedScheduleDate);
+
+                                        return (
+                                            <div className="space-y-6">
+                                                <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                                                    <div>
+                                                        <h5 className="font-black text-slate-800 text-sm">
+                                                            {selectedScheduleDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+                                                        </h5>
+                                                        <p className="text-[11px] text-slate-400 font-bold tracking-wider mt-0.5">상담 시간대 활성/비활성 상세 제어</p>
+                                                    </div>
+                                                    
+                                                    {/* 전체 차단 토글 */}
+                                                    <button
+                                                        onClick={() => handleToggleAllDayBlocked(dateStr)}
+                                                        className={`px-4 py-2 text-xs font-black rounded-xl transition-all shadow-sm ${isAllBlocked ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'}`}
+                                                    >
+                                                        {isAllBlocked ? '🔓 하루 휴무 해제' : '🔒 하루 전체 마감'}
+                                                    </button>
+                                                </div>
+
+                                                {!isAllBlocked ? (
+                                                    <div className="space-y-4">
+                                                        <h6 className="text-xs font-black text-slate-500 uppercase tracking-wider">⏱️ 개별 시간 슬롯 제어</h6>
+                                                        {baseTimes.length > 0 ? (
+                                                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                                                {baseTimes.map(time => {
+                                                                    const isBlocked = blockedTimesList.includes(time);
+                                                                    return (
+                                                                        <button
+                                                                            key={time}
+                                                                            onClick={() => handleToggleBlockedTime(dateStr, time)}
+                                                                            className={`py-3 px-2 rounded-xl text-xs font-bold transition-all text-center flex flex-col gap-1.5 border items-center justify-center ${isBlocked ? 'bg-red-50 text-red-500 border-red-200 hover:bg-red-100/50' : 'bg-green-50/40 text-green-700 border-green-200/50 hover:bg-green-50'}`}
+                                                                        >
+                                                                            <span className="font-extrabold text-sm">{time}</span>
+                                                                            <span className="text-[9px] font-black">{isBlocked ? '🚫 비활성' : '🟢 활성화'}</span>
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="p-10 border border-slate-150 border-dashed rounded-2xl text-center bg-slate-50/50 text-slate-400 font-bold text-xs">
+                                                                이날은 기본 상담 가능 요일(월, 화, 수, 금)이 아닙니다.<br/>
+                                                                (특별 예약을 원하시면 하루 전체 마감 해제 상태에서 추가 설정할 수 있습니다.)
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="p-12 bg-red-50/40 border border-red-200 border-dashed rounded-3xl text-center flex flex-col items-center justify-center">
+                                                        <span className="text-red-500 font-black text-3xl mb-3">🔒</span>
+                                                        <h6 className="font-black text-slate-800 text-sm">하루 전체 휴무(예약 불가) 상태입니다.</h6>
+                                                        <p className="text-[11px] text-slate-400 font-bold mt-1.5 leading-relaxed">
+                                                            사용자 예약 화면에서 이 날짜 전체가 선택 불가능하게 마감 처리됩니다.<br/>
+                                                            개별 시간 슬롯을 조정하려면 위 [하루 휴무 해제] 버튼을 클릭해 주세요.
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()
+                                ) : (
+                                    <div className="p-20 border border-slate-200 border-dashed rounded-3xl text-center bg-slate-50/30 text-slate-400 font-black text-sm flex flex-col justify-center items-center">
+                                        <span>🗓️</span>
+                                        <p className="mt-2">달력에서 제어할 날짜를 선택해 주세요.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
             </main>
 
             {/* Consultation Notes Modal */}

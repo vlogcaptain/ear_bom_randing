@@ -467,8 +467,8 @@ export default function Home() {
                                             </h4>
                                             <ul className="space-y-2">
                                                 {[
-                                                    "Certified Ear Acupuncture Specialist ; ACCAIM(미국통합의학인증위원회)",
-                                                    "[영국 자격증] 이혈요법 전문과정 (Introduction to auricular therapy diploma) - 영국 공인 전문 교육원 (Centre of Excellence, UK)",
+                                                    "미국통합의학인증위원회 Certified Ear Acupuncture Specialist",
+                                                    "영국공인전문교육원 Introduction to Auricular Therapy Diploma",
                                                     "국제이현협회 귀상담사 수석지도사",
                                                     "국제이현협회 귀상담사 지도사",
                                                     "국제이현협회 귀상담사 1급",

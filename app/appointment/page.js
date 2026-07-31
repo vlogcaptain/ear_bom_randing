@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { User, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, Mic, MessageSquare, MapPin, FileText } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 
 const typeLabelMap = {
@@ -41,9 +41,27 @@ function AppointmentContent() {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [agreementChecked, setAgreementChecked] = useState(false);
     const [bookedSlots, setBookedSlots] = useState([]);
+    const [blockedSlotsMap, setBlockedSlotsMap] = useState({});
 
     // Calendar States
     const [currentMonth, setCurrentMonth] = useState(new Date());
+
+    useEffect(() => {
+        const fetchBlockedSlotsMap = async () => {
+            try {
+                const blockedQ = query(collection(db, 'blocked_slots'));
+                const snapshot = await getDocs(blockedQ);
+                const data = {};
+                snapshot.docs.forEach(doc => {
+                    data[doc.id] = doc.data();
+                });
+                setBlockedSlotsMap(data);
+            } catch (err) {
+                console.error("Error fetching blocked slots map:", err);
+            }
+        };
+        fetchBlockedSlotsMap();
+    }, []);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -76,7 +94,14 @@ function AppointmentContent() {
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const dateStr = `${year}-${month}-${day}`;
-        return bookedSlots.some(slot => slot.date === dateStr && slot.time === time);
+
+        // 1. 이미 예약된 슬롯인지 확인
+        const isBooked = bookedSlots.some(slot => slot.date === dateStr && slot.time === time);
+        // 2. 관리자가 임의로 비활성화(차단)했는지 확인
+        const blockData = blockedSlotsMap[dateStr];
+        const isBlocked = blockData?.blockedTimes?.includes(time) || false;
+
+        return isBooked || isBlocked;
     };
 
     if (loading || !user) {
@@ -90,38 +115,30 @@ function AppointmentContent() {
         const expert = {
         name: "백정숙 수석지도사",
         title: "earbom wellness 대표 전문가",
-        image: "/expert_baek.png",
-        tags: ["#통증관리", "#스트레스케어", "#이침전문가"],
-        description: "수천 년간 이어져 온 전통 이침 요법의 지혜를 전문가의 분석력과 결합하여, 누구나 자신의 건강 상태를 쉽고 정확하게 파악할 수 있는 시대를 열고자 합니다."
+        image: "/js_profile.jpg",
+        tags: ["이침 요법", "아로마 이혈", "웰니스 케어"],
+        description: "미국통합의학인증위원회 자격의 Certified Ear Acupuncture Specialist이자, 영국공인전문교육원 Introduction to Auricular Therapy Diploma를 취득한 귀 건강 웰니스 1:1 케어 수석 전문가입니다. 당신의 일상 속 편안함과 활력을 찾아드립니다."
     };
 
     const availability = {
-        1: { start: "13:30", end: "19:00" }, // 월
-        2: { start: "17:30", end: "20:00" }, // 화
-        3: { start: "13:00", end: "17:00" }, // 수
-        5: { start: "16:00", end: "20:00" }  // 금
+        1: ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'], // 월
+        2: ['17:30', '18:00', '18:30', '19:00', '19:30', '20:00'], // 화
+        3: ['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'], // 수
+        5: ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00']  // 금
     };
 
     const generateTimeSlots = (date) => {
         if (!date) return [];
-        const day = date.getDay();
-        const config = availability[day];
-        if (!config) return [];
+        const dayOfWeek = date.getDay();
+        return availability[dayOfWeek] || [];
+    };
 
-        const slots = [];
-        let [startH, startM] = config.start.split(':').map(Number);
-        let [endH, endM] = config.end.split(':').map(Number);
-
-        let current = new Date();
-        current.setHours(startH, startM, 0, 0);
-        const end = new Date();
-        end.setHours(endH, endM, 0, 0);
-
-        while (current <= end) {
-            slots.push(current.toTimeString().substring(0, 5));
-            current.setMinutes(current.getMinutes() + 30);
-        }
-        return slots;
+    const getFormattedDate = (date) => {
+        if (!date) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     const handleDateSelect = (day) => {
@@ -221,7 +238,13 @@ function AppointmentContent() {
             const maxDate = new Date(today.getFullYear(), today.getMonth() + 3, 0);
             maxDate.setHours(23, 59, 59, 999);
 
-            const isSelectable = availability[date.getDay()] && date >= today && date <= maxDate;
+            const mStr = String(month + 1).padStart(2, '0');
+            const dStr = String(i).padStart(2, '0');
+            const dateKey = `${year}-${mStr}-${dStr}`;
+            const blockData = blockedSlotsMap[dateKey];
+            const isAllDayBlocked = blockData?.isAllDayBlocked === true;
+
+            const isSelectable = availability[date.getDay()] && date >= today && date <= maxDate && !isAllDayBlocked;
             const isSelected = selectedDate && selectedDate.getDate() === i && selectedDate.getMonth() === month && selectedDate.getFullYear() === year;
 
             days.push(
@@ -344,7 +367,7 @@ function AppointmentContent() {
                                                                     ? 'bg-[#F697AB] border-[#F697AB] text-white shadow-lg' 
                                                                     : 'bg-white border-slate-100 text-slate-600 hover:border-[#F697AB] hover:text-[#F697AB]'}`}
                                                     >
-                                                        {time} {isBooked && "(예약 완료)"}
+                                                        {time} {isBooked && "(마감)"}
                                                     </button>
                                                 );
                                             })
