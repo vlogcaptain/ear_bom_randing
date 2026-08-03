@@ -443,7 +443,7 @@ export default function Survey() {
                                         }}
                                     >
                                         {option}
-                                        {answers[currentStep - 1] === option && <CheckCircle2 size={20} />}
+                                        {answers[currentStep - 1] === option && <CheckCircle size={20} />}
                                     </button>
                                 ))}
                                 {currentStep === 1 && answers[0] === '기타 / 예방 차원' && (
