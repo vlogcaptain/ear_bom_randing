@@ -46,6 +46,13 @@ export default function Survey() {
     const { user, loading, logout } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
 
+    // Personal Info States (Gender & Birthdate)
+    const [gender, setGender] = useState(''); // '남성' | '여성'
+    const [birthYear, setBirthYear] = useState('');
+    const [birthMonth, setBirthMonth] = useState('');
+    const [birthDay, setBirthDay] = useState('');
+    const [birthType, setBirthType] = useState('양력'); // '양력' | '음력'
+
     const handleLogout = async () => {
         try {
             await logout();
@@ -81,7 +88,7 @@ export default function Survey() {
     }
 
     const handleOptionSelect = (option) => {
-        setAnswers({ ...answers, [currentStep]: option });
+        setAnswers({ ...answers, [currentStep - 1]: option });
     };
 
     const handleFileChange = async (e, side) => {
@@ -126,7 +133,7 @@ export default function Survey() {
 
 
     const handleNext = async () => {
-        if (currentStep < questions.length - 1) {
+        if (currentStep < questions.length) {
             setCurrentStep(currentStep + 1);
         } else {
             // Finish survey and save to Firestore
@@ -155,6 +162,8 @@ export default function Survey() {
                 await addDoc(collection(db, 'surveys'), {
                     userId: user.uid,
                     userName: user.displayName || user.phoneNumber || '사용자',
+                    gender,
+                    birthDate: `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')} (${birthType})`,
                     answers: finalAnswers,
                     earPhotoUrl: leftUrl, // Backward compatibility
                     leftEarUrl: leftUrl,
@@ -178,7 +187,7 @@ export default function Survey() {
         }
     };
 
-    const progress = ((currentStep + 1) / questions.length) * 100;
+    const progress = ((currentStep + 1) / (questions.length + 1)) * 100;
 
     return (
         <div className="section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', position: 'relative' }}>
@@ -224,13 +233,110 @@ export default function Survey() {
 
                     {/* Header */}
                     <div style={{ marginBottom: '40px' }}>
-                        <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.9rem' }}>QUESTION {currentStep + 1} / {questions.length}</span>
-                        <h2 style={{ fontSize: '1.8rem', marginTop: '10px' }}>{questions[currentStep].question}</h2>
+                        <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                            {currentStep === 0 ? '기본 인적사항 입력' : `질문 ${currentStep} / ${questions.length}`}
+                        </span>
+                        <h2 style={{ fontSize: '1.8rem', marginTop: '10px' }}>
+                            {currentStep === 0 ? '성별 및 생년월일을 입력해 주세요.' : questions[currentStep - 1].question}
+                        </h2>
                     </div>
 
                     {/* Options / Upload Area */}
                     <div style={{ marginBottom: '40px' }}>
-                        {currentStep === 5 ? (
+                        {currentStep === 0 ? (
+                            <div className="space-y-6">
+                                {/* 성별 선택 */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700 block">성별</label>
+                                    <div className="flex gap-3">
+                                        {['남성', '여성'].map((g) => (
+                                            <button
+                                                key={g}
+                                                type="button"
+                                                onClick={() => setGender(g)}
+                                                style={{
+                                                    flex: 1,
+                                                    padding: '16px',
+                                                    borderRadius: '12px',
+                                                    border: gender === g ? '2px solid var(--primary)' : '1px solid #e2e8f0',
+                                                    background: gender === g ? 'var(--secondary)' : 'white',
+                                                    color: gender === g ? 'var(--primary-dark)' : 'var(--text-primary)',
+                                                    fontWeight: '700',
+                                                    fontSize: '1rem',
+                                                    transition: 'all 0.2s ease',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {g}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 생년월일 입력 */}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-bold text-slate-700 block">생년월일</label>
+                                    
+                                    {/* 연도, 월, 일 3단 그리드 */}
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-bold text-slate-400">년도 (4자리)</span>
+                                            <input
+                                                type="number"
+                                                placeholder="1995"
+                                                value={birthYear}
+                                                onChange={(e) => {
+                                                    const val = e.target.value.slice(0, 4);
+                                                    setBirthYear(val);
+                                                }}
+                                                className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm font-bold"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-bold text-slate-400">월</span>
+                                            <select
+                                                value={birthMonth}
+                                                onChange={(e) => setBirthMonth(e.target.value)}
+                                                className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm font-bold bg-white"
+                                            >
+                                                <option value="">선택</option>
+                                                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                                                    <option key={m} value={m}>{m}월</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-bold text-slate-400">일</span>
+                                            <select
+                                                value={birthDay}
+                                                disabled={!birthMonth}
+                                                onChange={(e) => setBirthDay(e.target.value)}
+                                                className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm font-bold bg-white disabled:bg-slate-50 disabled:text-slate-300"
+                                            >
+                                                <option value="">선택</option>
+                                                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                                                    <option key={d} value={d}>{d}일</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* 양력 / 음력 선택 */}
+                                    <div className="flex bg-slate-100 p-1 rounded-xl w-32 mt-2">
+                                        {['양력', '음력'].map((type) => (
+                                            <button
+                                                key={type}
+                                                type="button"
+                                                onClick={() => setBirthType(type)}
+                                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${birthType === type ? 'bg-white text-[#2E7D32] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : currentStep === questions.length ? (
                             <div className="space-y-6">
                                 {/* Sample Image Guidance */}
                                 <div className="bg-pale p-6 rounded-[32px] border border-[#2E7D32]/10 overflow-hidden shadow-custom">
@@ -317,19 +423,19 @@ export default function Survey() {
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {questions[currentStep].options.map((option, index) => (
+                                {questions[currentStep - 1].options.map((option, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleOptionSelect(option)}
                                         style={{
                                             padding: '16px 20px',
                                             borderRadius: '12px',
-                                            border: answers[currentStep] === option ? '2px solid var(--primary)' : '1px solid #e2e8f0',
-                                            background: answers[currentStep] === option ? 'var(--secondary)' : 'white',
-                                            color: answers[currentStep] === option ? 'var(--primary-dark)' : 'var(--text-primary)',
+                                            border: answers[currentStep - 1] === option ? '2px solid var(--primary)' : '1px solid #e2e8f0',
+                                            background: answers[currentStep - 1] === option ? 'var(--secondary)' : 'white',
+                                            color: answers[currentStep - 1] === option ? 'var(--primary-dark)' : 'var(--text-primary)',
                                             textAlign: 'left',
                                             fontSize: '1rem',
-                                            fontWeight: answers[currentStep] === option ? '600' : '400',
+                                            fontWeight: answers[currentStep - 1] === option ? '600' : '400',
                                             transition: 'all 0.2s ease',
                                             display: 'flex',
                                             justifyContent: 'space-between',
@@ -337,10 +443,10 @@ export default function Survey() {
                                         }}
                                     >
                                         {option}
-                                        {answers[currentStep] === option && <CheckCircle size={20} />}
+                                        {answers[currentStep - 1] === option && <CheckCircle2 size={20} />}
                                     </button>
                                 ))}
-                                {currentStep === 0 && answers[0] === '기타 / 예방 차원' && (
+                                {currentStep === 1 && answers[0] === '기타 / 예방 차원' && (
                                     <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }} className="animate-in fade-in slide-in-from-top-2 duration-200">
                                         <label className="text-xs font-bold text-[#2E7D32]">기타 원하시는 건강 상담 및 예방 목적을 자유롭게 적어주세요</label>
                                         <textarea
@@ -382,28 +488,40 @@ export default function Survey() {
                             <ArrowLeft size={20} /> 이전
                         </button>
 
-                        <button
-                            onClick={handleNext}
-                            disabled={(currentStep === questions.length - 1 ? (!leftEarPhoto || !rightEarPhoto) : !answers[currentStep]) || isSaving}
-                            className="btn btn-primary"
-                            style={{
-                                opacity: (currentStep === questions.length - 1 ? (!leftEarPhoto || !rightEarPhoto) : !answers[currentStep]) || isSaving ? 0.5 : 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}
-                        >
-                            {isSaving ? (
-                                <>
-                                    <Loader2 size={18} className="animate-spin" /> 저장 중...
-                                </>
-                            ) : (
-                                <>
-                                    {currentStep === questions.length - 1 ? '분석 요청하기' : '다음'}
-                                    {currentStep !== questions.length - 1 && <ArrowRight size={20} />}
-                                </>
-                            )}
-                        </button>
+                        {/* Next Button Logic */}
+                        {(() => {
+                            const isNextDisabled = isSaving || (
+                                currentStep === 0
+                                    ? (!gender || !birthYear || birthYear.length < 4 || !birthMonth || !birthDay)
+                                    : currentStep === questions.length
+                                        ? (!leftEarPhoto || !rightEarPhoto)
+                                        : !answers[currentStep - 1]
+                            );
+                            return (
+                                <button
+                                    onClick={handleNext}
+                                    disabled={isNextDisabled}
+                                    className="btn btn-primary"
+                                    style={{
+                                        opacity: isNextDisabled ? 0.5 : 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px'
+                                    }}
+                                >
+                                    {isSaving ? (
+                                        <>
+                                            <Loader2 size={18} className="animate-spin" /> 저장 중...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {currentStep === questions.length ? '분석 요청하기' : '다음'}
+                                            {currentStep !== questions.length && <ArrowRight size={20} />}
+                                        </>
+                                    )}
+                                </button>
+                            );
+                        })()}
                     </div>
 
                 </div>

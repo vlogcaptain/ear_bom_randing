@@ -16,7 +16,8 @@ import {
     ZoomOut,
     RotateCcw,
     CheckCircle,
-    MapPin
+    MapPin,
+    User
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -389,6 +390,29 @@ function DiagnoseContent() {
                 {/* Right Side: Inputs */}
                 <div className="w-full md:w-1/2 bg-white md:overflow-y-auto p-6 md:p-10 custom-scrollbar">
                     <div className="max-w-2xl mx-auto space-y-10">
+
+                        {/* 회원 기본 인적사항 카드 */}
+                        {(survey?.gender || survey?.birthDate) && (
+                            <section className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 space-y-3">
+                                <h2 className="text-xs font-black text-emerald-700 uppercase tracking-widest flex items-center gap-2">
+                                    <User size={16} className="text-emerald-600" /> 기본 인적사항
+                                </h2>
+                                <div className="grid grid-cols-2 gap-4 text-xs">
+                                    {survey?.gender && (
+                                        <div className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-emerald-100/60 shadow-sm">
+                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">성별</span>
+                                            <span className="text-slate-800 font-bold">{survey.gender}</span>
+                                        </div>
+                                    )}
+                                    {survey?.birthDate && (
+                                        <div className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-[#C8E6C9] shadow-sm">
+                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">생년월일 (양/음)</span>
+                                            <span className="text-slate-800 font-bold">{survey.birthDate}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
                         
                         {/* Survey Summary Section */}
                         {survey?.answers && Object.keys(survey.answers).length > 0 && (

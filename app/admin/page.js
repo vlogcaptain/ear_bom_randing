@@ -586,7 +586,16 @@ export default function AdminDashboardPage() {
                                                             {getUserRealName(survey.userId, survey.userName).substring(0, 1)}
                                                         </div>
                                                         <div>
-                                                            <p className="font-black text-slate-800 text-sm">{getUserRealName(survey.userId, survey.userName)}</p>
+                                                            <p className="font-black text-slate-800 text-sm">
+                                                                {getUserRealName(survey.userId, survey.userName)}
+                                                                {(survey.gender || survey.birthDate) && (
+                                                                    <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                                                        {survey.gender ? survey.gender : ''}
+                                                                        {survey.gender && survey.birthDate ? ' | ' : ''}
+                                                                        {survey.birthDate ? survey.birthDate : ''}
+                                                                    </span>
+                                                                )}
+                                                            </p>
                                                             <p className="text-[10px] text-slate-400 font-bold flex flex-wrap gap-2 mt-1">
                                                                 {getUserContact(survey.userId).phone && (
                                                                     <span className="text-green-700 font-extrabold bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
@@ -1288,7 +1297,16 @@ export default function AdminDashboardPage() {
                                                             {getUserRealName(log.userId, log.userName).substring(0, 1)}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-slate-800 text-sm">{getUserRealName(log.userId, log.userName)}</p>
+                                                            <p className="font-bold text-slate-800 text-sm">
+                                                                {getUserRealName(log.userId, log.userName)}
+                                                                {(log.gender || log.birthDate) && (
+                                                                    <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                                                        {log.gender ? log.gender : ''}
+                                                                        {log.gender && log.birthDate ? ' | ' : ''}
+                                                                        {log.birthDate ? log.birthDate : ''}
+                                                                    </span>
+                                                                )}
+                                                            </p>
                                                             <p className="text-[10px] text-slate-400 font-medium">{log.userId?.substring(0, 8)}...</p>
                                                         </div>
                                                     </div>
