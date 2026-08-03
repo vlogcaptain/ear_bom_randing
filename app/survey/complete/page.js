@@ -67,7 +67,7 @@ export default function SurveyComplete() {
                     </Link>
 
                     <Link
-                        href="https://blog.naver.com/js100216"
+                        href="https://blog.naver.com/js_ear"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 border border-slate-200 py-4 px-6 rounded-2xl transition-all font-bold text-slate-700 group"
