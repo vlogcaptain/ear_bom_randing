@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Image as ImageIcon, ZoomIn, LogOut } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon, ZoomIn, LogOut, ChevronDown, ChevronUp, X as XIcon, Filter } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { galleryImages, symptomCategories } from './galleryData';
 
 export default function GalleryPage() {
     const { user, logout } = useAuth();
@@ -19,37 +20,54 @@ export default function GalleryPage() {
         }
     };
 
-    // 업로드된 이미지 리스트 (파일명 기준)
-    const images = [
-        "갑상선저하증 편두통(우).png", "갑상선저하증 편두통(좌).png",
-        "고혈압 고지혈증(우).png", "고혈압 고지혈증(좌).png",
-        "고혈압 당뇨 어깨통증(우).png", "고혈압 당뇨 어깨통증(좌).png",
-        "고혈압 목디스크(우).png", "고혈압 목디스크(좌).png",
-        "긴장성두통 수족냉증(우).png", "긴장성두통 수족냉증(좌).png",
-        "당뇨 고지혈 고혈압.png", "두통(우).png", "두통(좌).png",
-        "등통증 명치답답 수족냉증.png", "만성피로 뒷목통증 과민성대장.png",
-        "만성피로 팔꿈치통증(우).png", "만성피로 팔꿈치통증(좌).png",
-        "목 이물감 치루.png", "목통증 가슴답답 자주 건망증빈번(우).png",
-        "목통증 가슴답답 자주 건망증빈번(좌).png", "목통증 심한두통.png",
-        "발목통증.png", "소화불량 두통.png", "소화불량 뒷골당김 안구건조.png",
-        "소화불량 어깨통증.png", "소화불편감 만성피로.png",
-        "손발저림 다리통증 건망증.png", "수면불량 장불편감(우).png",
-        "수면불량 장불편감(좌).png", "심한 피로감(우).png",
-        "심한 피로감(좌).png", "어깨통증.png", "어지럼증 고혈압.png",
-        "역류성식도염 수전증.png", "역류성식도염(우).png", "역류성식도염(좌).png",
-        "자궁근종으로 자궁부분절제(우).png", "자궁근종으로 자궁부분절제(좌).png",
-        "전신통증 특히 목허리통증(우).png", "전신통증 특히 목허리통증(좌).png",
-        "척추협착증(우).png", "척추협착증(좌).png",
-        "하복부 수족냉증 허리어깨통증.png", "허리 팔 통증심함(우).png",
-        "허리 팔 통증심함(좌).png", "허리디스크수술.png"
-    ];
-
+    // 필터 상태
     const [selectedImage, setSelectedImage] = useState(null);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [expandedCategories, setExpandedCategories] = useState({});
+    const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+
+    // 카테고리 열기/닫기
+    const toggleCategory = (category) => {
+        setExpandedCategories(prev => ({
+            ...prev,
+            [category]: !prev[category]
+        }));
+    };
+
+    // 증상 선택/해제
+    const toggleSymptom = (symptom) => {
+        setSelectedSymptoms(prev => {
+            if (prev.includes(symptom)) {
+                return prev.filter(s => s !== symptom);
+            } else {
+                return [...prev, symptom];
+            }
+        });
+    };
+
+    // 필터 초기화
+    const clearFilters = () => {
+        setSelectedSymptoms([]);
+    };
+
+    // 필터링된 이미지
+    const filteredImages = selectedSymptoms.length === 0
+        ? galleryImages
+        : galleryImages.filter(img =>
+            selectedSymptoms.some(symptom => img.tags.includes(symptom))
+        );
+
+    // 이미지 경로 생성
+    const getImagePath = (image) => {
+        return image.path
+            ? `/images/gallery/${image.path}/${image.filename}`
+            : `/images/gallery/${image.filename}`;
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* 상단 헤더 */}
-            <header className="bg-white border-b sticky top-0 z-30 px-4 py-4 sm:px-8">
+            <header className="bg-white border-b sticky top-0 z-30 px-4 py-4 sm:px-8 shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link href="/" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
@@ -63,8 +81,8 @@ export default function GalleryPage() {
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
                             <ImageIcon className="w-5 h-5 text-emerald-600" />
-                            <span className="font-semibold text-emerald-700">{images.length}</span>
-                            <span className="text-emerald-600 text-sm">Cases</span>
+                            <span className="font-semibold text-emerald-700">{filteredImages.length}</span>
+                            <span className="text-emerald-600 text-sm hidden sm:inline">Cases</span>
                         </div>
                         {user && (
                             <button
@@ -72,48 +90,181 @@ export default function GalleryPage() {
                                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold transition-all"
                             >
                                 <LogOut size={14} />
-                                <span>로그아웃</span>
+                                <span className="hidden sm:inline">로그아웃</span>
                             </button>
                         )}
                     </div>
                 </div>
             </header>
 
-            {/* 그리드 컨텐츠 */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-8 mt-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {images.map((imgName, index) => (
-                        <div
-                            key={index}
-                            className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer border border-slate-100"
-                            onClick={() => setSelectedImage(imgName)}
-                        >
-                            {/* 이미지 컨테이너 */}
-                            <div className="aspect-[3/4] overflow-hidden">
-                                <img
-                                    src={`/images/gallery/${imgName}`}
-                                    alt={imgName}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
+            {/* 필터 컨트롤 바 */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-6">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    {/* 필터 헤더 (커튼 토글) */}
+                    <button
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors"
+                    >
+                        <div className="flex items-center gap-3">
+                            <Filter className="w-5 h-5 text-[#2E7D32]" />
+                            <span className="font-semibold text-slate-800">증상별 필터</span>
+                            {selectedSymptoms.length > 0 && (
+                                <span className="bg-[#2E7D32] text-white text-xs px-2.5 py-1 rounded-full font-bold">
+                                    {selectedSymptoms.length}개 선택
+                                </span>
+                            )}
+                        </div>
+                        {isFilterOpen ? (
+                            <ChevronUp className="w-5 h-5 text-slate-400" />
+                        ) : (
+                            <ChevronDown className="w-5 h-5 text-slate-400" />
+                        )}
+                    </button>
+
+                    {/* 필터 내용 (아코디언) */}
+                    {isFilterOpen && (
+                        <div className="border-t border-slate-200 bg-slate-50">
+                            <div className="px-6 py-5 space-y-4">
+                                {Object.entries(symptomCategories).map(([category, symptoms]) => (
+                                    <div key={category} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                                        {/* 카테고리 헤더 */}
+                                        <button
+                                            onClick={() => toggleCategory(category)}
+                                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+                                        >
+                                            <span className="font-semibold text-slate-700 text-sm">{category}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-slate-500">
+                                                    {symptoms.filter(s => selectedSymptoms.includes(s)).length}/{symptoms.length}
+                                                </span>
+                                                {expandedCategories[category] ? (
+                                                    <ChevronUp className="w-4 h-4 text-slate-400" />
+                                                ) : (
+                                                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                                                )}
+                                            </div>
+                                        </button>
+
+                                        {/* 증상 목록 */}
+                                        {expandedCategories[category] && (
+                                            <div className="px-4 py-3 border-t border-slate-100 bg-slate-50">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {symptoms.map(symptom => {
+                                                        const count = galleryImages.filter(img => img.tags.includes(symptom)).length;
+                                                        const isSelected = selectedSymptoms.includes(symptom);
+
+                                                        return (
+                                                            <button
+                                                                key={symptom}
+                                                                onClick={() => toggleSymptom(symptom)}
+                                                                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                                                    isSelected
+                                                                        ? 'bg-[#2E7D32] text-white shadow-md'
+                                                                        : 'bg-white text-slate-600 border border-slate-200 hover:border-[#2E7D32] hover:text-[#2E7D32]'
+                                                                }`}
+                                                            >
+                                                                {symptom} ({count})
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
 
-                            {/* 호버 오버레이 (파일명 표시) */}
-                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 text-center">
-                                <span className="text-white font-medium text-lg leading-snug transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                    {imgName.replace('.png', '')}
-                                </span>
-                                <div className="mt-4 p-2 bg-white/20 rounded-full backdrop-blur-sm transform scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-100">
-                                    <ZoomIn className="w-6 h-6 text-white" />
+                            {/* 필터 액션 */}
+                            {selectedSymptoms.length > 0 && (
+                                <div className="px-6 py-4 bg-white border-t border-slate-200 flex items-center justify-between">
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedSymptoms.map(symptom => (
+                                            <span
+                                                key={symptom}
+                                                className="inline-flex items-center gap-1.5 bg-[#2E7D32] text-white px-3 py-1 rounded-full text-sm"
+                                            >
+                                                {symptom}
+                                                <button
+                                                    onClick={() => toggleSymptom(symptom)}
+                                                    className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                                                >
+                                                    <XIcon className="w-3.5 h-3.5" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={clearFilters}
+                                        className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors"
+                                    >
+                                        전체 초기화
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* 그리드 컨텐츠 */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
+                {/* 결과 요약 */}
+                {selectedSymptoms.length > 0 && (
+                    <div className="mb-6 text-center">
+                        <p className="text-slate-600">
+                            <span className="font-bold text-[#2E7D32]">{filteredImages.length}개</span>의 사례가 검색되었습니다
+                        </p>
+                    </div>
+                )}
+
+                {filteredImages.length === 0 ? (
+                    <div className="text-center py-20">
+                        <ImageIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                        <p className="text-slate-500 text-lg">선택한 증상에 해당하는 사례가 없습니다</p>
+                        <button
+                            onClick={clearFilters}
+                            className="mt-4 px-6 py-2 bg-[#2E7D32] text-white rounded-lg hover:bg-[#1B5E20] transition-colors"
+                        >
+                            필터 초기화
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {filteredImages.map((image, index) => (
+                            <div
+                                key={index}
+                                className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer border border-slate-100"
+                                onClick={() => setSelectedImage(image)}
+                            >
+                                {/* 이미지 컨테이너 */}
+                                <div className="aspect-[3/4] overflow-hidden">
+                                    <img
+                                        src={getImagePath(image)}
+                                        alt={image.filename}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                </div>
+
+                                {/* 호버 오버레이 (파일명 표시) */}
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 text-center">
+                                    <span className="text-white font-medium text-base leading-snug transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                        {image.filename.replace(/\.(png|jpg|jpeg)$/i, '')}
+                                    </span>
+                                    <div className="mt-4 p-2 bg-white/20 rounded-full backdrop-blur-sm transform scale-50 opacity-0 group-hover:scale-100 group-group-hover:opacity-100 transition-all duration-500 delay-100">
+                                        <ZoomIn className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
+
+                                {/* 하단 캡션 (모바일 대응) */}
+                                <div className="p-3 bg-white border-t border-slate-50 sm:hidden">
+                                    <p className="text-xs font-medium text-slate-800 truncate">
+                                        {image.filename.replace(/\.(png|jpg|jpeg)$/i, '')}
+                                    </p>
                                 </div>
                             </div>
-
-                            {/* 하단 캡션 (모바일 대응) */}
-                            <div className="p-4 bg-white border-t border-slate-50 sm:hidden">
-                                <p className="text-sm font-medium text-slate-800 truncate">{imgName.replace('.png', '')}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </main>
 
             {/* 이미지 라이트박스 모달 (간이형) */}
@@ -122,19 +273,34 @@ export default function GalleryPage() {
                     className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-300"
                     onClick={() => setSelectedImage(null)}
                 >
-                    <button className="absolute top-6 right-6 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                    <button
+                        className="absolute top-6 right-6 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                        onClick={() => setSelectedImage(null)}
+                    >
                         <X className="w-8 h-8" />
                     </button>
                     <div className="max-w-4xl w-full max-h-[90vh] flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
                         <img
-                            src={`/images/gallery/${selectedImage}`}
-                            alt={selectedImage}
+                            src={getImagePath(selectedImage)}
+                            alt={selectedImage.filename}
                             className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
                         />
-                        <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
-                            <p className="text-white font-medium text-lg text-center">
-                                {selectedImage.replace('.png', '')}
+                        <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 max-w-full">
+                            <p className="text-white font-medium text-base sm:text-lg text-center break-words">
+                                {selectedImage.filename.replace(/\.(png|jpg|jpeg)$/i, '')}
                             </p>
+                            {selectedImage.tags.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-2 justify-center">
+                                    {selectedImage.tags.slice(0, 5).map(tag => (
+                                        <span
+                                            key={tag}
+                                            className="text-xs bg-white/20 text-white px-2 py-1 rounded-full"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -143,7 +309,7 @@ export default function GalleryPage() {
     );
 }
 
-// 아이콘 컴포넌트 추가를 위해 shadcn이나 lucide가 설치되어 있다고 가정 (현재 프로젝트에 lucide-react 있음)
+// X 아이콘 컴포넌트
 function X({ className }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
