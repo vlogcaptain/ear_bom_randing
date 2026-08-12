@@ -33,18 +33,13 @@ const questions = [
         id: 5,
         question: "식욕 상태는 어떤가요?",
         options: ["정상", "식욕 부진", "과식/폭식 경향", "불규칙함"]
-    },
-    {
-        id: 6,
-        question: "마지막으로, 귀 사진을 업로드해 주세요.",
-        options: [] // Special step for file upload
     }
 ];
 
 export default function Survey() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState(1);
 
     // Personal Info States (Gender & Birthdate)
     const [gender, setGender] = useState(''); // '남성' | '여성'
@@ -133,7 +128,8 @@ export default function Survey() {
 
 
     const handleNext = async () => {
-        if (currentStep < questions.length) {
+        const totalSteps = 7;
+        if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         } else {
             // Finish survey and save to Firestore
@@ -182,12 +178,13 @@ export default function Survey() {
     };
 
     const handlePrev = () => {
-        if (currentStep > 0) {
+        if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
         }
     };
 
-    const progress = ((currentStep + 1) / (questions.length + 1)) * 100;
+    const totalSteps = 7;
+    const progress = (currentStep / totalSteps) * 100;
 
     return (
         <div className="section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', position: 'relative' }}>
@@ -234,16 +231,63 @@ export default function Survey() {
                     {/* Header */}
                     <div style={{ marginBottom: '40px' }}>
                         <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                            {currentStep === 0 ? '기본 인적사항 입력' : `질문 ${currentStep} / ${questions.length}`}
+                            {currentStep <= 5 ? `질문 ${currentStep} / 5` : currentStep === 6 ? '기본 인적사항 입력' : '귀 사진 업로드'}
                         </span>
                         <h2 style={{ fontSize: '1.8rem', marginTop: '10px' }}>
-                            {currentStep === 0 ? '성별 및 생년월일을 입력해 주세요.' : questions[currentStep - 1].question}
+                            {currentStep <= 5 ? questions[currentStep - 1].question : currentStep === 6 ? '성별 및 생년월일을 입력해 주세요.' : '양쪽 귀 사진을 업로드해 주세요.'}
                         </h2>
                     </div>
 
                     {/* Options / Upload Area */}
                     <div style={{ marginBottom: '40px' }}>
-                        {currentStep === 0 ? (
+                        {currentStep <= 5 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {questions[currentStep - 1].options.map((option, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleOptionSelect(option)}
+                                        style={{
+                                            padding: '16px 20px',
+                                            borderRadius: '12px',
+                                            border: answers[currentStep - 1] === option ? '2px solid var(--primary)' : '1px solid #e2e8f0',
+                                            background: answers[currentStep - 1] === option ? 'var(--secondary)' : 'white',
+                                            color: answers[currentStep - 1] === option ? 'var(--primary-dark)' : 'var(--text-primary)',
+                                            textAlign: 'left',
+                                            fontSize: '1rem',
+                                            fontWeight: answers[currentStep - 1] === option ? '600' : '400',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        {option}
+                                        {answers[currentStep - 1] === option && <CheckCircle size={20} />}
+                                    </button>
+                                ))}
+                                {currentStep === 1 && answers[0] === '기타 / 예방 차원' && (
+                                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }} className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <label className="text-xs font-bold text-[#2E7D32]">기타 원하시는 건강 상담 및 예방 목적을 자유롭게 적어주세요</label>
+                                        <textarea
+                                            value={etcDetail}
+                                            onChange={(e) => setEtcDetail(e.target.value)}
+                                            placeholder="예: 이명 완화 목적, 최근 수면 보조 등 상세 내용을 입력해주세요."
+                                            style={{
+                                                width: '100%',
+                                                height: '100px',
+                                                padding: '12px',
+                                                borderRadius: '12px',
+                                                border: '1px solid #e2e8f0',
+                                                fontSize: '0.9rem',
+                                                outline: 'none',
+                                                resize: 'none'
+                                            }}
+                                            className="focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ) : currentStep === 6 ? (
                             <div className="space-y-6">
                                 {/* 성별 선택 */}
                                 <div className="space-y-2">
@@ -336,7 +380,7 @@ export default function Survey() {
                                     </div>
                                 </div>
                             </div>
-                        ) : currentStep === questions.length ? (
+                        ) : (
                             <div className="space-y-6">
                                 {/* Sample Image Guidance */}
                                 <div className="bg-pale p-6 rounded-[32px] border border-[#2E7D32]/10 overflow-hidden shadow-custom">
@@ -421,53 +465,6 @@ export default function Survey() {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {questions[currentStep - 1].options.map((option, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleOptionSelect(option)}
-                                        style={{
-                                            padding: '16px 20px',
-                                            borderRadius: '12px',
-                                            border: answers[currentStep - 1] === option ? '2px solid var(--primary)' : '1px solid #e2e8f0',
-                                            background: answers[currentStep - 1] === option ? 'var(--secondary)' : 'white',
-                                            color: answers[currentStep - 1] === option ? 'var(--primary-dark)' : 'var(--text-primary)',
-                                            textAlign: 'left',
-                                            fontSize: '1rem',
-                                            fontWeight: answers[currentStep - 1] === option ? '600' : '400',
-                                            transition: 'all 0.2s ease',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        {option}
-                                        {answers[currentStep - 1] === option && <CheckCircle size={20} />}
-                                    </button>
-                                ))}
-                                {currentStep === 1 && answers[0] === '기타 / 예방 차원' && (
-                                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }} className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <label className="text-xs font-bold text-[#2E7D32]">기타 원하시는 건강 상담 및 예방 목적을 자유롭게 적어주세요</label>
-                                        <textarea
-                                            value={etcDetail}
-                                            onChange={(e) => setEtcDetail(e.target.value)}
-                                            placeholder="예: 이명 완화 목적, 최근 수면 보조 등 상세 내용을 입력해주세요."
-                                            style={{
-                                                width: '100%',
-                                                height: '100px',
-                                                padding: '12px',
-                                                borderRadius: '12px',
-                                                border: '1px solid #e2e8f0',
-                                                fontSize: '0.9rem',
-                                                outline: 'none',
-                                                resize: 'none'
-                                            }}
-                                            className="focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent transition-all"
-                                        />
-                                    </div>
-                                )}
-                            </div>
                         )}
                     </div>
 
@@ -491,11 +488,11 @@ export default function Survey() {
                         {/* Next Button Logic */}
                         {(() => {
                             const isNextDisabled = isSaving || (
-                                currentStep === 0
-                                    ? (!gender || !birthYear || birthYear.length < 4 || !birthMonth || !birthDay)
-                                    : currentStep === questions.length
-                                        ? (!leftEarPhoto || !rightEarPhoto)
-                                        : !answers[currentStep - 1]
+                                currentStep <= 5
+                                    ? !answers[currentStep - 1]
+                                    : currentStep === 6
+                                        ? (!gender || !birthYear || birthYear.length < 4 || !birthMonth || !birthDay)
+                                        : (!leftEarPhoto || !rightEarPhoto)
                             );
                             return (
                                 <button
@@ -515,8 +512,8 @@ export default function Survey() {
                                         </>
                                     ) : (
                                         <>
-                                            {currentStep === questions.length ? '분석 요청하기' : '다음'}
-                                            {currentStep !== questions.length && <ArrowRight size={20} />}
+                                            {currentStep === 7 ? '분석 요청하기' : '다음'}
+                                            {currentStep !== 7 && <ArrowRight size={20} />}
                                         </>
                                     )}
                                 </button>
