@@ -83,6 +83,12 @@ service cloud.firestore {
       allow write: if isExpert();
     }
 
+    // 앱 설정 (App Config - 버전 체크 등)
+    match /app_config/{docId} {
+      allow read: if true;
+      allow write: if isExpert();
+    }
+
     // 기본 차단
     match /{document=**} {
       allow read, write: if false;

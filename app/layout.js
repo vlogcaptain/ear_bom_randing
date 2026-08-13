@@ -2,6 +2,7 @@ import "./globals.css";
 
 import { AuthProvider } from "@/context/AuthContext";
 import FloatingQuickMenu from "@/components/FloatingQuickMenu";
+import VersionChecker from "@/components/VersionChecker";
 
 export const metadata = {
     title: "earbom wellness - 귀 하나로 읽는 당신의 건강",
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
             </head>
             <body className="antialiased">
                 <AuthProvider>
+                    <VersionChecker />
                     {children}
                     <FloatingQuickMenu />
                 </AuthProvider>
