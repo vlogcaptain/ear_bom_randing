@@ -115,8 +115,8 @@ function AppointmentContent() {
         const expert = {
         name: "백정숙 수석지도사",
         title: "earbom wellness 대표 전문가",
-        image: "/js_profile.jpg",
-        tags: ["이침 요법", "아로마 이혈", "웰니스 케어"],
+        image: "/expert_baek.png",
+        tags: ["#통증관리", "#스트레스케어", "#이침전문가"],
         description: "미국통합의학인증위원회 자격의 Certified Ear Acupuncture Specialist이자, 영국공인전문교육원 Introduction to Auricular Therapy Diploma를 취득한 귀 건강 웰니스 1:1 케어 수석 전문가입니다. 당신의 일상 속 편안함과 활력을 찾아드립니다."
     };
 
