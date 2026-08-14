@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-const CURRENT_VERSION = '1.0.0'; // 배포 시 수동으로 증가
-const VERSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5분
+const CURRENT_VERSION = '1.0.1'; // 배포 시 수동으로 증가
+const VERSION_CHECK_INTERVAL = 30 * 1000; // 30초 (더 빠른 업데이트)
 
 export function useVersionCheck() {
     useEffect(() => {
@@ -49,9 +49,22 @@ export function useVersionCheck() {
         // 즉시 실행
         checkVersion();
 
-        // 주기적으로 체크 (5분마다)
+        // 주기적으로 체크 (30초마다)
         const interval = setInterval(checkVersion, VERSION_CHECK_INTERVAL);
 
-        return () => clearInterval(interval);
+        // 탭 전환 시에도 체크 (더 빠른 감지)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                // 탭이 활성화될 때마다 체크
+                checkVersion();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 }
