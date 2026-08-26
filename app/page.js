@@ -553,10 +553,10 @@ export default function Home() {
                                     {/* Schedule & Location Notice */}
                                     <div className="bg-[#FFF0F2]/80 p-4 rounded-2xl border border-pink-200/70 mb-6 space-y-1.5 text-xs text-[#C6566D]">
                                         <div className="font-extrabold flex items-center gap-1.5 text-xs md:text-sm text-[#9C3349]">
-                                            <span>🗓️</span> 차기 일정: 2026.09.07 (월) 14:00 ~ 17:00
+                                            <span>🗓️</span> 차기 일정: 2026.09.21 (월) 14:00 ~ 17:00
                                         </div>
                                         <div className="font-semibold flex items-center gap-1.5 text-slate-600">
-                                            <span>📍</span> 장소: 논현역 부근 예정 (소수 정예 진행 / 추후 상세 공지)
+                                            <span>📍</span> 장소: 광진구 센터 (서울시 광진구 능동로 59길 27, 1층)
                                         </div>
                                     </div>
 
@@ -632,7 +632,10 @@ export default function Home() {
                                     {/* Schedule Notice & Discount 特典 Banner */}
                                     <div className="bg-green-900/80 p-4 rounded-2xl border border-green-700/80 mb-6 space-y-2 text-xs">
                                         <div className="font-extrabold flex items-center gap-1.5 text-xs md:text-sm text-green-200">
-                                            <span>🗓️</span> 일정: 2026.09.21 ~ 10.19 (5주 과정) / 주 1회 (월) 14:00~17:00
+                                            <span>🗓️</span> 일정: 2026.09.28 ~ 10.28 (5주 과정) / 주 1회 (월) 14:00~17:00
+                                        </div>
+                                        <div className="font-semibold flex items-center gap-1.5 text-green-300">
+                                            <span>📍</span> 장소: 광진구 센터 (서울시 광진구 능동로 59길 27, 1층)
                                         </div>
                                         <div className="bg-[#FFF0F2] text-[#C6566D] font-black p-2.5 rounded-xl border border-pink-200 flex items-center gap-2 text-xs shadow-xs">
                                             <span className="text-base">🎁</span>
