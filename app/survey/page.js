@@ -58,6 +58,7 @@ export default function Survey() {
     };
     const [answers, setAnswers] = useState({});
     const [etcDetail, setEtcDetail] = useState('');
+    const [description, setDescription] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     
     // Ear Photos States
@@ -128,7 +129,7 @@ export default function Survey() {
 
 
     const handleNext = async () => {
-        const totalSteps = 7;
+        const totalSteps = 8;
         if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         } else {
@@ -161,6 +162,7 @@ export default function Survey() {
                     gender,
                     birthDate: `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')} (${birthType})`,
                     answers: finalAnswers,
+                    description,
                     earPhotoUrl: leftUrl, // Backward compatibility
                     leftEarUrl: leftUrl,
                     rightEarUrl: rightUrl,
@@ -183,7 +185,7 @@ export default function Survey() {
         }
     };
 
-    const totalSteps = 7;
+    const totalSteps = 8;
     const progress = (currentStep / totalSteps) * 100;
 
     return (
@@ -231,10 +233,10 @@ export default function Survey() {
                     {/* Header */}
                     <div style={{ marginBottom: '40px' }}>
                         <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                            {currentStep <= 5 ? `질문 ${currentStep} / 5` : currentStep === 6 ? '기본 인적사항 입력' : '귀 사진 업로드'}
+                            {currentStep <= 5 ? `질문 ${currentStep} / 5` : currentStep === 6 ? '기본 인적사항 입력' : currentStep === 7 ? '귀 사진 업로드' : '추가 작성 사항'}
                         </span>
                         <h2 style={{ fontSize: '1.8rem', marginTop: '10px' }}>
-                            {currentStep <= 5 ? questions[currentStep - 1].question : currentStep === 6 ? '성별 및 생년월일을 입력해 주세요.' : '양쪽 귀 사진을 업로드해 주세요.'}
+                            {currentStep <= 5 ? questions[currentStep - 1].question : currentStep === 6 ? '성별 및 생년월일을 입력해 주세요.' : currentStep === 7 ? '양쪽 귀 사진을 업로드해 주세요.' : '평소 건강관리 루틴이나 특별히 불편한 부분을 설명해주세요.'}
                         </h2>
                     </div>
 
@@ -380,7 +382,7 @@ export default function Survey() {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
+                        ) : currentStep === 7 ? (
                             <div className="space-y-6">
                                 {/* Sample Image Guidance */}
                                 <div className="bg-pale p-6 rounded-[32px] border border-[#2E7D32]/10 overflow-hidden shadow-custom">
@@ -465,6 +467,18 @@ export default function Survey() {
                                     </div>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <p className="text-sm font-semibold text-slate-500 leading-relaxed">
+                                    현재 복용 중인 약물이 있거나, 평소 불편했던 증상, 생활 습관(식습관, 수면 등)을 편하게 적어주시면 더 정밀하게 분석해 드립니다. (선택사항)
+                                </p>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="예: 매일 비타민과 유산균을 복용 중이나 최근 수면의 질이 크게 떨어졌으며, 왼쪽 귀 주변이 찌릿거리는 통증이 종종 발생합니다."
+                                    className="w-full h-48 p-5 border border-slate-200 rounded-[24px] outline-none focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent text-sm font-semibold transition-all resize-none bg-slate-50/50"
+                                />
+                            </div>
                         )}
                     </div>
 
@@ -492,7 +506,9 @@ export default function Survey() {
                                     ? !answers[currentStep - 1]
                                     : currentStep === 6
                                         ? (!gender || !birthYear || birthYear.length < 4 || !birthMonth || !birthDay)
-                                        : (!leftEarPhoto || !rightEarPhoto)
+                                        : currentStep === 7
+                                            ? (!leftEarPhoto || !rightEarPhoto)
+                                            : false // 8단계는 선택이므로 disabled되지 않음
                             );
                             return (
                                 <button
@@ -512,8 +528,8 @@ export default function Survey() {
                                         </>
                                     ) : (
                                         <>
-                                            {currentStep === 7 ? '분석 요청하기' : '다음'}
-                                            {currentStep !== 7 && <ArrowRight size={20} />}
+                                            {currentStep === 8 ? '분석 요청하기' : '다음'}
+                                            {currentStep !== 8 && <ArrowRight size={20} />}
                                         </>
                                     )}
                                 </button>

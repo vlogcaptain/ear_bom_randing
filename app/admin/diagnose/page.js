@@ -413,6 +413,18 @@ function DiagnoseContent() {
                                 </div>
                             </section>
                         )}
+
+                        {/* 평소 루틴 및 추가 서술 정보 카드 */}
+                        {survey?.description && (
+                            <section className="bg-amber-50/40 border border-amber-100 rounded-2xl p-5 space-y-3">
+                                <h2 className="text-xs font-black text-amber-800 uppercase tracking-widest flex items-center gap-2">
+                                    <FileText size={16} className="text-amber-600" /> 평소 루틴 및 추가 의견
+                                </h2>
+                                <div className="bg-white p-4 rounded-xl border border-amber-100/60 shadow-xs text-xs text-slate-700 leading-relaxed font-semibold">
+                                    {survey.description}
+                                </div>
+                            </section>
+                        )}
                         
                         {/* Survey Summary Section */}
                         {survey?.answers && Object.keys(survey.answers).length > 0 && (
