@@ -12,13 +12,13 @@ export default function FloatingQuickMenu() {
     }
 
     return (
-        <div className="fixed right-6 bottom-6 z-50 flex flex-col gap-3.5 select-none animate-in fade-in slide-in-from-bottom-5 duration-700">
+        <div className="fixed right-4 md:right-6 bottom-28 md:bottom-6 z-50 flex flex-col gap-3 md:gap-3.5 select-none animate-in fade-in slide-in-from-bottom-5 duration-700">
             {/* 네이버 블로그 버튼 */}
             <a
                 href="https://blog.naver.com/js_ear"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-13 h-13 rounded-full bg-[#03C75A] shadow-md hover:shadow-lg flex items-center justify-center text-white hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 group"
+                className="w-11 h-11 md:w-13 md:h-13 rounded-full bg-[#03C75A] shadow-md hover:shadow-lg flex items-center justify-center text-white hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 group"
                 title="네이버 블로그 문의"
             >
                 {/* 네이버 N 로고 고밀도 벡터 SVG */}
@@ -36,7 +36,7 @@ export default function FloatingQuickMenu() {
                 href="https://open.kakao.com/o/sTJMmaCi"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-13 h-13 rounded-full bg-[#FEE500] shadow-md hover:shadow-lg flex items-center justify-center text-[#191919] hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300"
+                className="w-11 h-11 md:w-13 md:h-13 rounded-full bg-[#FEE500] shadow-md hover:shadow-lg flex items-center justify-center text-[#191919] hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300"
                 title="카카오톡 오픈채팅 문의"
             >
                 {/* 카카오톡 말풍선 고밀도 벡터 SVG */}
@@ -52,7 +52,7 @@ export default function FloatingQuickMenu() {
             {/* 메시지 전용 SMS 연동 버튼 */}
             <a
                 href="sms:01052660150?body=안녕하세요,%20이어봄%20문의드립니다."
-                className="w-13 h-13 rounded-full bg-[#E53935] shadow-md hover:shadow-lg flex items-center justify-center text-white hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300"
+                className="w-11 h-11 md:w-13 md:h-13 rounded-full bg-[#E53935] shadow-md hover:shadow-lg flex items-center justify-center text-white hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300"
                 title="메시지 전송 문의"
             >
                 <MessageSquare className="w-5.5 h-5.5 fill-white/10" />
