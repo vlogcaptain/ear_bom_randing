@@ -49,7 +49,7 @@ export default function Footer() {
                             <li><Link className="hover:text-[#F697AB]" href="/sitemap">사이트맵</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/terms">이용약관</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/privacy">개인정보처리방침</Link></li>
-                            <li><Link className="hover:text-[#F697AB]" href="/terms">취소 및 환불규정</Link></li>
+                            <li><Link className="hover:text-[#F697AB]" href="/terms#refund">취소 및 환불규정</Link></li>
                         </ul>
                     </div>
                 </div>

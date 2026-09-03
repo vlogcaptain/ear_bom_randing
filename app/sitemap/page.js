@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -441,9 +441,10 @@ export default function SitemapPage() {
                                 </p>
                             </div>
 
-                            <div className="pt-3 border-t border-stone-100 flex items-center gap-4 text-xs font-bold text-stone-500">
+                            <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center gap-4 text-xs font-bold text-stone-500">
                                 <Link href="/terms" className="hover:text-[#2E7D32] underline">이용약관</Link>
                                 <Link href="/privacy" className="hover:text-[#2E7D32] underline">개인정보처리방침</Link>
+                                <Link href="/terms#refund" className="hover:text-[#2E7D32] underline">취소 및 환불규정</Link>
                                 <Link href="/" className="hover:text-[#2E7D32] ml-auto">홈으로 이동 &rarr;</Link>
                             </div>
                         </div>
