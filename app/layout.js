@@ -17,6 +17,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="ko" suppressHydrationWarning>
             <head>
+                <meta name="naver-site-verification" content="81128eba88b84c19f16a7d1fdd32b9251f3b3038" />
                 <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
                 <meta httpEquiv="Pragma" content="no-cache" />
                 <meta httpEquiv="Expires" content="0" />
