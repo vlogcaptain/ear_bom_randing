@@ -46,6 +46,7 @@ export default function Footer() {
                     <div>
                         <h4 className="font-bold mb-6">고객지원</h4>
                         <ul className="space-y-4 text-gray-500 text-sm">
+                            <li><Link className="hover:text-[#F697AB]" href="/sitemap">사이트맵</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/terms">이용약관</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/privacy">개인정보처리방침</Link></li>
                             <li><Link className="hover:text-[#F697AB]" href="/terms">취소 및 환불규정</Link></li>
