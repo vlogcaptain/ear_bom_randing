@@ -186,7 +186,7 @@ export default function SitemapPage() {
                                         <CheckCircle2 size={13} className="text-[#2E7D32]" /> 차기일정: 9/21 (월) 14:00~17:00
                                     </li>
                                     <li className="flex items-center gap-1.5">
-                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 수강료: 100,000원
+                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 수강료: 60,000원
                                     </li>
                                 </ul>
                             </div>
@@ -218,7 +218,7 @@ export default function SitemapPage() {
                                         <CheckCircle2 size={13} className="text-[#2E7D32]" /> 차기일정: 9/28~10/28 (주1회)
                                     </li>
                                     <li className="flex items-center gap-1.5">
-                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 수강료: 500,000원 (얼리버드 5만원 할인)
+                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 수강료: 400,000원
                                     </li>
                                 </ul>
                             </div>
