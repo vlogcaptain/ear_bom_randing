@@ -11,7 +11,7 @@ import { collection, addDoc, serverTimestamp, getDocs, query } from 'firebase/fi
 import Footer from '@/components/Footer';
 
 const typeLabelMap = {
-    offline: '대면 상담 (방문)',
+    offline: '1:1 대면 방문 상담 (30,000원)',
     video: '비대면 상담',
     oneday: '원데이 클래스 (60,000원)',
     '5weeks': '5주 입문과정 (400,000원)'
@@ -387,7 +387,7 @@ function AppointmentContent() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {[
                                     { id: 'video', label: '1:1 비대면 상담', sub: '온라인 화상 1:1 웰니스 케어', icon: <Video /> },
-                                    { id: 'offline', label: '1:1 대면 방문 상담', sub: '서울 광진구 센터 직접 방문', icon: <MapPin /> },
+                                    { id: 'offline', label: '1:1 대면 방문 상담 (30,000원)', sub: '서울 광진구 센터 직접 방문', icon: <MapPin /> },
                                     { id: 'oneday', label: '원데이 클래스 (60,000원)', sub: '3시간 실습 체험 / 재료비 포함', icon: <FileText /> },
                                     { id: '5weeks', label: '5주 입문과정 (400,000원)', sub: '주 3시간 × 5주 마스터 코스', icon: <FileText /> }
                                 ].map(type => (
@@ -458,9 +458,9 @@ function AppointmentContent() {
                                             {consultationType === 'offline' ? <MapPin size={20} /> : <Video size={20} />}
                                         </div>
                                         <div>
-                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">상담 방식</p>
-                                            <p className="font-bold text-slate-800">
-                                                {consultationType === 'offline' ? '대면 상담 (방문)' : '비대면 상담'} (30분)
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">상담 및 신청 구분</p>
+                                            <p className="font-bold text-slate-800 text-sm">
+                                                {typeLabelMap[consultationType] || consultationType}
                                             </p>
                                         </div>
                                     </div>
