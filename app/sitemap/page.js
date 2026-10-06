@@ -183,7 +183,7 @@ export default function SitemapPage() {
                                 </p>
                                 <ul className="text-xs text-stone-500 space-y-1 pt-1 font-medium">
                                     <li className="flex items-center gap-1.5">
-                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 차기일정: 9/21 (월) 14:00~17:00
+                                        <CheckCircle2 size={13} className="text-[#2E7D32]" /> 차기일정: 11/9 (월) 14:00~17:00
                                     </li>
                                     <li className="flex items-center gap-1.5">
                                         <CheckCircle2 size={13} className="text-[#2E7D32]" /> 수강료: 60,000원

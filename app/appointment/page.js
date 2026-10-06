@@ -161,10 +161,10 @@ function AppointmentContent() {
             let timeStr = '';
 
             if (consultationType === 'oneday') {
-                dateStr = '2026-09-07';
+                dateStr = '2026-11-09';
                 timeStr = '14:00~17:00';
             } else if (consultationType === '5weeks') {
-                dateStr = '2026-09-21';
+                dateStr = '2026-09-28';
                 timeStr = '14:00~17:00 (5주과정)';
             } else if (selectedDate) {
                 const year = selectedDate.getFullYear();
