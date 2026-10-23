@@ -22,10 +22,18 @@ import {
     Trash2
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
-import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, limit, where, doc, updateDoc, deleteDoc, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Image from 'next/image';
 import EditAppointmentModal from '@/components/EditAppointmentModal';
+
+
+const formatGender = (gender) => {
+    if (!gender) return '';
+    if (gender === 'female' || gender === '여성') return '여성';
+    if (gender === 'male' || gender === '남성') return '남성';
+    return gender;
+};
 
 export default function AdminDashboardPage() {
     const router = useRouter();
@@ -52,6 +60,9 @@ export default function AdminDashboardPage() {
     const [selectedUpload, setSelectedUpload] = useState(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
+    const [avoidFoods, setAvoidFoods] = useState('');
+    const [supplements, setSupplements] = useState('');
+    const [nextConsultDate, setNextConsultDate] = useState('');
     const [submittingFeedback, setSubmittingFeedback] = useState(false);
     const [showHidden, setShowHidden] = useState(false);
 
@@ -315,6 +326,9 @@ export default function AdminDashboardPage() {
     const openUploadDetail = (upload) => {
         setSelectedUpload(upload);
         setFeedbackText(upload.feedback || '');
+        setAvoidFoods(upload.avoidFoods || '');
+        setSupplements(upload.supplements || '');
+        setNextConsultDate(upload.nextConsultDate || '');
         setIsUploadModalOpen(true);
     };
 
@@ -330,17 +344,47 @@ export default function AdminDashboardPage() {
         if (!selectedUpload) return;
         setSubmittingFeedback(true);
         try {
+            const batch = writeBatch(db);
             const uploadRef = doc(db, 'uploads', selectedUpload.id);
-            await updateDoc(uploadRef, {
+            const trimmedAvoid = avoidFoods.trim();
+            const trimmedSupplements = supplements.trim();
+            const trimmedNextDate = nextConsultDate.trim();
+
+            batch.update(uploadRef, {
                 feedback: feedbackText,
+                avoidFoods: trimmedAvoid,
+                forbiddenFoods: trimmedAvoid,
+                supplements: trimmedSupplements,
+                nextConsultDate: trimmedNextDate,
+                nextDate: trimmedNextDate,
                 status: 'completed',
                 reviewedAt: serverTimestamp()
             });
+
+            if (selectedUpload.surveyId) {
+                const surveyRef = doc(db, 'surveys', selectedUpload.surveyId);
+                batch.update(surveyRef, {
+                    overallCondition: feedbackText,
+                    feedback: feedbackText,
+                    avoidFoods: trimmedAvoid,
+                    forbiddenFoods: trimmedAvoid,
+                    supplements: trimmedSupplements,
+                    nextConsultDate: trimmedNextDate,
+                    nextDate: trimmedNextDate,
+                    status: 'completed',
+                    diagnosedAt: serverTimestamp()
+                });
+            }
+
+            await batch.commit();
             
             // Local state update
             setUploads(prev => prev.map(u => u.id === selectedUpload.id ? {
                 ...u,
                 feedback: feedbackText,
+                avoidFoods: avoidFoods.trim(),
+                supplements: supplements.trim(),
+                nextConsultDate: nextConsultDate.trim(),
                 status: 'completed'
             } : u));
             
@@ -590,7 +634,7 @@ export default function AdminDashboardPage() {
                                                                 {getUserRealName(survey.userId, survey.userName)}
                                                                 {(survey.gender || survey.birthDate) && (
                                                                     <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                                                                        {survey.gender ? survey.gender : ''}
+                                                                        {survey.gender ? formatGender(survey.gender) : ''}
                                                                         {survey.gender && survey.birthDate ? ' | ' : ''}
                                                                         {survey.birthDate ? survey.birthDate : ''}
                                                                     </span>
@@ -1301,7 +1345,7 @@ export default function AdminDashboardPage() {
                                                                 {getUserRealName(log.userId, log.userName)}
                                                                 {(log.gender || log.birthDate) && (
                                                                     <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                                                                        {log.gender ? log.gender : ''}
+                                                                        {log.gender ? formatGender(log.gender) : ''}
                                                                         {log.gender && log.birthDate ? ' | ' : ''}
                                                                         {log.birthDate ? log.birthDate : ''}
                                                                     </span>
@@ -1755,28 +1799,44 @@ export default function AdminDashboardPage() {
                                         <div className="grid grid-cols-2 gap-4 text-xs">
                                             {Object.entries(selectedUpload.quizAnswers).map(([qKey, aVal]) => {
                                                 const questionLabels = {
-                                                    1: '불편 부위',
+                                                    1: '가장 불편한 부위',
                                                     2: '통증 강도',
                                                     3: '피로도',
                                                     4: '소화 상태',
-                                                    5: '수면 품질',
-                                                    6: '스트레스'
+                                                    5: '수면의 질',
+                                                    6: '스트레스 수준',
+                                                    discomfort: '가장 불편한 부위',
+                                                    pain: '통증 강도',
+                                                    painLevel: '통증 강도',
+                                                    fatigue: '피로도',
+                                                    digestion: '소화 상태',
+                                                    sleep: '수면의 질',
+                                                    stress: '스트레스 수준',
+                                                    symptom: '주요 증상',
+                                                    lifestyle: '생활 습관'
                                                 };
                                                 const answerLabels = {
                                                     head: '머리/두통',
                                                     neck_shoulder: '목/어깨',
+                                                    neck: '목',
+                                                    shoulder: '어깨',
                                                     back: '허리/등',
                                                     digestive: '소화기관',
-                                                    none: '없음',
-                                                    very_good: '매우 좋음',
-                                                    good: '좋음',
+                                                    none: '특별히 없음',
+                                                    '1': '거의 없음 (1단계)',
+                                                    '2': '약간 있음 (2단계)',
+                                                    '3': '보통 (3단계)',
+                                                    '4': '꽤 심함 (4단계)',
+                                                    '5': '매우 심함 (5단계)',
+                                                    very_good: '매우 좋음/활력있음',
+                                                    good: '좋음/괜찮은 편',
                                                     normal: '보통',
-                                                    bad: '안좋음',
-                                                    very_bad: '매우 안좋음',
+                                                    bad: '좋지 않음/자주 깸',
+                                                    very_bad: '매우 안 좋음/불면증',
                                                     tired: '피곤함',
                                                     very_tired: '매우 피곤함',
-                                                    very_low: '매우 낮음',
-                                                    low: '낮음',
+                                                    very_low: '거의 없음',
+                                                    low: '약간 있음',
                                                     high: '높음',
                                                     very_high: '매우 높음'
                                                 };
@@ -1806,6 +1866,39 @@ export default function AdminDashboardPage() {
                                             required
                                             placeholder="사용자의 귀 분석 결과를 토대로 증상 완화를 위한 혈자리 자극 조언이나 기타 피드백을 자세히 기입해주세요..."
                                             className="w-full border border-slate-200 rounded-2xl p-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-black text-slate-600">🚫 주의할 음식 / 식이 가이드</label>
+                                        <input
+                                            type="text"
+                                            value={avoidFoods}
+                                            onChange={(e) => setAvoidFoods(e.target.value)}
+                                            placeholder="예: 기름진 음식, 밀가루, 차가운 음료 피하기"
+                                            className="w-full border border-slate-200 rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-black text-slate-600">💊 추천 영양 성분</label>
+                                        <input
+                                            type="text"
+                                            value={supplements}
+                                            onChange={(e) => setSupplements(e.target.value)}
+                                            placeholder="예: 마그네슘, 비타민 B군, 테아닌"
+                                            className="w-full border border-slate-200 rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-black text-slate-600">📅 다음 상담 추천일</label>
+                                        <input
+                                            type="text"
+                                            value={nextConsultDate}
+                                            onChange={(e) => setNextConsultDate(e.target.value)}
+                                            placeholder="예: 2주 후 권장 (2026-11-02)"
+                                            className="w-full border border-slate-200 rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-500/20"
                                         />
                                     </div>
                                     

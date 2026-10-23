@@ -20,10 +20,65 @@ import {
     User
 } from 'lucide-react';
 import { db, auth } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import Image from 'next/image';
 import MarkingModal from '@/components/MarkingModal';
+
+
+const formatGender = (gender) => {
+    if (!gender) return '';
+    if (gender === 'female' || gender === '여성') return '여성';
+    if (gender === 'male' || gender === '남성') return '남성';
+    return gender;
+};
+
+const quizQuestionMap = {
+    '1': '가장 불편한 부위',
+    '2': '통증 강도',
+    '3': '피로도',
+    '4': '소화 상태',
+    '5': '수면의 질',
+    '6': '스트레스 수준',
+    discomfort: '가장 불편한 부위',
+    pain: '통증 강도',
+    painLevel: '통증 강도',
+    fatigue: '피로도',
+    digestion: '소화 상태',
+    sleep: '수면의 질',
+    stress: '스트레스 수준',
+    symptom: '주요 증상',
+    lifestyle: '생활 습관'
+};
+
+const quizAnswerMap = {
+    head: '머리/두통',
+    neck_shoulder: '목/어깨',
+    neck: '목',
+    shoulder: '어깨',
+    back: '허리/등',
+    digestive: '소화기관',
+    none: '특별히 없음',
+    '1': '거의 없음 (1단계)',
+    '2': '약간 있음 (2단계)',
+    '3': '보통 (3단계)',
+    '4': '꽤 심함 (4단계)',
+    '5': '매우 심함 (5단계)',
+    very_good: '매우 좋음/활력있음',
+    good: '좋음/괜찮은 편',
+    normal: '보통',
+    bad: '좋지 않음/자주 깸',
+    very_bad: '매우 안 좋음/불면증',
+    tired: '피곤함',
+    very_tired: '매우 피곤함',
+    very_low: '거의 없음',
+    low: '약간 있음',
+    high: '높음',
+    very_high: '매우 높음'
+};
+
+const formatQuizKey = (key) => quizQuestionMap[key] || (isNaN(key) ? key : `질문 ${key}`);
+const formatQuizValue = (val) => quizAnswerMap[val] || val;
 
 function DiagnoseContent() {
     const router = useRouter();
@@ -180,19 +235,41 @@ function DiagnoseContent() {
         setSaving(true);
         setShowConfirm(false);
         try {
+            const batch = writeBatch(db);
             const docRef = doc(db, 'surveys', id);
-            await updateDoc(docRef, {
+            batch.update(docRef, {
                 status: 'completed',
                 score: Number(form.score),
                 overallCondition: form.opinion || '',
+                feedback: form.opinion || '',
                 recommendations: form.habits || '',
                 acupoints: form.acupoints || '',
                 nextDate: form.nextDate || '',
+                nextConsultDate: form.nextDate || '',
                 forbiddenFoods: form.forbiddenFoods || '',
+                avoidFoods: form.forbiddenFoods || '',
                 supplements: form.supplements || '',
                 markedAcupoints: markedAcupoints || [],
                 diagnosedAt: serverTimestamp()
             });
+
+            if (survey?.uploadId) {
+                const uploadRef = doc(db, 'uploads', survey.uploadId);
+                batch.update(uploadRef, {
+                    status: 'completed',
+                    feedback: form.opinion || '',
+                    recommendations: form.habits || '',
+                    nextDate: form.nextDate || '',
+                    nextConsultDate: form.nextDate || '',
+                    forbiddenFoods: form.forbiddenFoods || '',
+                    avoidFoods: form.forbiddenFoods || '',
+                    supplements: form.supplements || '',
+                    points: markedAcupoints || [],
+                    reviewedAt: serverTimestamp()
+                });
+            }
+
+            await batch.commit();
 
             // 사용자 대상 진단 완료 SMS 알림 전송 (비동기)
             if (survey?.userPhone) {
@@ -401,7 +478,7 @@ function DiagnoseContent() {
                                     {survey?.gender && (
                                         <div className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-emerald-100/60 shadow-sm">
                                             <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">성별</span>
-                                            <span className="text-slate-800 font-bold">{survey.gender}</span>
+                                            <span className="text-slate-800 font-bold">{formatGender(survey.gender)}</span>
                                         </div>
                                     )}
                                     {survey?.birthDate && (
@@ -435,8 +512,8 @@ function DiagnoseContent() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
                                     {Object.entries(survey.answers).map(([key, value]) => (
                                         <div key={key} className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm">
-                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">{key}</span>
-                                            <span className="text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">{value}</span>
+                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">{formatQuizKey(key)}</span>
+                                            <span className="text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">{formatQuizValue(value)}</span>
                                         </div>
                                     ))}
                                 </div>

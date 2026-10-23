@@ -2,35 +2,53 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 전문가 권한 확인 함수
+    // 1. 전문가 확인 함수 (Firestore admins 컬렉션에 등록된 이메일인지 검증)
     function isExpert() {
       return request.auth != null && 
              exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
     }
 
-    // 설문 데이터 (Surveys)
+    // 2. 문진표 (Surveys) - 비로그인 생성 차단 및 고객 본인 UID 생성으로 강화
     match /surveys/{docId} {
-      allow create: if true;
+      allow create: if request.auth != null && 
+                       request.resource.data.userId == request.auth.uid;
       allow get, list: if isExpert() || 
                        (request.auth != null && resource.data.userId == request.auth.uid);
       allow update, delete: if isExpert();
     }
 
-    // 회원 정보 (Users)
+    // 3. 사진 업로드 기록 (Uploads) - 고객 임의 수정/삭제 차단, 관리자만 update/delete
+    match /uploads/{docId} {
+      allow create: if request.auth != null && 
+                       request.resource.data.userId == request.auth.uid;
+      allow get, list: if isExpert() || 
+                       (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isExpert();
+    }
+
+    // 4. 회원 정보 (Users) - 본인 정보만 읽기/수정 가능, 관리자 전체 권한
     match /users/{userId} {
       allow read, write: if isExpert() || 
                            (request.auth != null && request.auth.uid == userId);
     }
 
-    // 예약 데이터 (Appointments)
+    // 5. 상담 예약 (Appointments) - 방안 A: 1.0.2 및 1.0.3 앱 달력 슬롯 조회 호환성 유지
     match /appointments/{docId} {
-      allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid);
-      allow get, list: if isExpert() || 
-                       (request.auth != null && resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && 
+                       request.resource.data.userId == request.auth.uid;
+      // 앱과 웹의 예약 달력에서 이미 예약된 시간대를 조회할 수 있도록 로그인 사용자 목록 읽기 허용
+      allow get, list: if request.auth != null;
       allow update, delete: if isExpert();
     }
 
-    // 채팅 메시지 (Chats)
+    // 6. 레거시 진단 기록 (Diagnose) - 로그인 시 과거 이력 확인용 누락 컬렉션 추가
+    match /diagnose/{docId} {
+      allow get, list: if isExpert() || 
+                       (request.auth != null && resource.data.userId == request.auth.uid);
+      allow write: if isExpert();
+    }
+
+    // 7. 채팅 메시지 (Chats)
     match /chats/{docId} {
       allow create: if (request.auth != null && request.resource.data.userId == request.auth.uid) || 
                        isExpert();
@@ -39,22 +57,23 @@ service cloud.firestore {
       allow update, delete: if isExpert();
     }
 
-    // 상담 노트 (Notes)
+    // 8. 상담 노트 (Notes) - 관리자의 노트 작성/수정(isExpert) 권한 결함 보완
     match /notes/{docId} {
-      allow create, update: if (request.auth != null && request.resource.data.userId == request.auth.uid);
+      allow create, update: if isExpert() || 
+                               (request.auth != null && request.resource.data.userId == request.auth.uid);
       allow read: if isExpert() || 
                         (request.auth != null && resource.data.userId == request.auth.uid);
       allow delete: if isExpert();
     }
 
-    // 결제 내역 (Payments)
+    // 9. 결제 정보 (Payments) - 백엔드 API 검증 웹훅 생성 허용
     match /payments/{docId} {
       allow read: if isExpert() || 
                     (request.auth != null && resource.data.customer.id == request.auth.uid);
       allow create: if true; 
     }
 
-    // 화상 상담 신호 (Calls for WebRTC)
+    // 10. 화상 통화 신호 (Calls for WebRTC)
     match /calls/{userId} {
       allow create, update, delete: if isExpert() || 
                                      (request.auth != null && request.auth.uid == userId);
@@ -71,25 +90,25 @@ service cloud.firestore {
       }
     }
 
-    // 관리자 명부 (Admins)
+    // 11. 관리자 계정 목록 (Admins)
     match /admins/{email} {
       allow read: if isExpert();
       allow write: if false;
     }
     
-    // 차단 일정 데이터 (Blocked Slots)
+    // 12. 휴무 및 차단 슬롯 (Blocked Slots)
     match /blocked_slots/{dateStr} {
       allow read: if true;
       allow write: if isExpert();
     }
 
-    // 앱 설정 (App Config - 버전 체크 등)
+    // 13. 앱 설정 및 버전 (App Config)
     match /app_config/{docId} {
       allow read: if true;
       allow write: if isExpert();
     }
 
-    // 기본 차단
+    // 14. 기본 차단
     match /{document=**} {
       allow read, write: if false;
     }

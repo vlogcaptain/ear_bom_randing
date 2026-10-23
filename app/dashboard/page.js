@@ -28,6 +28,25 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
+
+const formatConsultDate = (dateVal) => {
+    if (!dateVal) return '예약 가능';
+    if (typeof dateVal === 'string') {
+        if (dateVal.includes('후') || dateVal.includes('권장') || dateVal.includes('(') || dateVal.includes('년') || dateVal.includes('월')) {
+            return dateVal;
+        }
+        const d = new Date(dateVal);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString();
+        }
+        return dateVal;
+    }
+    if (dateVal.toDate) {
+        return dateVal.toDate().toLocaleDateString();
+    }
+    return String(dateVal);
+};
+
 export default function DashboardPage() {
     const router = useRouter();
     const { user, loading, logout } = useAuth();
@@ -89,10 +108,46 @@ export default function DashboardPage() {
                 orderBy('createdAt', 'desc')
             );
             const querySnapshot = await getDocs(q);
-            const list = querySnapshot.docs.map(doc => ({
+            let list = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
+
+            // uploads 컬렉션의 분석 완료 데이터도 함께 병합
+            try {
+                const uploadQ = query(
+                    collection(db, 'uploads'),
+                    where('userId', '==', user.uid),
+                    orderBy('uploadedAt', 'desc')
+                );
+                const uploadSnapshot = await getDocs(uploadQ);
+                uploadSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.status === 'completed' || !!data.feedback) {
+                        const isDuplicate = list.some(s => 
+                            s.id === data.surveyId || 
+                            s.uploadId === doc.id ||
+                            (data.fileUrl && (s.earPhotoUrl === data.fileUrl || s.leftEarUrl === data.fileUrl))
+                        );
+                        if (!isDuplicate) {
+                            list.push({
+                                id: doc.id,
+                                ...data,
+                                createdAt: data.uploadedAt || data.reviewedAt || new Date().toISOString(),
+                                overallCondition: data.feedback || '원장님의 귀 사진 분석이 완료되었습니다.',
+                                recommendations: data.recommendations || '귀 마사지 및 수분 섭취, 충분한 수면을 권장합니다.',
+                                avoidFoods: data.avoidFoods || data.forbiddenFoods || '',
+                                supplements: data.supplements || '',
+                                nextConsultDate: data.nextConsultDate || data.nextDate || '',
+                                acupoints: data.points ? data.points.map((p, i) => `${i+1}. ${p.label || '침점'}`).join(', ') : '귀 반사구 자극'
+                            });
+                        }
+                    }
+                });
+            } catch (uErr) {
+                console.warn("Error fetching uploads in dashboard:", uErr);
+            }
+
             setDiagnoses(list);
             if (list.length > 0) {
                 setSelectedDiagnosis(list[0]);
@@ -514,7 +569,7 @@ export default function DashboardPage() {
                                                         <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm shrink-0">
                                                             <AlertCircle size={18} />
                                                         </div>
-                                                        <p className="text-red-700 text-sm font-bold leading-tight whitespace-pre-line">{selectedDiagnosis.forbiddenFoods || '주의할 음식을 식별 중입니다.'}</p>
+                                                        <p className="text-red-700 text-sm font-bold leading-tight whitespace-pre-line">{selectedDiagnosis.avoidFoods || selectedDiagnosis.forbiddenFoods || '주의할 음식을 식별 중입니다.'}</p>
                                                     </div>
                                                 </div>
                                                 
@@ -534,7 +589,7 @@ export default function DashboardPage() {
                                                     <h4 className="text-xs font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-2">
                                                         <Calendar size={14} /> 다음 상담 추천일
                                                     </h4>
-                                                    <p className="text-2xl font-black">{selectedDiagnosis.nextDate ? new Date(selectedDiagnosis.nextDate).toLocaleDateString() : '예약 대기'}</p>
+                                                    <p className="text-2xl font-black">{formatConsultDate(selectedDiagnosis.nextConsultDate || selectedDiagnosis.nextDate)}</p>
                                                     <Link 
                                                         href="/appointment" 
                                                         className="mt-6 w-full py-3 bg-white text-[#C6566D] rounded-xl font-black text-xs hover:bg-slate-100 transition-all block text-center"
