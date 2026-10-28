@@ -284,15 +284,6 @@ export default function AdminDashboardPage() {
         };
     };
 
-    const getUserBirthDate = (userId, fallbackBirthDate) => {
-        const found = users.find(u => u.id === userId || u.uid === userId);
-        const bDate = found?.birthDate;
-        if (bDate && typeof bDate === 'string' && bDate.trim()) {
-            return bDate.trim();
-        }
-        return fallbackBirthDate || '';
-    };
-
     const filteredSurveys = surveys.filter(s => {
         if (s.isHidden && !showHidden) return false;
         const realName = getUserRealName(s.userId, s.userName);
@@ -641,11 +632,11 @@ export default function AdminDashboardPage() {
                                                         <div>
                                                             <p className="font-black text-slate-800 text-sm">
                                                                 {getUserRealName(survey.userId, survey.userName)}
-                                                                {(survey.gender || getUserBirthDate(survey.userId, survey.birthDate)) && (
+                                                                {(survey.gender || survey.birthDate) && (
                                                                     <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                                                                         {survey.gender ? formatGender(survey.gender) : ''}
-                                                                        {survey.gender && getUserBirthDate(survey.userId, survey.birthDate) ? ' | ' : ''}
-                                                                        {getUserBirthDate(survey.userId, survey.birthDate)}
+                                                                        {survey.gender && survey.birthDate ? ' | ' : ''}
+                                                                        {survey.birthDate ? survey.birthDate : ''}
                                                                     </span>
                                                                 )}
                                                             </p>
@@ -1352,11 +1343,11 @@ export default function AdminDashboardPage() {
                                                         <div>
                                                             <p className="font-bold text-slate-800 text-sm">
                                                                 {getUserRealName(log.userId, log.userName)}
-                                                                {(log.gender || getUserBirthDate(log.userId, log.birthDate)) && (
+                                                                {(log.gender || log.birthDate) && (
                                                                     <span className="text-[10px] text-slate-400 font-bold ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                                                                         {log.gender ? formatGender(log.gender) : ''}
-                                                                        {log.gender && getUserBirthDate(log.userId, log.birthDate) ? ' | ' : ''}
-                                                                        {getUserBirthDate(log.userId, log.birthDate)}
+                                                                        {log.gender && log.birthDate ? ' | ' : ''}
+                                                                        {log.birthDate ? log.birthDate : ''}
                                                                     </span>
                                                                 )}
                                                             </p>

@@ -191,7 +191,6 @@ function DiagnoseContent() {
                 let realName = '';
                 let userPhone = '';
                 let userEmail = '';
-                let userBirthDate = '';
                 if (data.userId) {
                     try {
                         const userSnap = await getDoc(doc(db, 'users', data.userId));
@@ -200,17 +199,13 @@ function DiagnoseContent() {
                             realName = uData.name || uData.displayName || '';
                             userPhone = uData.phoneNumber || uData.phone || '';
                             userEmail = uData.email || '';
-                            const b = uData.birthDate;
-                            if (b && typeof b === 'string' && b.trim()) {
-                                userBirthDate = b.trim();
-                            }
                         }
                     } catch (userErr) {
                         console.error("Error fetching user profile for survey:", userErr);
                     }
                 }
                 
-                setSurvey({ ...data, realName, userPhone, userEmail, userBirthDate });
+                setSurvey({ ...data, realName, userPhone, userEmail });
                 // 기존 데이터가 있으면 채워넣기 (수정 모드 대비)
                 if (data.status === 'completed') {
                     setForm({
@@ -474,7 +469,7 @@ function DiagnoseContent() {
                     <div className="max-w-2xl mx-auto space-y-10">
 
                         {/* 회원 기본 인적사항 카드 */}
-                        {(survey?.gender || survey?.userBirthDate || survey?.birthDate) && (
+                        {(survey?.gender || survey?.birthDate) && (
                             <section className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 space-y-3">
                                 <h2 className="text-xs font-black text-emerald-700 uppercase tracking-widest flex items-center gap-2">
                                     <User size={16} className="text-emerald-600" /> 기본 인적사항
@@ -486,10 +481,10 @@ function DiagnoseContent() {
                                             <span className="text-slate-800 font-bold">{formatGender(survey.gender)}</span>
                                         </div>
                                     )}
-                                    {(survey?.userBirthDate || survey?.birthDate) && (
+                                    {survey?.birthDate && (
                                         <div className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-[#C8E6C9] shadow-sm">
                                             <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">생년월일 (양/음)</span>
-                                            <span className="text-slate-800 font-bold">{survey.userBirthDate || survey.birthDate}</span>
+                                            <span className="text-slate-800 font-bold">{survey.birthDate}</span>
                                         </div>
                                     )}
                                 </div>
