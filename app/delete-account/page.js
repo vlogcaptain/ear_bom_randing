@@ -21,7 +21,7 @@ import Footer from '@/components/Footer';
 const CONFIG = {
     appName: "earbom wellness (이어봄 웰니스)",
     companyName: "이어봄 웰니스",
-    supportEmail: "js100216@naver.com", // 문의 및 삭제 요청 이메일 (확정 전 상수 분리)
+    supportEmail: "vlogcaptain@gmail.com", // 문의 및 삭제 요청 이메일
     responseTime: "영업일 기준 24시간 이내",
     lastUpdated: "2026년 11월 20일",
     appPlatforms: "Android (Google Play) / iOS (App Store)"
