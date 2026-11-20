@@ -11,28 +11,80 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 const questions = [
     {
         id: 1,
-        question: "현재 가장 불편한 증상은 무엇인가요?",
-        options: ["만성 통증 (어깨/허리 등)", "불면증 / 수면 장애", "스트레스 / 불안감", "소화 불량 / 식욕 문제", "기타 / 예방 차원"]
+        question: "현재 가장 신경 쓰이거나 불편한 부위는 어디인가요?",
+        options: [
+            "머리 (무거움/지끈거림)",
+            "목/어깨/허리/등 (뻐근함·결림)",
+            "소화/배변 (더부룩함·답답함)",
+            "순환 (수족냉증/저림/붓기)",
+            "특별히 없음"
+        ]
     },
     {
         id: 2,
-        question: "최근 피로도는 어느 정도인가요?",
-        options: ["매우 상쾌함", "보통임", "오후에 피곤함", "항상 피곤함", "번아웃 상태"]
+        question: "현재 느끼는 불편함이나 뻐근함의 강도는?",
+        options: [
+            "거의 없음",
+            "약간 있음",
+            "보통",
+            "꽤 심함",
+            "매우 심함"
+        ]
     },
     {
         id: 3,
-        question: "하루 평균 수면 시간은 어떻게 되나요?",
-        options: ["8시간 이상", "6~7시간", "4~5시간", "4시간 미만", "불규칙함"]
+        question: "요즘 피로도는 어떠신가요?",
+        options: [
+            "거의 없음",
+            "가끔 피곤함",
+            "오후에 피곤함",
+            "자주 피곤함",
+            "늘 피곤함"
+        ]
     },
     {
         id: 4,
-        question: "현재 스트레스 수준을 선택해주세요.",
-        options: ["거의 없음", "가끔 받음", "지속적인 스트레스", "매우 심각함"]
+        question: "소화 및 속 편안함은 어떠신가요?",
+        options: [
+            "매우 편안함",
+            "가끔 불편함",
+            "속이 더부룩하고 가스가 참",
+            "배변이 답답하고 원활하지 못함",
+            "장이 예민하고 배변이 불규칙함"
+        ]
     },
     {
         id: 5,
-        question: "식욕 상태는 어떤가요?",
-        options: ["정상", "식욕 부진", "과식/폭식 경향", "불규칙함"]
+        question: "평소 수면 상태는?",
+        options: [
+            "숙면함",
+            "대체로 잘 잠",
+            "자주 깸",
+            "잠들기 어려움",
+            "자도 피곤함"
+        ]
+    },
+    {
+        id: 6,
+        question: "평소 스트레스 정도는?",
+        options: [
+            "거의 없음",
+            "가끔 받음",
+            "보통 수준",
+            "스트레스가 많음",
+            "매우 심함"
+        ]
+    },
+    {
+        id: 7,
+        question: "가장 케어하고 싶은 건강 분야는?",
+        options: [
+            "피로·활력 충전",
+            "편안한 수면·스트레스 완화",
+            "소화·가벼운 속",
+            "원활한 순환·바디 릴렉스",
+            "전반적인 데일리 웰니스"
+        ]
     }
 ];
 
@@ -129,7 +181,7 @@ export default function Survey() {
 
 
     const handleNext = async () => {
-        const totalSteps = 8;
+        const totalSteps = questions.length + 3;
         if (currentStep < totalSteps) {
             setCurrentStep(currentStep + 1);
         } else {
@@ -185,7 +237,7 @@ export default function Survey() {
         }
     };
 
-    const totalSteps = 8;
+    const totalSteps = questions.length + 3;
     const progress = (currentStep / totalSteps) * 100;
 
     return (
@@ -233,16 +285,16 @@ export default function Survey() {
                     {/* Header */}
                     <div style={{ marginBottom: '40px' }}>
                         <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                            {currentStep <= 5 ? `질문 ${currentStep} / 5` : currentStep === 6 ? '기본 인적사항 입력' : currentStep === 7 ? '귀 사진 업로드' : '추가 작성 사항'}
+                            {currentStep <= questions.length ? `질문 ${currentStep} / ${questions.length}` : currentStep === questions.length + 1 ? '기본 인적사항 입력' : currentStep === questions.length + 2 ? '귀 사진 업로드' : '추가 작성 사항'}
                         </span>
                         <h2 style={{ fontSize: '1.8rem', marginTop: '10px' }}>
-                            {currentStep <= 5 ? questions[currentStep - 1].question : currentStep === 6 ? '성별 및 생년월일을 입력해 주세요.' : currentStep === 7 ? '양쪽 귀 사진을 업로드해 주세요.' : '평소 건강관리 루틴이나 특별히 불편한 부분을 설명해주세요.'}
+                            {currentStep <= questions.length ? questions[currentStep - 1].question : currentStep === questions.length + 1 ? '성별 및 생년월일을 입력해 주세요.' : currentStep === questions.length + 2 ? '양쪽 귀 사진을 업로드해 주세요.' : '평소 건강관리 루틴이나 특별히 불편한 부분을 설명해주세요.'}
                         </h2>
                     </div>
 
                     {/* Options / Upload Area */}
                     <div style={{ marginBottom: '40px' }}>
-                        {currentStep <= 5 ? (
+                        {currentStep <= questions.length ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {questions[currentStep - 1].options.map((option, index) => (
                                     <button
@@ -289,7 +341,7 @@ export default function Survey() {
                                     </div>
                                 )}
                             </div>
-                        ) : currentStep === 6 ? (
+                        ) : currentStep === questions.length + 1 ? (
                             <div className="space-y-6">
                                 {/* 성별 선택 */}
                                 <div className="space-y-2">
@@ -382,7 +434,7 @@ export default function Survey() {
                                     </div>
                                 </div>
                             </div>
-                        ) : currentStep === 7 ? (
+                        ) : currentStep === questions.length + 2 ? (
                             <div className="space-y-6">
                                 {/* Sample Image Guidance */}
                                 <div className="bg-pale p-6 rounded-[32px] border border-[#2E7D32]/10 overflow-hidden shadow-custom">
@@ -502,13 +554,13 @@ export default function Survey() {
                         {/* Next Button Logic */}
                         {(() => {
                             const isNextDisabled = isSaving || (
-                                currentStep <= 5
+                                currentStep <= questions.length
                                     ? !answers[currentStep - 1]
-                                    : currentStep === 6
+                                    : currentStep === questions.length + 1
                                         ? (!gender || !birthYear || birthYear.length < 4 || !birthMonth || !birthDay)
-                                        : currentStep === 7
+                                        : currentStep === questions.length + 2
                                             ? (!leftEarPhoto || !rightEarPhoto)
-                                            : false // 8단계는 선택이므로 disabled되지 않음
+                                            : false // 마지막 단계는 선택이므로 disabled되지 않음
                             );
                             return (
                                 <button
@@ -528,8 +580,8 @@ export default function Survey() {
                                         </>
                                     ) : (
                                         <>
-                                            {currentStep === 8 ? '분석 요청하기' : '다음'}
-                                            {currentStep !== 8 && <ArrowRight size={20} />}
+                                            {currentStep === totalSteps ? '분석 요청하기' : '다음'}
+                                            {currentStep !== totalSteps && <ArrowRight size={20} />}
                                         </>
                                     )}
                                 </button>
