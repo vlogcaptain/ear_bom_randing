@@ -16,14 +16,13 @@ import Footer from '@/components/Footer';
 
 // ==========================================
 // 설정값 / 상수 분리 (문의 이메일 및 서비스 정보)
-// 추후 공식 고객센터 이메일 확정 시 아래 상수만 손쉽게 변경할 수 있습니다.
 // ==========================================
 const CONFIG = {
     appName: "earbom wellness (이어봄 웰니스)",
     companyName: "이어봄 웰니스",
     supportEmail: "vlogcaptain@gmail.com", // 문의 및 삭제 요청 이메일
-    responseTime: "영업일 기준 24시간 이내",
-    lastUpdated: "2026년 11월 20일",
+    responseTime: "영업일 기준 7일 이내",
+    lastUpdated: "2026년 11월 23일",
     appPlatforms: "Android (Google Play) / iOS (App Store)"
 };
 
@@ -73,7 +72,7 @@ export default function DeleteAccountPage() {
                         {CONFIG.appName} 계정 및 데이터 삭제 안내
                     </h1>
                     <p className="text-sm text-stone-600 leading-relaxed font-medium">
-                        이어봄 웰니스는 사용자의 개인정보 자기결정권을 존중하며, 구글 플레이(Google Play) 및 애플(Apple)의 개발자 계정 삭제 정책을 준수합니다. 본 페이지에서는 앱 내에서 계정을 직접 탈퇴하는 방법과 앱에 접속할 수 없는 경우 웹/이메일을 통해 계정 및 관련 데이터의 영구 파기를 요청하는 절차를 안내합니다.
+                        이어봄 웰니스는 사용자의 개인정보 자기결정권을 존중하며, 구글 플레이(Google Play) 및 애플(Apple)의 개발자 계정 삭제 정책을 준수합니다. 본 페이지에서는 앱 내에서 로그인 계정 및 기기 내 데이터를 삭제(탈퇴)하는 방법과, 서버에 저장된 프로필·건강 설문·귀 사진 등 관련 데이터의 삭제를 이메일로 요청하는 절차를 안내합니다.
                     </p>
                     <div className="flex flex-wrap gap-4 pt-2 text-xs text-stone-400 font-bold border-t border-stone-100">
                         <span>대상 앱: {CONFIG.appName} ({CONFIG.appPlatforms})</span>
@@ -88,12 +87,12 @@ export default function DeleteAccountPage() {
                             <Smartphone size={20} />
                         </div>
                         <div>
-                            <span className="text-xs font-black text-[#2E7D32] uppercase tracking-wider">방법 1 (가장 빠름)</span>
-                            <h2 className="text-lg sm:text-xl font-bold text-stone-900">앱 내에서 직접 계정 삭제 (회원 탈퇴)</h2>
+                            <span className="text-xs font-black text-[#2E7D32] uppercase tracking-wider">방법 1 (앱 내 탈퇴)</span>
+                            <h2 className="text-lg sm:text-xl font-bold text-stone-900">앱 내에서 직접 계정 탈퇴</h2>
                         </div>
                     </div>
                     <p className="text-sm text-stone-600 leading-relaxed">
-                        앱이 기기에 설치되어 있고 로그인이 가능한 경우, 앱 내에서 몇 번의 터치만으로 즉시 계정을 탈퇴하고 모든 데이터를 영구 삭제할 수 있습니다.
+                        앱이 기기에 설치되어 있고 로그인이 가능한 경우, 앱 내에서 몇 번의 터치로 로그인 계정과 기기 내 저장 데이터를 삭제(회원 탈퇴)할 수 있습니다.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-2">
@@ -114,7 +113,7 @@ export default function DeleteAccountPage() {
                         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-2">
                             <span className="text-xs font-black text-[#2E7D32]">STEP 04</span>
                             <div className="font-bold text-sm text-stone-800">탈퇴 확인 및 완료</div>
-                            <p className="text-xs text-stone-500 leading-relaxed">확인 팝업에서 [확인]을 누르면 계정 및 모든 데이터가 즉시 영구 파기됩니다.</p>
+                            <p className="text-xs text-stone-500 leading-relaxed">확인 팝업에서 [확인]을 누르면 로그인 계정과 기기 내 저장 데이터가 즉시 삭제됩니다.</p>
                         </div>
                     </div>
                 </section>
@@ -126,12 +125,12 @@ export default function DeleteAccountPage() {
                             <Mail size={20} />
                         </div>
                         <div>
-                            <span className="text-xs font-black text-amber-600 uppercase tracking-wider">방법 2 (앱 접근이 불가능한 경우)</span>
-                            <h2 className="text-lg sm:text-xl font-bold text-stone-900">이메일을 통한 계정 및 데이터 삭제 요청</h2>
+                            <span className="text-xs font-black text-amber-600 uppercase tracking-wider">방법 2 (이메일 요청)</span>
+                            <h2 className="text-lg sm:text-xl font-bold text-stone-900">서버 데이터 완전 삭제 요청 (이메일 접수)</h2>
                         </div>
                     </div>
                     <p className="text-sm text-stone-600 leading-relaxed">
-                        앱을 이미 삭제하셨거나, 기기 분실·로그인 불가 등의 사유로 앱 내에서 직접 탈퇴가 어려우신 경우 고객지원 이메일로 삭제를 요청해 주시면 관리자가 본인 확인 후 즉시 안전하게 파기해 드립니다.
+                        서버에 저장된 프로필, 건강 설문 응답, 귀 사진 원본, 상담 예약 기록 등의 완전 삭제를 원하시거나, 앱을 이미 삭제하여 앱 내 탈퇴가 불가능하신 경우 고객지원 이메일로 요청해 주시면 영업일 기준 7일 이내에 안전하게 삭제 처리해 드립니다.
                     </p>
 
                     <div className="bg-amber-50/50 p-5 rounded-2xl border border-amber-200/60 space-y-3">
@@ -167,25 +166,33 @@ export default function DeleteAccountPage() {
 
                     <div className="space-y-4">
                         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-2">
-                            <div className="font-bold text-sm text-stone-800 flex items-center gap-2 text-rose-600">
-                                <CheckCircle2 size={16} /> 1. 즉시 영구 삭제되는 데이터 (회수 불가)
+                            <div className="font-bold text-sm text-stone-800 flex items-center gap-2 text-emerald-700">
+                                <CheckCircle2 size={16} /> 1. 앱 내 탈퇴 시 삭제되는 데이터
                             </div>
                             <ul className="text-xs text-stone-600 space-y-1.5 pl-6 list-disc">
-                                <li><strong>계정 식별 정보:</strong> Firebase Authentication 계정 UID, 로그인 이메일, 인증 휴대폰 번호</li>
-                                <li><strong>프로필 정보:</strong> 성별, 연령대, 출생연도/생년월일(양력/음력)</li>
-                                <li><strong>귀 사진 이미지 데이터:</strong> 사용자가 업로드한 좌우 귀 촬영 사진 원본 및 썸네일 (Cloud Storage에서 영구 삭제)</li>
-                                <li><strong>웰니스 문진 및 분석 내역:</strong> 7단계 데일리 컨디션 설문 답변, 전문가 진단 리포트, 추천 혈자리 지도 데이터 일체</li>
-                                <li><strong>예약 및 신청 이력:</strong> 1:1 상담 예약 신청서, 메모, 온/오프라인 수강 신청 기록</li>
-                                <li><strong>기기 로컬 캐시:</strong> 앱 내 로컬 저장소(LocalStorage, Preferences)에 캐시된 모든 개인 데이터 즉시 파기</li>
+                                <li><strong>로그인 계정 식별 정보:</strong> Firebase Authentication 계정(로그인 세션) 삭제</li>
+                                <li><strong>기기 내 저장 데이터:</strong> 앱 내 로컬 저장소(LocalStorage, Preferences)에 캐시된 모든 개인 데이터 삭제</li>
+                            </ul>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-2">
+                            <div className="font-bold text-sm text-stone-800 flex items-center gap-2 text-rose-600">
+                                <CheckCircle2 size={16} /> 2. 이메일 요청 시 삭제되는 서버 저장 데이터 (영업일 기준 7일 이내 처리)
+                            </div>
+                            <ul className="text-xs text-stone-600 space-y-1.5 pl-6 list-disc">
+                                <li><strong>프로필 정보:</strong> 성별, 연령대, 출생연도/생년월일(양력/음력), 이름, 연락처, SNS 계정 정보</li>
+                                <li><strong>건강 설문 및 분석 내역:</strong> 7단계 데일리 컨디션 설문 답변, 전문가 진단 리포트, 추천 혈자리 지도 데이터 일체</li>
+                                <li><strong>귀 사진 이미지 데이터:</strong> 사용자가 업로드한 좌우 귀 촬영 사진 원본 및 파일(Cloud Storage)</li>
+                                <li><strong>예약 및 신청 기록:</strong> 1:1 상담 예약 신청서, 메모, 온/오프라인 수강 신청 기록</li>
                             </ul>
                         </div>
 
                         <div className="p-4 rounded-2xl bg-stone-50 border border-stone-100 space-y-2">
                             <div className="font-bold text-sm text-stone-800 flex items-center gap-2 text-stone-600">
-                                <Clock size={16} /> 2. 관련 법령에 따른 보관 예외 (해당 시에만 적용)
+                                <Clock size={16} /> 3. 관련 법령에 따른 보관 예외 (해당 시에만 적용)
                             </div>
                             <p className="text-xs text-stone-600 leading-relaxed pl-6">
-                                원칙적으로 탈퇴 시 모든 데이터는 즉시 지체 없이 파기됩니다. 단, 「전자상거래 등에서의 소비자보호에 관한 법률」 등 관계 법령에 따라 거래 내역 보존 의무가 발생하는 경우(예: 오프라인 수강료 결제 및 취소/환불 내역)에는 법정 기간(계약/청약철회 5년, 대금결제/재화공급 5년, 소비자 불만/분쟁처리 3년) 동안 다른 데이터와 분리 보관된 후 해당 기간 경과 시 영구 파기됩니다.
+                                원칙적으로 탈퇴 시 모든 데이터는 지체 없이 파기됩니다. 단, 「전자상거래 등에서의 소비자보호에 관한 법률」 등 관계 법령에 따라 거래 내역 보존 의무가 발생하는 경우(예: 오프라인 수강료 결제 및 취소/환불 내역)에는 법정 기간(계약/청약철회 5년, 대금결제/재화공급 5년, 소비자 불만/분쟁처리 3년) 동안 다른 데이터와 분리 보관된 후 해당 기간 경과 시 영구 파기됩니다.
                             </p>
                         </div>
                     </div>
