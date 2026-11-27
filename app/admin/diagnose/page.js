@@ -33,54 +33,162 @@ const formatGender = (gender) => {
     return gender;
 };
 
-const quizQuestionMap = {
-    '0': '1. 가장 불편한 부위',
-    '1': '2. 불편함/통증 강도',
-    '2': '3. 피로도',
-    '3': '4. 소화 및 속 편안함',
-    '4': '5. 수면 상태',
-    '5': '6. 스트레스 수준',
-    '6': '7. 희망 케어 분야',
-    '7': '7. 희망 케어 분야',
-    discomfort: '가장 불편한 부위',
-    pain: '통증 강도',
-    painLevel: '통증 강도',
-    fatigue: '피로도',
-    digestion: '소화 상태',
-    sleep: '수면의 질',
-    stress: '스트레스 수준',
-    symptom: '주요 증상',
-    lifestyle: '생활 습관'
+const questionSpecificAnswerMap = {
+    1: {
+        head: '머리 (무거움/지끈거림)',
+        neck_shoulder_back: '목/어깨/허리/등 (뻐근함·결림)',
+        digestive: '소화/배변 (더부룩함·답답함)',
+        circulation: '순환 (수족냉증/저림/붓기)',
+        none: '특별히 없음'
+    },
+    2: {
+        '1': '거의 없음 (1단계)',
+        '2': '약간 있음 (2단계)',
+        '3': '보통 (3단계)',
+        '4': '꽤 심함 (4단계)',
+        '5': '매우 심함 (5단계)'
+    },
+    3: {
+        none: '거의 없음',
+        occasional: '가끔 피곤함',
+        afternoon: '오후에 피곤함',
+        frequent: '자주 피곤함',
+        always: '늘 피곤함'
+    },
+    4: {
+        very_good: '매우 편안함',
+        occasional_discomfort: '가끔 불편함',
+        bloating: '속이 더부룩하고 가스가 참',
+        sluggish_bowel: '배변이 답답하고 원활하지 못함',
+        sensitive_bowel: '장이 예민하고 배변이 불규칙함'
+    },
+    5: {
+        deep_sleep: '숙면함',
+        good: '대체로 잘 잠',
+        frequent_waking: '자주 깸',
+        difficulty_falling_asleep: '잠들기 어려움',
+        tired_after_sleep: '자도 피곤함'
+    },
+    6: {
+        very_low: '거의 없음',
+        low: '가끔 받음',
+        normal: '보통 수준',
+        high: '스트레스가 많음',
+        very_high: '매우 심함'
+    },
+    7: {
+        vitality: '피로·활력 충전',
+        sleep_stress: '편안한 수면·스트레스 완화',
+        digestion: '소화·가벼운 속',
+        circulation_relaxation: '원활한 순환·바디 릴렉스',
+        general_wellness: '전반적인 데일리 웰니스'
+    }
 };
 
 const quizAnswerMap = {
-    head: '머리/두통',
+    // Q1
+    head: '머리 (무거움/지끈거림)',
     neck_shoulder: '목/어깨',
     neck: '목',
     shoulder: '어깨',
     back: '허리/등',
-    digestive: '소화기관',
-    none: '특별히 없음',
+    neck_shoulder_back: '목/어깨/허리/등 (뻐근함·결림)',
+    digestive: '소화/배변 (더부룩함·답답함)',
+    circulation: '순환 (수족냉증/저림/붓기)',
+    none: '특별히 없음 / 거의 없음',
+
+    // Q2
     '1': '거의 없음 (1단계)',
     '2': '약간 있음 (2단계)',
     '3': '보통 (3단계)',
     '4': '꽤 심함 (4단계)',
     '5': '매우 심함 (5단계)',
-    very_good: '매우 좋음/활력있음',
-    good: '좋음/괜찮은 편',
-    normal: '보통',
-    bad: '좋지 않음/자주 깸',
-    very_bad: '매우 안 좋음/불면증',
+
+    // Q3
+    occasional: '가끔 피곤함',
+    afternoon: '오후에 피곤함',
+    frequent: '자주 피곤함',
+    always: '늘 피곤함',
     tired: '피곤함',
     very_tired: '매우 피곤함',
+
+    // Q4
+    very_good: '매우 편안함 (매우 좋음)',
+    good: '좋음 / 괜찮은 편',
+    normal: '보통',
+    bad: '좋지 않음 / 자주 깸',
+    very_bad: '매우 안 좋음 / 불면증',
+    occasional_discomfort: '가끔 불편함',
+    bloating: '속이 더부룩하고 가스가 참',
+    sluggish_bowel: '배변이 답답하고 원활하지 못함',
+    sensitive_bowel: '장이 예민하고 배변이 불규칙함',
+
+    // Q5
+    deep_sleep: '숙면함',
+    frequent_waking: '자주 깸',
+    difficulty_falling_asleep: '잠들기 어려움',
+    tired_after_sleep: '자도 피곤함',
+
+    // Q6
     very_low: '거의 없음',
-    low: '약간 있음',
-    high: '높음',
-    very_high: '매우 높음'
+    low: '가끔 받음 (약간 있음)',
+    high: '스트레스가 많음 (높음)',
+    very_high: '매우 심함 (매우 높음)',
+
+    // Q7
+    vitality: '피로·활력 충전',
+    sleep_stress: '편안한 수면·스트레스 완화',
+    digestion: '소화·가벼운 속',
+    circulation_relaxation: '원활한 순환·바디 릴렉스',
+    general_wellness: '전반적인 데일리 웰니스'
 };
 
-const formatQuizKey = (key) => quizQuestionMap[key] || (isNaN(key) ? key : `질문 ${key}`);
-const formatQuizValue = (val) => quizAnswerMap[val] || val;
+const getQuestionIndex = (key, allAnswers = {}) => {
+    const isZeroIndexed = allAnswers && (allAnswers['0'] !== undefined || allAnswers[0] !== undefined);
+    const numKey = parseInt(key, 10);
+    if (!isNaN(numKey)) {
+        if (numKey === 0) return 1;
+        return isZeroIndexed ? numKey + 1 : numKey;
+    }
+    const legacyIndexMap = {
+        discomfort: 1,
+        pain: 2,
+        painLevel: 2,
+        fatigue: 3,
+        digestion: 4,
+        sleep: 5,
+        stress: 6,
+        care: 7
+    };
+    return legacyIndexMap[key] || null;
+};
+
+const formatQuizKey = (key, allAnswers = {}) => {
+    const qIndex = getQuestionIndex(key, allAnswers);
+    const titleMap = {
+        1: '1. 가장 불편한 부위',
+        2: '2. 불편함/통증 강도',
+        3: '3. 피로도',
+        4: '4. 소화 및 속 편안함',
+        5: '5. 수면 상태',
+        6: '6. 스트레스 수준',
+        7: '7. 희망 케어 분야'
+    };
+    if (qIndex && titleMap[qIndex]) {
+        return titleMap[qIndex];
+    }
+    return (isNaN(key) ? key : `질문 ${key}`);
+};
+
+const formatQuizValue = (val, key, allAnswers = {}) => {
+    if (key !== undefined) {
+        const qIndex = getQuestionIndex(key, allAnswers);
+        if (qIndex && questionSpecificAnswerMap[qIndex] && questionSpecificAnswerMap[qIndex][val]) {
+            return questionSpecificAnswerMap[qIndex][val];
+        }
+    }
+    return quizAnswerMap[val] || val;
+};
 
 function DiagnoseContent() {
     const router = useRouter();
@@ -514,8 +622,8 @@ function DiagnoseContent() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
                                     {Object.entries(survey.answers).map(([key, value]) => (
                                         <div key={key} className="flex flex-col gap-1 p-3.5 bg-white rounded-xl border border-slate-200/60 shadow-sm">
-                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">{formatQuizKey(key)}</span>
-                                            <span className="text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">{formatQuizValue(value)}</span>
+                                            <span className="text-slate-400 font-black text-[9px] uppercase tracking-wider">{formatQuizKey(key, survey.answers)}</span>
+                                            <span className="text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">{formatQuizValue(value, key, survey.answers)}</span>
                                         </div>
                                     ))}
                                 </div>
